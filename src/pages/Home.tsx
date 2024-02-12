@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Button from "../components/Button";
 import TextField from "../components/TextField";
 
+import sendIcon from "../assets/send.svg";
+
 function Home() {
   const [time, setTime] = useState(new Date());
 
@@ -52,8 +54,15 @@ function Home() {
             placeholder="Passcode (4-digit)"
             value={passcode}
             onChange={(e) => setPasscode(e.target.value)}
+            style={{ marginTop: "14px" }}
           />
-          <Button type="submit">Send</Button>
+          <Button
+            type="submit"
+            style={{ marginTop: "37px", width: "158px", marginLeft: "auto" }}
+          >
+            <img src={sendIcon} alt="Send" width={24} height={24} />
+            Send
+          </Button>
         </InputContainer>
       </LoginContainer>
     </Container>
@@ -120,20 +129,6 @@ const InputContainer = styled.form`
   flex-direction: column;
   align-items: stretch;
   margin-top: 37px;
-
-  & > input {
-    flex: 1;
-  }
-
-  & > input + input {
-    margin-top: 14px;
-  }
-
-  & > button {
-    margin-top: 37px;
-    width: 158px;
-    margin-left: auto;
-  }
 `;
 
 export default Home;
