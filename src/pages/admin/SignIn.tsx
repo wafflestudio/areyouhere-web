@@ -1,27 +1,77 @@
 import styled from "styled-components";
 import TransferBanner from "../../components/TransferBanner";
 import TextField from "../../components/TextField";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
-import { OptionalActionLabel, OptionalActionLink } from "../../components/OptionalAction";
+import {
+  OptionalActionLabel,
+  OptionalActionLink,
+} from "../../components/OptionalAction";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { postSignIn } from "../../api/user";
+import { useState } from "react";
 
 function SignIn() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // TODO: handle failure cases
+  const { mutate } = useMutation({
+    mutationFn: postSignIn,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      navigate("/admin");
+    },
+  });
+
   return (
     <Container>
       <TransferBanner from="admin" />
       <LoginContainer>
         <DisplayMessage>
-          Simply manage attendance<br/>for your seminars, meetings,<br/>and lectures
+          Simply manage attendance
+          <br />
+          for your seminars, meetings,
+          <br />
+          and lectures
         </DisplayMessage>
-        <InputContainer>
-          <TextField type="text" name="email" autoComplete="username" label="Email address" />
-          <TextField type="password" autoComplete="current-password" label="Password" style={{ marginTop: '1.4rem' }} />
-          <ForgotPasswordLink to="/admin/forgotpassword" style={{ marginTop: '1.4rem' }}>
+        <InputContainer
+          onSubmit={(e) => {
+            e.preventDefault();
+            mutate({ email, password });
+          }}
+        >
+          <TextField
+            type="text"
+            name="email"
+            autoComplete="username"
+            label="Email address"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            type="password"
+            autoComplete="current-password"
+            label="Password"
+            style={{ marginTop: "1.4rem" }}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <ForgotPasswordLink
+            to="/admin/forgotpassword"
+            style={{ marginTop: "1.4rem" }}
+          >
             Forgot Password
           </ForgotPasswordLink>
-          <Button type="submit" style={{ marginTop: '3.0rem' }}>Sign In</Button>
-          <OptionalActionLabel style={{ marginTop: '5.0rem' }}>
-            Don't have an account? <OptionalActionLink to="/admin/signup">Sign up now</OptionalActionLink>
+          <Button type="submit" style={{ marginTop: "3.0rem" }}>
+            Sign In
+          </Button>
+          <OptionalActionLabel style={{ marginTop: "5.0rem" }}>
+            Don't have an account?{" "}
+            <OptionalActionLink to="/admin/signup">
+              Sign up now
+            </OptionalActionLink>
           </OptionalActionLabel>
         </InputContainer>
       </LoginContainer>
@@ -42,7 +92,7 @@ const LoginContainer = styled.div`
   margin-top: 14.7rem;
   margin-left: 14.3rem;
   margin-right: 14.6rem;
-`
+`;
 
 const DisplayMessage = styled.p`
   font-size: 4.8rem;
@@ -50,7 +100,7 @@ const DisplayMessage = styled.p`
   color: #000000;
   font-weight: 800;
   flex: 1;
-  margin-right: 10.0rem;
+  margin-right: 10rem;
   width: 60.7rem;
 `;
 

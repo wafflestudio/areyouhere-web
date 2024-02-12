@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Result from "./pages/Result";
 import SignIn from "./pages/admin/SignIn";
 import SignUp from "./pages/admin/SignUp";
+import AuthRequiredRoute from "./components/AuthRequiredRoute";
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
       { path: "/result", element: <Result /> },
       { path: "/admin/signin", element: <SignIn /> },
       { path: "/admin/signup", element: <SignUp /> },
+      { path: "/admin", element: <AuthRequiredRoute />, children: [
+        // TODO: add admin pages
+        { path: "/admin", element: <div>Admin</div> }
+      ] }
     ],
   },
 ]);
