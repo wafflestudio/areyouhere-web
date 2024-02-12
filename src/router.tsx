@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import App from "./App";
-import AuthRequiredRoute from "./components/AuthRequiredRoute";
+import AuthRequiredRoute from "./components/admin/AuthRequiredRoute.tsx";
 import SignIn from "./pages/admin/SignIn";
 import SignUp from "./pages/admin/SignUp";
 import ClassList from "./pages/class/ClassList.tsx";
