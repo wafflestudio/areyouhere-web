@@ -4,13 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { postSignIn } from "../../api/user";
-import Button from "../../components/Button";
 import {
   OptionalActionLabel,
   OptionalActionLink,
-} from "../../components/OptionalAction";
+} from "../../components/admin/OptionalAction";
+import TransferBanner from "../../components/admin/TransferBanner";
+import Button from "../../components/Button";
 import TextField from "../../components/TextField";
-import TransferBanner from "../../components/TransferBanner";
 
 function SignIn() {
   const navigate = useNavigate();
