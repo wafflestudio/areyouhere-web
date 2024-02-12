@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Navigate, Outlet } from "react-router-dom";
+
 import { User, getUser } from "../api/user";
 
 function AuthRequiredRoute() {

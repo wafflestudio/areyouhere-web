@@ -1,10 +1,15 @@
 import styled from "styled-components";
+
 import { SmallButton } from "../components/Button";
 
 function Result() {
   return (
     <Container>
-      <Title>Thank you for the register!<br />We checked your attendance</Title>
+      <Title>
+        Thank you for the register!
+        <br />
+        We checked your attendance
+      </Title>
       <InfoCard>
         <InfoLabel>Name</InfoLabel>
         <InfoLabel>Class / Session</InfoLabel>
@@ -54,7 +59,7 @@ const InfoLabel = styled.p`
   color: #4f4f4f;
   font-weight: 400;
   width: 100%;
-`
+`;
 
 const ConfirmButton = styled(SmallButton)`
   margin-top: 4.5rem;

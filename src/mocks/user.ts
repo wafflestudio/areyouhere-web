@@ -28,9 +28,12 @@ mock.onGet("/api/user/logout").reply((_) => {
 
 mock.onGet("/api/user").reply((_) => {
   if (logined) {
-    return [HttpStatusCode.Ok, {
-      name: "test user"
-    }];
+    return [
+      HttpStatusCode.Ok,
+      {
+        name: "test user",
+      },
+    ];
   } else {
     return [HttpStatusCode.Unauthorized];
   }

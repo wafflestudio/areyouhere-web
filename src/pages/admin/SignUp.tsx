@@ -1,20 +1,21 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import TransferBanner from "../../components/TransferBanner";
-import TextField from "../../components/TextField";
-import Button from "../../components/Button";
+
+import { postSignUp } from "../../api/user";
 import {
   OptionalActionLabel,
   OptionalActionLink,
-} from "../../components/OptionalAction";
-import { postSignUp } from "../../api/user";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+} from "../../components/admin/OptionalAction.tsx";
+import TransferBanner from "../../components/admin/TransferBanner.tsx";
+import Button from "../../components/Button";
+import TextField from "../../components/TextField.tsx";
 
 function SignUp() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
