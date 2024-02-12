@@ -15,12 +15,12 @@ function SignIn() {
         </DisplayMessage>
         <InputContainer>
           <TextField type="text" name="email" autoComplete="username" label="Email address" />
-          <TextField type="password" autoComplete="current-password" label="Password" style={{ marginTop: '14px' }} />
-          <ForgotPasswordLink to="/admin/forgotpassword" style={{ marginTop: '14px' }}>
+          <TextField type="password" autoComplete="current-password" label="Password" style={{ marginTop: '1.4rem' }} />
+          <ForgotPasswordLink to="/admin/forgotpassword" style={{ marginTop: '1.4rem' }}>
             Forgot Password
           </ForgotPasswordLink>
-          <Button type="submit" style={{ marginTop: '30px' }}>Sign In</Button>
-          <OptionalActionLabel style={{ marginTop: '50px' }}>
+          <Button type="submit" style={{ marginTop: '3.0rem' }}>Sign In</Button>
+          <OptionalActionLabel style={{ marginTop: '5.0rem' }}>
             Don't have an account? <OptionalActionLink to="/admin/signup">Sign up now</OptionalActionLink>
           </OptionalActionLabel>
         </InputContainer>
@@ -39,30 +39,30 @@ const LoginContainer = styled.div`
   display: flex;
   flex-direction: row;
 
-  margin-top: 147px;
-  margin-left: 143px;
-  margin-right: 146px;
+  margin-top: 14.7rem;
+  margin-left: 14.3rem;
+  margin-right: 14.6rem;
 `
 
 const DisplayMessage = styled.p`
-  font-size: 48px;
-  line-height: 58px;
+  font-size: 4.8rem;
+  line-height: 5.8rem;
   color: #000000;
   font-weight: 800;
   flex: 1;
-  margin-right: 100px;
-  width: 607px;
+  margin-right: 10.0rem;
+  width: 60.7rem;
 `;
 
 const InputContainer = styled.form`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 444px;
+  width: 44.4rem;
 `;
 
 const ForgotPasswordLink = styled(Link)`
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #4f4f4f;
   text-decoration: none;
   font-weight: 400;

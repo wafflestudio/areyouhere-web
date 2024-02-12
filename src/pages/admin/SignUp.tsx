@@ -24,8 +24,8 @@ function SignUp() {
             label="Repeat password"
           />
         </InputContainer>
-        <Button style={{ marginTop: '30px' }}>Sign up</Button>
-        <OptionalActionLabel style={{ marginTop: '50px' }}>
+        <Button style={{ marginTop: '3.0rem' }}>Sign up</Button>
+        <OptionalActionLabel style={{ marginTop: '5.0rem' }}>
           Already a member? <OptionalActionLink to="/admin/signin">Sign in</OptionalActionLink>
         </OptionalActionLabel>
       </CenterContainer>
@@ -40,17 +40,17 @@ const Container = styled.div`
 `;
 
 const Title = styled.p`
-  font-size: 32px;
+  font-size: 3.2rem;
   font-weight: 800;
-  line-height: 38px;
+  line-height: 3.8rem;
 
-  margin-top: 111px;
-  margin-bottom: 66px;
+  margin-top: 11.1rem;
+  margin-bottom: 6.6rem;
   text-align: center;
 `;
 
 const CenterContainer = styled.div`
-  max-width: 444px;
+  max-width: 44.4rem;
   width: 100%;
 
   display: flex;
@@ -62,7 +62,7 @@ const InputContainer = styled.form`
 
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 1.4rem;
 `;
 
 export default SignUp;

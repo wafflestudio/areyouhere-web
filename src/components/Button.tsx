@@ -3,11 +3,11 @@ import styled from "styled-components";
 const Button = styled.button`
   background-color: ${({ theme }) => theme.colors.primaryBlue};
   color: #ffffff;
-  font-size: 18px;
-  line-height: 22px;
+  font-size: 1.8rem;
+  line-height: 2.2rem;
   font-weight: bold;
-  padding: 12px;
-  border-radius: 10px;
+  padding: 1.2rem;
+  border-radius: 1.0rem;
   border: none;
   cursor: pointer;
 
@@ -15,17 +15,17 @@ const Button = styled.button`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 0.5rem;
 `;
 
 const SmallButton = styled.button`
   background-color: ${({ theme }) => theme.colors.primaryBlue};
   color: #ffffff;
-  font-size: 11px;
-  line-height: 14px;
+  font-size: 1.1rem;
+  line-height: 1.4rem;
   font-weight: 600;
-  padding: 11px;
-  border-radius: 10px;
+  padding: 1.1rem;
+  border-radius: 1.0rem;
   border: none;
   cursor: pointer;
   
@@ -33,7 +33,7 @@ const SmallButton = styled.button`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 0.5rem;
 `;
 
 export default Button;

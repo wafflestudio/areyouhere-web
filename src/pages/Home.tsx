@@ -54,11 +54,11 @@ function Home() {
             placeholder="Passcode (4-digit)"
             value={passcode}
             onChange={(e) => setPasscode(e.target.value)}
-            style={{ marginTop: "14px" }}
+            style={{ marginTop: "1.4rem" }}
           />
           <Button
             type="submit"
-            style={{ marginTop: "37px", width: "158px", marginLeft: "auto" }}
+            style={{ marginTop: "3.7rem", width: "15.8rem", marginLeft: "auto" }}
           >
             <img src={sendIcon} alt="Send" width={24} height={24} />
             Send
@@ -76,10 +76,10 @@ const Container = styled.div`
 `;
 
 const TimeDisplay = styled.p`
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #000000;
-  margin-top: 98px;
-  margin-bottom: 48px;
+  margin-top: 9.8rem;
+  margin-bottom: 4.8rem;
   font-weight: 500;
   text-align: center;
 `;
@@ -92,20 +92,20 @@ const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 444px;
+  width: 44.4rem;
 `;
 
 const BannerContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 241px;
+  width: 24.1rem;
 `;
 
 const BannerLabel = styled.p`
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #646464;
-  margin-left: 12px;
+  margin-left: 1.2rem;
   font-weight: 500;
 `;
 
@@ -113,22 +113,22 @@ const BannerChatBubble = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 31px 15px 28px;
-  margin-top: 8px;
+  padding: 1.2rem 3.1rem 1.5rem 2.8rem;
+  margin-top: 0.8rem;
   background-color: ${({ theme }) => theme.colors.lightGrey};
 
-  font-size: 30px;
+  font-size: 3.0rem;
   font-weight: 400;
   color: #000000;
-  line-height: 36px;
-  border-radius: 0px 20px 20px 20px;
+  line-height: 3.6rem;
+  border-radius: 0rem 2.0rem 2.0rem 2.0rem;
 `;
 
 const InputContainer = styled.form`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  margin-top: 37px;
+  margin-top: 3.7rem;
 `;
 
 export default Home;

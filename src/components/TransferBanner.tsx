@@ -24,11 +24,11 @@ const BannerLink = styled(Link)<{ from: "admin" | "attendees" }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 19px;
+  padding: 1.9rem;
   background-color: ${(props) =>
     props.from === "admin" ? "#000000" : "#6b6b6b"};
   color: white;
-  font-size: 18px;
+  font-size: 1.8rem;
   font-weight: bold;
   text-decoration: none;
 `;

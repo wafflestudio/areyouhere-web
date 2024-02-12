@@ -1,10 +1,10 @@
 import styled from "styled-components";
 
 const StyledInput = styled.input`
-  padding: 16px 26px;
-  font-size: 16px;
+  padding: 1.6rem 2.6rem;
+  font-size: 1.6rem;
   border: 1px solid #e3e3e3;
-  border-radius: 10px;
+  border-radius: 1rem;
 
   :focus {
     outline: none;
@@ -37,10 +37,10 @@ const TextFieldContainer = styled.div`
 `;
 
 const TextFieldLabel = styled.label`
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: 400;
   color: #4f4f4f;
-  margin-bottom: 10px;
+  margin-bottom: 1.0rem;
 `;
 
 export default TextField;

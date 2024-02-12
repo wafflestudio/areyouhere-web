@@ -4,14 +4,14 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const OptionalActionLabel = styled.p`
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #4f4f4f;
   font-weight: 400;
   text-align: center;
 `;
 
 const OptionalActionLink = styled(Link)`
-  font-size: 16px;
+  font-size: 1.6rem;
   color: ${({ theme }) => theme.colors.primaryBlue};
   text-decoration: none;
   font-weight: bold;

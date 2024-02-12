@@ -25,40 +25,40 @@ const Container = styled.div`
 `;
 
 const Title = styled.p`
-  margin-top: 188px;
-  margin-bottom: 40px;
-  font-size: 36px;
-  line-height: 43px;
+  margin-top: 18.8rem;
+  margin-bottom: 4.0rem;
+  font-size: 3.6rem;
+  line-height: 4.3rem;
   font-weight: bold;
   text-align: center;
 `;
 
 const InfoCard = styled.div`
   background-color: white;
-  border-radius: 20px;
+  border-radius: 2.0rem;
   border: 1px solid #e6e6e6;
-  width: 448px;
+  width: 44.8rem;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px 40px;
+  padding: 3.2rem 4.0rem;
 
   & > p + p {
-    margin-top: 28px;
+    margin-top: 2.8rem;
   }
 `;
 
 const InfoLabel = styled.p`
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #4f4f4f;
   font-weight: 400;
   width: 100%;
 `
 
 const ConfirmButton = styled(SmallButton)`
-  margin-top: 45px;
-  width: 190px;
+  margin-top: 4.5rem;
+  width: 19.0rem;
 `;
 
 export default Result;
