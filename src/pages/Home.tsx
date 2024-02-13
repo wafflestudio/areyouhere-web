@@ -1,10 +1,10 @@
-import styled from "styled-components";
-import TransferBanner from "../components/TransferBanner";
 import { useEffect, useState } from "react";
-import Button from "../components/Button";
-import TextField from "../components/TextField";
+import styled from "styled-components";
 
 import sendIcon from "../assets/send.svg";
+import TransferBanner from "../components/admin/TransferBanner.tsx";
+import Button from "../components/Button";
+import TextField from "../components/TextField";
 
 function Home() {
   const [time, setTime] = useState(new Date());

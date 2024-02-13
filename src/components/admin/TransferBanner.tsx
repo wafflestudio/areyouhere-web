@@ -11,9 +11,13 @@ function TransferBanner(props: TransferBannerProps) {
   return (
     <>
       {props.from === "admin" ? (
-        <BannerLink from={props.from} to="/">If you are Attendees</BannerLink>
+        <BannerLink from={props.from} to="/">
+          If you are Attendees
+        </BannerLink>
       ) : (
-        <BannerLink from={props.from} to="/admin">If you are Admin</BannerLink>
+        <BannerLink from={props.from} to="/admin">
+          If you are Admin
+        </BannerLink>
       )}
     </>
   );

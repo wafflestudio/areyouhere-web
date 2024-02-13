@@ -1,9 +1,11 @@
 import styled from "styled-components";
 
+import Theme from "../styles/Theme.tsx";
+
 const StyledInput = styled.input`
   padding: 1.6rem 2.6rem;
   font-size: 1.6rem;
-  border: 1px solid #e3e3e3;
+  border: 0.1rem solid #e3e3e3;
   border-radius: 1rem;
 
   :focus {
@@ -11,7 +13,7 @@ const StyledInput = styled.input`
   }
 
   ::placeholder {
-    color: #4f4f4f;
+    color: ${Theme.colors.lightGrey};
   }
 `;
 
@@ -22,9 +24,7 @@ interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 function TextField({ label, style, ...props }: TextFieldProps) {
   return (
     <TextFieldContainer style={style}>
-      {
-        label && <TextFieldLabel>{label}</TextFieldLabel>
-      }
+      {label && <TextFieldLabel>{label}</TextFieldLabel>}
       <StyledInput {...props} />
     </TextFieldContainer>
   );
@@ -40,7 +40,11 @@ const TextFieldLabel = styled.label`
   font-size: 1.6rem;
   font-weight: 400;
   color: #4f4f4f;
+<<<<<<< HEAD
   margin-bottom: 1.0rem;
+=======
+  margin-bottom: 1rem;
+>>>>>>> 4c79253 (feat: add class page)
 `;
 
 export default TextField;
