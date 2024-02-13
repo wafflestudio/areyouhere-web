@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import addClass from "../../assets/addClass.svg";
+import addClass from "../../assets/class/addClass.svg";
 import Button from "../../components/Button.tsx";
 import ClassItem from "../../components/class/ClassItem.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
