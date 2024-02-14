@@ -40,11 +40,7 @@ const TextFieldLabel = styled.label`
   font-size: 1.6rem;
   font-weight: 400;
   color: #4f4f4f;
-<<<<<<< HEAD
-  margin-bottom: 1.0rem;
-=======
   margin-bottom: 1rem;
->>>>>>> 4c79253 (feat: add class page)
 `;
 
 export default TextField;

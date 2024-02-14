@@ -15,7 +15,8 @@ const queryClient = new QueryClient({
       retry(failureCount, error) {
         if (
           isAxiosError(error) &&
-          HTTP_STATUS_TO_NOT_RETRY.includes(error.response?.status!)
+          error.response &&
+          HTTP_STATUS_TO_NOT_RETRY.includes(error.response?.status)
         ) {
           return false;
         } else {
