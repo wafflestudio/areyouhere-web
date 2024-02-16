@@ -24,24 +24,20 @@ const router = createBrowserRouter([
       { path: "/admin/signin", element: <SignIn /> },
       { path: "/admin/signup", element: <SignUp /> },
       {
-        path: "/admin",
+        path: "/",
         element: <AuthRequiredRoute />,
         children: [
-          // TODO: add admin pages
-          { path: "/admin", element: <div>Admin</div> },
+          // 클래스 관련
+          { path: "/class", element: <ClassList /> },
+          { path: "/class/create", element: <CreateClass /> },
+          // 클래스 선택 후
+          { path: "/:classId", element: <Dashboard /> },
+          { path: "/:classId/sessions", element: <Sessions /> },
+          { path: "/:classId/attendees", element: <Attendees /> },
+          { path: "/:classId/statistics", element: <Statistics /> },
+          { path: "/:classId/settings", element: <Settings /> },
         ],
       },
-
-      // 클래스 관련
-      { path: "/class", element: <ClassList /> },
-      { path: "/class/create", element: <CreateClass /> },
-
-      // 클래스 선택 후
-      { path: "/:classId", element: <Dashboard /> },
-      { path: "/:classId/sessions", element: <Sessions /> },
-      { path: "/:classId/attendees", element: <Attendees /> },
-      { path: "/:classId/statistics", element: <Statistics /> },
-      { path: "/:classId/settings", element: <Settings /> },
     ],
   },
 ]);
