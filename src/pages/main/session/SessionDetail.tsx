@@ -1,15 +1,72 @@
+import { useState } from "react";
 import styled from "styled-components";
 
-import TitleBar from "../../../components/TitleBar.tsx";
+import AttendanceChip from "../../../components/sessions/AttendanceChip";
+import SessionControl from "../../../components/sessions/SessionControl";
+import SessionInfoBar from "../../../components/sessions/SessionInfoBar";
+import {
+  SessionTable,
+  SessionTableHead,
+  SessionTableHeadItem,
+  SessionTableBody,
+  SessionTableItem,
+} from "../../../components/sessions/SessionTable";
+import TitleBar from "../../../components/TitleBar";
 
 function SessionDetail() {
+  const [filter, setFilter] = useState<"all" | "absentees">("all");
+  const [isEditing, setIsEditing] = useState(false);
+
   return (
     <Container>
-      <TitleBar label="Sessions" />
-      <SessionInfoBar>
-        <span>Session Name: </span>
-        <span>Date 2024.01.01 </span>
-      </SessionInfoBar>
+      <TitleBar label="Session Details" />
+      <Divider />
+      <ContentContainer>
+        <SessionInfoBar
+          date={new Date()}
+          sessionName="Waruru Hackerton"
+          attendance={5}
+          absence={0}
+        />
+        <SessionControl
+          onActionButtonClick={() => {
+            if (!isEditing) {
+              // TODO: copy current attendance status
+            } else {
+              // TODO: send changed attendance status
+            }
+            setIsEditing(!isEditing);
+          }}
+          onFilterChange={(filter) => setFilter(filter)}
+          isEditing={isEditing}
+          filter={filter}
+        />
+        <SessionTable>
+          <SessionTableHead>
+            <tr>
+              <SessionTableHeadItem style={{ width: "24rem" }}>
+                Name
+              </SessionTableHeadItem>
+              <SessionTableHeadItem>Attendance Status</SessionTableHeadItem>
+              <SessionTableHeadItem>Time of Attendance</SessionTableHeadItem>
+            </tr>
+          </SessionTableHead>
+          <SessionTableBody>
+            <tr>
+              <SessionTableItem style={{ width: "24rem" }}>
+                홍길동
+              </SessionTableItem>
+              <SessionTableItem>
+                <AttendanceChipContainer>
+                  {isEditing && <AttendanceChip type="attendance" />}
+                  <AttendanceChip type="absence" active />
+                </AttendanceChipContainer>
+              </SessionTableItem>
+              <SessionTableItem>12:00</SessionTableItem>
+            </tr>
+          </SessionTableBody>
+        </SessionTable>
+      </ContentContainer>
     </Container>
   );
 }
@@ -21,12 +78,25 @@ const Container = styled.div`
   justify-content: center;
 `;
 
-const SessionInfoBar = styled.div`
-  width: 100%;
+const Divider = styled.div`
+  width: calc(100% - 7rem);
+  border-top: ${({ theme }) => theme.colors.grey} 1px solid;
+  margin: 2.1rem 2.9rem 3.3rem 4.1rem;
+`;
+
+const ContentContainer = styled.div`
+  width: 118.1rem;
   display: flex;
-  ${({ theme }) => theme.typography.h5};
-  padding: 0 6.3rem;
-  justify-content: space-between;
+  flex-direction: column;
+  margin-left: 6.2rem;
+  margin-right: auto;
+`;
+
+const AttendanceChipContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
 `;
 
 export default SessionDetail;

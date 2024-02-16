@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 import styled from "styled-components";
 
+import { ModalProps } from "../type";
+
 const ModalContainer = styled.div`
   display: flex;
   align-items: center;
@@ -13,24 +15,12 @@ const ModalContainer = styled.div`
   top: 0;
   bottom: 0;
 
-  // 모달 버튼 글꼴
-  & p {
-    font-size: 1.2rem;
-    margin: 0;
-  }
-
   // 모달 컴포넌트 css
   & > :not(.modal--background) {
     animation: modal-content 0.3s;
-    max-width: 430px;
-    width: 100%;
 
     // 모달 화면 중앙 위치
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     margin: auto;
 
     display: flex;
@@ -41,6 +31,10 @@ const ModalContainer = styled.div`
     border-radius: 1rem;
 
     box-sizing: border-box;
+  }
+
+  &.closing {
+    pointer-events: none;
   }
 
   &.closing :not(.modal--background) {
@@ -89,21 +83,22 @@ const ModalContainer = styled.div`
   }
 `;
 
-type Props = {
-  children: ReactNode;
-  onBackgroundClick: () => void;
-  isClosing: boolean;
-};
-
 export default function Modal({
   children,
   onBackgroundClick,
-  isClosing,
-}: Props) {
+  state,
+}: ModalProps) {
   return (
-    <ModalContainer className={isClosing ? " closing" : ""}>
-      <div className="modal--background" onClick={() => onBackgroundClick()} />
-      {children}
-    </ModalContainer>
+    <>
+      {state !== "closed" && (
+        <ModalContainer className={state != "open" ? " closing" : ""}>
+          <div
+            className="modal--background"
+            onClick={() => onBackgroundClick()}
+          />
+          {children}
+        </ModalContainer>
+      )}
+    </>
   );
 }

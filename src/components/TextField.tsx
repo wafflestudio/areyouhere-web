@@ -35,9 +35,8 @@ const TextFieldContainer = styled.div`
 `;
 
 const TextFieldLabel = styled.label`
-  font-size: 1.6rem;
-  font-weight: 400;
-  color: #4f4f4f;
+  ${({ theme }) => theme.typography.b3};
+  font-weight: 600;
   margin-bottom: 1rem;
 `;
 
