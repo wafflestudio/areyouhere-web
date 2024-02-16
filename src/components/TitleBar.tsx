@@ -24,13 +24,11 @@ const Container = styled.div`
 
   align-self: flex-start;
 
-  width: calc(100% - 12rem);
-  margin: 6rem;
+  width: 100%;
+  padding: 5.6rem 0 0 6.3rem;
 
   & h2 {
-    font-size: 3.6rem;
-    line-height: 4.8rem;
-    font-weight: 500;
+    ${({ theme }) => theme.typography.h2};
   }
 `;
 

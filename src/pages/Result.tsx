@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { SmallButton } from "../components/Button";
+import { PrimaryButton } from "../components/Button";
 
 function Result() {
+  const navigate = useNavigate();
   return (
     <Container>
       <Title>
@@ -14,7 +16,14 @@ function Result() {
         <InfoLabel>Name</InfoLabel>
         <InfoLabel>Class / Session</InfoLabel>
         <InfoLabel>Sent Time</InfoLabel>
-        <ConfirmButton>Confirm</ConfirmButton>
+        <PrimaryButton
+          style={{ width: "13rem", marginTop: "4rem" }}
+          onClick={() => {
+            navigate("/");
+          }}
+        >
+          Confirm
+        </PrimaryButton>
       </InfoCard>
     </Container>
   );
@@ -31,23 +40,21 @@ const Container = styled.div`
 
 const Title = styled.p`
   margin-top: 18.8rem;
-  margin-bottom: 4.0rem;
-  font-size: 3.6rem;
-  line-height: 4.3rem;
-  font-weight: bold;
+  margin-bottom: 4rem;
+  ${({ theme }) => theme.typography.h2};
   text-align: center;
 `;
 
 const InfoCard = styled.div`
   background-color: white;
-  border-radius: 2.0rem;
+  border-radius: 2rem;
   border: 1px solid #e6e6e6;
   width: 44.8rem;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 3.2rem 4.0rem;
+  padding: 3.2rem 4rem;
 
   & > p + p {
     margin-top: 2.8rem;
@@ -59,11 +66,6 @@ const InfoLabel = styled.p`
   color: #4f4f4f;
   font-weight: 400;
   width: 100%;
-`;
-
-const ConfirmButton = styled(SmallButton)`
-  margin-top: 4.5rem;
-  width: 19.0rem;
 `;
 
 export default Result;

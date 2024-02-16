@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import sendIcon from "../assets/send.svg";
 import TransferBanner from "../components/admin/TransferBanner.tsx";
-import Button from "../components/Button";
+import Alert from "../components/Alert.tsx";
+import { PrimaryButton } from "../components/Button.tsx";
 import TextField from "../components/TextField";
 
 function Home() {
+  const navigate = useNavigate();
+
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -18,6 +22,8 @@ function Home() {
 
   const [name, setName] = useState("");
   const [passcode, setPasscode] = useState("");
+
+  const [hasError, setHasError] = useState(false);
 
   return (
     <Container>
@@ -38,8 +44,12 @@ function Home() {
         <InputContainer
           onSubmit={(e) => {
             e.preventDefault();
-            console.log(name, passcode);
             // TODO: Send name and passcode to server
+            if (passcode === "1234") {
+              navigate("/result");
+            } else {
+              setHasError(true);
+            }
           }}
         >
           <TextField
@@ -51,18 +61,29 @@ function Home() {
           />
           <TextField
             type="text"
-            placeholder="Passcode (4-digit)"
+            placeholder="Passcode"
             value={passcode}
             onChange={(e) => setPasscode(e.target.value)}
-            style={{ marginTop: "1.4rem" }}
+            style={{ marginTop: "1.1rem" }}
           />
-          <Button
+          {hasError && (
+            <Alert type="warning" style={{ marginTop: "2rem" }}>
+              Could not find a session corresponding to your name and passcode.
+              Please check your credentials or contact the administrator for
+              help.
+            </Alert>
+          )}
+          <PrimaryButton
             type="submit"
-            style={{ marginTop: "3.7rem", width: "15.8rem", marginLeft: "auto" }}
+            style={{
+              marginTop: "4.4rem",
+              width: "11.5rem",
+              marginLeft: "auto",
+            }}
           >
-            <img src={sendIcon} alt="Send" width={24} height={24} />
+            <img src={sendIcon} alt="Send" width={20} height={20} />
             Send
-          </Button>
+          </PrimaryButton>
         </InputContainer>
       </LoginContainer>
     </Container>
@@ -92,7 +113,7 @@ const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 44.4rem;
+  width: 41rem;
 `;
 
 const BannerContainer = styled.div`
@@ -117,18 +138,18 @@ const BannerChatBubble = styled.div`
   margin-top: 0.8rem;
   background-color: ${({ theme }) => theme.colors.lightGrey};
 
-  font-size: 3.0rem;
+  font-size: 3rem;
   font-weight: 400;
   color: #000000;
   line-height: 3.6rem;
-  border-radius: 0rem 2.0rem 2.0rem 2.0rem;
+  border-radius: 0rem 2rem 2rem 2rem;
 `;
 
 const InputContainer = styled.form`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  margin-top: 3.7rem;
+  margin-top: 2.9rem;
 `;
 
 export default Home;
