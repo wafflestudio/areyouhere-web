@@ -77,20 +77,20 @@ function SideBar() {
     const currentPath = location.split("?")[0].split("#")[0];
 
     if (currentPath === "/class" && item.path === "/class") {
-      return item.defaultIcon;
+      return false;
     }
 
     if (currentPath === item.path) {
-      return item.onClickIcon;
+      return true;
     } else if (currentPath.startsWith(item.path) && item.path !== "/class") {
-      return item.defaultIcon;
+      return false;
     } else if (item.path === "/class") {
       if (currentPath.startsWith("/class/") && currentPath !== "/class") {
-        return item.defaultIcon;
+        return false;
       }
     }
 
-    return item.defaultIcon;
+    return false;
   };
 
   return (
@@ -99,16 +99,24 @@ function SideBar() {
         <img src={logo} alt="logo" />
       </IconContainer>
       {location !== "/class" &&
-        menuItems.map((item, index) => (
-          <IconContainer key={index} onClick={() => navigate(item.path)}>
-            <img
-              src={determineIcon(item)}
-              alt={`${item.path}-icon`}
-              onMouseOver={(e) => (e.currentTarget.src = item.hoverIcon)}
-              onMouseOut={(e) => (e.currentTarget.src = determineIcon(item))}
-            />
-          </IconContainer>
-        ))}
+        menuItems.map((item, index) => {
+          const urlMatches = determineIcon(item);
+          return (
+            <IconContainer key={index} onClick={() => navigate(item.path)}>
+              <img
+                src={urlMatches ? item.onClickIcon : item.defaultIcon}
+                alt={`${item.path}-icon`}
+                onMouseOver={(e) => {
+                  if (!urlMatches) e.currentTarget.src = item.hoverIcon;
+                }}
+                onMouseOut={(e) => {
+                  if (!urlMatches) e.currentTarget.src = item.defaultIcon;
+                  else e.currentTarget.src = item.onClickIcon;
+                }}
+              />
+            </IconContainer>
+          );
+        })}
     </Container>
   );
 }
