@@ -17,13 +17,14 @@ const StyledInput = styled.input`
 
 interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  textFieldStyle?: React.CSSProperties;
 }
 
-function TextField({ label, style, ...props }: TextFieldProps) {
+function TextField({ label, style, textFieldStyle, ...props }: TextFieldProps) {
   return (
     <TextFieldContainer style={style}>
       {label && <TextFieldLabel>{label}</TextFieldLabel>}
-      <StyledInput {...props} />
+      <StyledInput {...props} style={textFieldStyle} />
     </TextFieldContainer>
   );
 }

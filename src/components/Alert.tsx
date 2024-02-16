@@ -5,9 +5,11 @@ import circleXRed from "../assets/alert/circleXRed.svg";
 
 interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
   type: "error" | "warning";
+  size?: "normal" | "small";
 }
 
-function Alert({ type, children, ...props }: AlertProps) {
+function Alert({ type, children, size, ...props }: AlertProps) {
+  size = size || "normal";
   return (
     <AlertContainer {...props}>
       {type === "error" ? (
@@ -15,7 +17,7 @@ function Alert({ type, children, ...props }: AlertProps) {
       ) : (
         <img width={24} height={24} src={alertTriangleRed} alt="Warning" />
       )}
-      <AlertText>{children}</AlertText>
+      <AlertText size={size}>{children}</AlertText>
     </AlertContainer>
   );
 }
@@ -30,9 +32,10 @@ const AlertContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.red["50"]};
 `;
 
-const AlertText = styled.p`
+const AlertText = styled.p<{ size: "normal" | "small" }>`
   margin-left: 1.3rem;
-  ${({ theme }) => theme.typography.b1};
+  ${({ theme, size }) =>
+    size === "normal" ? theme.typography.b1 : theme.typography.b4};
   color: ${({ theme }) => theme.colors.red["500"]};
 `;
 

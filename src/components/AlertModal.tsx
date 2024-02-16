@@ -7,7 +7,7 @@ import { ModalStateType } from "../type";
 import { GreyButton, PrimaryButton } from "./Button";
 import Modal from "./Modal";
 
-interface AlertModalProps extends React.HTMLAttributes<HTMLDivElement> {
+interface AlertModalProps {
   state: ModalStateType;
   type: "info" | "delete";
   title: string;
@@ -23,7 +23,6 @@ function AlertModal({
   content,
   onCancel,
   onConfirm,
-  ...props
 }: AlertModalProps) {
   const colorScheme = type === "info" ? "primary" : "red";
   return (
