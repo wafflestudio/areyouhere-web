@@ -134,8 +134,15 @@ const SessionMenuButton = styled.button`
   color: ${({ theme }) => theme.colors.red["500"]};
   ${({ theme }) => theme.typography.button1};
   border: none;
+  border-radius: 0.8rem;
   background: none;
   cursor: pointer;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.red["50"]};
+  }
+
+  transition: background-color 0.2s;
 `;
 
 export default SessionItem;
