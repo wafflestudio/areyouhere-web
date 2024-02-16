@@ -1,16 +1,17 @@
 import styled from "styled-components";
 
+import { ModalStateType } from "../../type.ts";
 import Modal from "../Modal.tsx";
 
 function NamesakeModal({
   close,
-  isClosing,
+  state,
 }: {
   close: () => void;
-  isClosing: boolean;
+  state: ModalStateType;
 }) {
   return (
-    <Modal onBackgroundClick={close} isClosing={isClosing}>
+    <Modal onBackgroundClick={close} state={state}>
       <Container>Namesake Alert</Container>
     </Modal>
   );

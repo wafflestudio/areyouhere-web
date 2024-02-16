@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 import styled from "styled-components";
 
+import { ModalProps } from "../type";
+
 const ModalContainer = styled.div`
   display: flex;
   align-items: center;
@@ -12,12 +14,6 @@ const ModalContainer = styled.div`
   right: 0;
   top: 0;
   bottom: 0;
-
-  // 모달 버튼 글꼴
-  & p {
-    font-size: 1.2rem;
-    margin: 0;
-  }
 
   // 모달 컴포넌트 css
   & > :not(.modal--background) {
@@ -87,21 +83,22 @@ const ModalContainer = styled.div`
   }
 `;
 
-type Props = {
-  children: ReactNode;
-  onBackgroundClick: () => void;
-  isClosing: boolean;
-};
-
 export default function Modal({
   children,
   onBackgroundClick,
-  isClosing,
-}: Props) {
+  state,
+}: ModalProps) {
   return (
-    <ModalContainer className={isClosing ? " closing" : ""}>
-      <div className="modal--background" onClick={() => onBackgroundClick()} />
-      {children}
-    </ModalContainer>
+    <>
+      {state !== "closed" && (
+        <ModalContainer className={state != "open" ? " closing" : ""}>
+          <div
+            className="modal--background"
+            onClick={() => onBackgroundClick()}
+          />
+          {children}
+        </ModalContainer>
+      )}
+    </>
   );
 }

@@ -2,12 +2,13 @@ import styled from "styled-components";
 
 import alertCircleBlue from "../assets/class/alertCircleBlue.svg";
 import trashRed from "../assets/class/trashRed.svg";
+import { ModalStateType } from "../type";
 
 import { GreyButton, PrimaryButton } from "./Button";
 import Modal from "./Modal";
 
 interface AlertModalProps extends React.HTMLAttributes<HTMLDivElement> {
-  isOpened: boolean;
+  state: ModalStateType;
   type: "info" | "delete";
   title: string;
   content: React.ReactNode;
@@ -16,7 +17,7 @@ interface AlertModalProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 function AlertModal({
-  isOpened,
+  state,
   type,
   title,
   content,
@@ -26,7 +27,7 @@ function AlertModal({
 }: AlertModalProps) {
   const colorScheme = type === "info" ? "primary" : "red";
   return (
-    <Modal onBackgroundClick={onCancel} isClosing={!isOpened}>
+    <Modal onBackgroundClick={onCancel} state={state}>
       <Container>
         <img
           width={40}
