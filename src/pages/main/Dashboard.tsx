@@ -49,7 +49,6 @@ function Dashboard() {
             Create New Session
           </PrimaryButton>
         </TitleBar>
-        <Divider />
         <ContentContainer>
           <Subtitle>Current Session</Subtitle>
           <InfoCards

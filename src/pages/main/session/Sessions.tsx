@@ -4,9 +4,11 @@ import styled from "styled-components";
 import AlertModal from "../../../components/AlertModal.tsx";
 import SessionItem from "../../../components/sessions/SessionItem.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
+import useModalState from "../../../hooks/modal.tsx";
 
 function Sessions() {
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
 
   return (
     <>
@@ -29,13 +31,14 @@ function Sessions() {
               absence={2}
               onDelete={() => {
                 setDeleteTarget(index);
+                openDeleteModal();
               }}
             />
           ))}
         </Content>
       </Container>
       <AlertModal
-        isOpened={deleteTarget !== null}
+        state={deleteModalState}
         type="delete"
         title="Delete Session?"
         content={
@@ -47,10 +50,12 @@ function Sessions() {
         }
         onCancel={() => {
           setDeleteTarget(null);
+          closeDeleteModal();
         }}
         onConfirm={() => {
           // TODO: delete session
           setDeleteTarget(null);
+          closeDeleteModal();
         }}
       />
     </>
