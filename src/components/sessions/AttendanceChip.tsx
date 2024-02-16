@@ -10,12 +10,19 @@ import minusDarkGrey from "../../assets/sessions/minusDarkGrey.svg";
 interface AttendanceChipProps extends React.HTMLAttributes<HTMLButtonElement> {
   type: "attendance" | "absence" | "none";
   active?: boolean;
+  clickable?: boolean;
 }
 
-function AttendanceChip({ type, active, ...props }: AttendanceChipProps) {
+function AttendanceChip({
+  type,
+  active,
+  clickable,
+  ...props
+}: AttendanceChipProps) {
   const theme = useContext(ThemeContext);
 
   active = active ?? false;
+  clickable = clickable ?? false;
 
   switch (type) {
     case "attendance":
@@ -26,6 +33,7 @@ function AttendanceChip({ type, active, ...props }: AttendanceChipProps) {
               ? theme?.colors?.green?.["500"]
               : theme?.colors?.green?.["100"]
           }
+          clickable={clickable}
           {...props}
         >
           <img src={active ? checkGreen : checkGreen100} alt="Attendance" />
@@ -38,6 +46,7 @@ function AttendanceChip({ type, active, ...props }: AttendanceChipProps) {
           color={
             active ? theme?.colors?.red?.["500"] : theme?.colors?.red?.["100"]
           }
+          clickable={clickable}
           {...props}
         >
           <img src={active ? crossRed : crossRed100} alt="Absence" />
@@ -46,14 +55,18 @@ function AttendanceChip({ type, active, ...props }: AttendanceChipProps) {
       );
     case "none":
       return (
-        <ChipBase color={theme?.colors?.darkGrey} {...props}>
+        <ChipBase
+          color={theme?.colors?.darkGrey}
+          clickable={clickable}
+          {...props}
+        >
           <img src={minusDarkGrey} alt="None" />
         </ChipBase>
       );
   }
 }
 
-const ChipBase = styled.button<{ color: string }>`
+const ChipBase = styled.button<{ color: string; clickable: boolean }>`
   padding: 0.5rem 1rem;
   display: flex;
   flex-direction: row;
@@ -66,7 +79,7 @@ const ChipBase = styled.button<{ color: string }>`
   color: ${({ color }) => color};
 
   background: none;
-  cursor: pointer;
+  cursor: ${({ clickable }) => (clickable ? "pointer" : "default")};
   user-select: none;
 `;
 

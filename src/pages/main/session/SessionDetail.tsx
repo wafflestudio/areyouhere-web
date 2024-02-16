@@ -20,7 +20,6 @@ function SessionDetail() {
   return (
     <Container>
       <TitleBar label="Session Details" />
-      <Divider />
       <ContentContainer>
         <SessionInfoBar
           date={new Date()}
@@ -58,8 +57,10 @@ function SessionDetail() {
               </SessionTableItem>
               <SessionTableItem>
                 <AttendanceChipContainer>
-                  {isEditing && <AttendanceChip type="attendance" />}
-                  <AttendanceChip type="absence" active />
+                  {isEditing && (
+                    <AttendanceChip type="attendance" clickable={isEditing} />
+                  )}
+                  <AttendanceChip type="absence" active clickable={isEditing} />
                 </AttendanceChipContainer>
               </SessionTableItem>
               <SessionTableItem>12:00</SessionTableItem>
