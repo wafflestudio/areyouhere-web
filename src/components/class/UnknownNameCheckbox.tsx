@@ -58,7 +58,7 @@ const StyledCheckbox = styled.label`
     position: absolute;
     width: 1.2rem;
     height: 1.2rem;
-    background: ${Theme.colors.primaryBlue};
+    background: ${Theme.colors.primary["500"]};
     border-radius: 0.2rem;
     opacity: 0;
     transition: opacity 0.1s ease;

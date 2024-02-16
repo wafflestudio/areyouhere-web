@@ -1,13 +1,11 @@
 import styled from "styled-components";
 
 const Button = styled.button`
-  background-color: ${({ theme }) => theme.colors.primaryBlue};
+  background-color: ${({ theme }) => theme.colors.primary["500"]};
   color: #ffffff;
-  font-size: 1.8rem;
-  line-height: 2.2rem;
-  font-weight: bold;
-  padding: 1.2rem;
-  border-radius: 1rem;
+  ${({ theme }) => theme.typography.button1};
+  padding: 1.2rem 2rem;
+  border-radius: 0.8rem;
   border: none;
   cursor: pointer;
 
@@ -15,11 +13,11 @@ const Button = styled.button`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
 `;
 
 const SmallButton = styled.button`
-  background-color: ${({ theme }) => theme.colors.primaryBlue};
+  background-color: ${({ theme }) => theme.colors.primary["500"]};
   color: #ffffff;
   font-size: 1.1rem;
   line-height: 1.4rem;

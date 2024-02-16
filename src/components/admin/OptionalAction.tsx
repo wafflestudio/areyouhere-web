@@ -12,7 +12,7 @@ const OptionalActionLabel = styled.p`
 
 const OptionalActionLink = styled(Link)`
   font-size: 1.6rem;
-  color: ${({ theme }) => theme.colors.primaryBlue};
+  color: ${({ theme }) => theme.colors.primary["500"]};
   text-decoration: none;
   font-weight: bold;
 `;

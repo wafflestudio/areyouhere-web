@@ -3,8 +3,8 @@ import styled from "styled-components";
 import Theme from "../styles/Theme.tsx";
 
 const StyledInput = styled.input`
-  padding: 1.6rem 2.6rem;
-  font-size: 1.6rem;
+  padding: 1rem 1.5rem;
+  ${({ theme }) => theme.typography.b3};
   border: 0.1rem solid #e3e3e3;
   border-radius: 1rem;
 

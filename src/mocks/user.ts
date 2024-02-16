@@ -3,7 +3,7 @@ import AxiosMockAdapter from "axios-mock-adapter";
 
 const mock = new AxiosMockAdapter(axios);
 
-let logined = false;
+let logined = true;
 
 mock.onPost("/api/user").reply((_) => {
   console.log("post /api/user");
