@@ -22,15 +22,9 @@ const ModalContainer = styled.div`
   // 모달 컴포넌트 css
   & > :not(.modal--background) {
     animation: modal-content 0.3s;
-    max-width: 430px;
-    width: 100%;
 
     // 모달 화면 중앙 위치
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     margin: auto;
 
     display: flex;
@@ -41,6 +35,10 @@ const ModalContainer = styled.div`
     border-radius: 1rem;
 
     box-sizing: border-box;
+  }
+
+  &.closing {
+    pointer-events: none;
   }
 
   &.closing :not(.modal--background) {

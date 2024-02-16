@@ -4,6 +4,7 @@ import alertCircleBlue from "../assets/class/alertCircleBlue.svg";
 import trashRed from "../assets/class/trashRed.svg";
 
 import { GreyButton, PrimaryButton } from "./Button";
+import Modal from "./Modal";
 
 interface AlertModalProps extends React.HTMLAttributes<HTMLDivElement> {
   isOpened: boolean;
@@ -15,6 +16,7 @@ interface AlertModalProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 function AlertModal({
+  isOpened,
   type,
   title,
   content,
@@ -24,8 +26,8 @@ function AlertModal({
 }: AlertModalProps) {
   const colorScheme = type === "info" ? "primary" : "red";
   return (
-    <AlertModalContainer {...props}>
-      <AlertModalContent>
+    <Modal onBackgroundClick={onCancel} isClosing={!isOpened}>
+      <Container>
         <img
           width={40}
           height={40}
@@ -48,25 +50,12 @@ function AlertModal({
             {type === "info" ? "Confirm" : "Delete"}
           </PrimaryButton>
         </AlertModalButtonContainer>
-      </AlertModalContent>
-    </AlertModalContainer>
+      </Container>
+    </Modal>
   );
 }
 
-const AlertModalContainer = styled.div<{ isOpened: boolean }>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  width: 100%;
-  height: 100%;
-  display: ${({ isOpened }) => (isOpened ? "flex" : "none")};
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.5);
-`;
-
-const AlertModalContent = styled.div`
+const Container = styled.div`
   position: relative;
   width: 35.5rem;
   padding: 4rem;
