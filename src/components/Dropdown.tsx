@@ -47,6 +47,8 @@ const DropdownMenuButton = styled.button`
   cursor: pointer;
 
   transition: background-color 0.2s;
+
+  user-select: none;
 `;
 
 export { DropdownContainer, DropdownButton, DropdownMenu, DropdownMenuButton };

@@ -17,6 +17,8 @@ const ButtonBase = styled.button`
     background-color 0.2s,
     color 0.2s,
     border 0.2s;
+
+  user-select: none;
 `;
 
 const PrimaryButton = styled(ButtonBase)<{ colorScheme?: string }>`

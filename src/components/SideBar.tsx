@@ -125,6 +125,8 @@ const Container = styled.div`
   height: 100vh;
   padding: 3rem 0;
   background-color: ${Theme.colors.white};
+
+  user-select: none;
 `;
 
 const IconContainer = styled.div`

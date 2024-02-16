@@ -172,6 +172,7 @@ const Chip = styled.span`
 
   & img {
     margin-left: 0.5rem;
+    user-select: none;
   }
 
   &:hover {
