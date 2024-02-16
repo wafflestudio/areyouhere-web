@@ -1,32 +1,33 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import Theme from "../../styles/Theme.tsx";
 
-function ClassItem() {
+interface ClassItemProps {
+  id: number;
+  name: string;
+  description: string;
+  attendeeNumber: number;
+  color: string;
+}
+
+function ClassItem({
+  id,
+  name,
+  description,
+  attendeeNumber,
+  color,
+}: ClassItemProps) {
   const navigate = useNavigate();
-
-  const [classId, setClassId] = useState(1);
-  const [className, setClassName] = useState("Wafflestudio React seminar");
-  const [description, setDescription] = useState(
-    "This is class for React seminar of wafflestudio."
-  );
-  const [attendeeNumber, setAttendeeNumber] = useState(14);
-  const [classColor, setClassColor] = useState("#ffffff");
-
-  useEffect(() => {
-    // TODO: fetch class info
-  }, []);
 
   return (
     <Container
-      style={{ backgroundColor: classColor }}
-      onClick={() => navigate(`/${classId}`)}
+      style={{ backgroundColor: color }}
+      onClick={() => navigate(`/${id}`)}
     >
-      <h4>{className}</h4>
-      <p>{description}</p>
-      <p>{attendeeNumber}</p>
+      <h4>{name}</h4>
+      <p className="description">{description}</p>
+      <p className="attendeeNumber">{attendeeNumber}</p>
     </Container>
   );
 }
@@ -35,7 +36,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
 
   width: 36rem;
   height: 24rem;
@@ -43,17 +43,41 @@ const Container = styled.div`
   border: 0.1rem solid ${Theme.colors.grey};
   border-radius: 1rem;
 
-  padding: 2rem;
-  gap: 2rem;
+  padding: 3.3rem;
+  gap: 1.7rem;
 
   cursor: pointer;
 
   h4 {
     font-size: 2.4rem;
+    width: 100%;
+    height: 25%;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   p {
     font-size: 1.6rem;
+    width: 100%;
+
+    height: 5rem;
+    white-space: normal;
+
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    text-overflow: ellipsis;
+  }
+
+  p.description {
+    height: 60%;
+  }
+
+  p.attendeeNumber {
+    height: 15%;
   }
 `;
 

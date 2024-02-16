@@ -1,0 +1,81 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "wafflestudio react seminar",
+      "description": "This is a seminar for react",
+      "attendeeNumber": 10,
+      "color": "#FF0000"
+    },
+    {
+      "id": 2,
+      "name": "Advanced React Workshop",
+      "description": "",
+      "attendeeNumber": 15,
+      "color": "#00FF00"
+    },
+    {
+      "id": 3,
+      "name": "overflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflow",
+      "description": "overflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowoverflowv",
+      "attendeeNumber": 8,
+      "color": "#0000FF"
+    },
+    {
+      "id": 4,
+      "name": "React State Management",
+      "description": "Managing state in React applications",
+      "attendeeNumber": 20,
+      "color": "#FFFF00"
+    },
+    {
+      "id": 5,
+      "name": "React Hooks in Depth",
+      "description": "Understanding React Hooks",
+      "attendeeNumber": 12,
+      "color": "#FF00FF"
+    },
+    {
+      "id": 6,
+      "name": "Next.js for React",
+      "description": "Building SSR applications with Next.js",
+      "attendeeNumber": 18,
+      "color": "#00FFFF"
+    },
+    {
+      "id": 7,
+      "name": "React Performance Optimization",
+      "description": "Techniques to optimize React apps",
+      "attendeeNumber": 5,
+      "color": "#C0C0C0"
+    },
+    {
+      "id": 8,
+      "name": "React Testing and Debugging",
+      "description": "Testing and debugging React applications",
+      "attendeeNumber": 9,
+      "color": "#FFA500"
+    },
+    {
+      "id": 9,
+      "name": "React and TypeScript",
+      "description": "Using TypeScript in React applications",
+      "attendeeNumber": 14,
+      "color": "#800080"
+    },
+    {
+      "id": 10,
+      "name": "React Router for SPA",
+      "description": "Creating single-page applications with React Router",
+      "attendeeNumber": 11,
+      "color": "#008000"
+    },
+    {
+      "id": 11,
+      "name": "React and Redux",
+      "description": "State management with Redux in React apps",
+      "attendeeNumber": 7,
+      "color": "#808080"
+    }
+  ]
+}
