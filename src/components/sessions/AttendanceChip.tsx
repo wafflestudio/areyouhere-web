@@ -36,7 +36,10 @@ function AttendanceChip({
           clickable={clickable}
           {...props}
         >
-          <img src={active ? checkGreen : checkGreen100} alt="Attendance" />
+          <UnselectableImg
+            src={active ? checkGreen : checkGreen100}
+            alt="Attendance"
+          />
           <span>Attendance</span>
         </ChipBase>
       );
@@ -49,7 +52,10 @@ function AttendanceChip({
           clickable={clickable}
           {...props}
         >
-          <img src={active ? crossRed : crossRed100} alt="Absence" />
+          <UnselectableImg
+            src={active ? crossRed : crossRed100}
+            alt="Absence"
+          />
           <span>Absence</span>
         </ChipBase>
       );
@@ -60,7 +66,7 @@ function AttendanceChip({
           clickable={clickable}
           {...props}
         >
-          <img src={minusDarkGrey} alt="None" />
+          <UnselectableImg src={minusDarkGrey} alt="None" />
         </ChipBase>
       );
   }
@@ -80,6 +86,10 @@ const ChipBase = styled.button<{ color: string; clickable: boolean }>`
 
   background: none;
   cursor: ${({ clickable }) => (clickable ? "pointer" : "default")};
+  user-select: ${({ clickable }) => (clickable ? "none" : "text")};
+`;
+
+const UnselectableImg = styled.img`
   user-select: none;
 `;
 

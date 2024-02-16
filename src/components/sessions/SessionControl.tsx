@@ -59,6 +59,8 @@ const Container = styled.div`
   justify-content: space-between;
   margin-bottom: 1.6rem;
   margin-top: 3.2rem;
+
+  user-select: none;
 `;
 
 const SessionFilterButton = styled.button<{ active?: boolean }>`
