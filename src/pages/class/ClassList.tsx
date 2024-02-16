@@ -6,11 +6,12 @@ import addClass from "../../assets/class/addClass.svg";
 import { PrimaryButton } from "../../components/Button.tsx";
 import ClassItem from "../../components/class/ClassItem.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
+import classData from "../../test/classData.json";
 
 function ClassList() {
   const navigate = useNavigate();
 
-  const [classList, setClassList] = useState([1]);
+  const [classList, setClassList] = useState(classData.data);
 
   useEffect(() => {
     // TODO: fetch class list
@@ -20,7 +21,7 @@ function ClassList() {
     <Container>
       <TitleBar label="Classes">
         <PrimaryButton onClick={() => navigate("/class/create")}>
-          New Class
+          Create New Class
         </PrimaryButton>
       </TitleBar>
       {classList.length === 0 ? (
@@ -35,14 +36,16 @@ function ClassList() {
         </EmptyClassContainer>
       ) : (
         <ClassListContainer>
-          <ClassItem />
-          <ClassItem />
-          <ClassItem />
-          <ClassItem />
-          <ClassItem />
-          <ClassItem />
-          <ClassItem />
-          <ClassItem />
+          {classList.map((classItem) => (
+            <ClassItem
+              key={classItem.id}
+              id={classItem.id}
+              name={classItem.name}
+              description={classItem.description}
+              attendeeNumber={classItem.attendeeNumber}
+              color={classItem.color}
+            />
+          ))}
         </ClassListContainer>
       )}
     </Container>

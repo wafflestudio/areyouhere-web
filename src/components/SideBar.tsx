@@ -15,19 +15,19 @@ function SideBar() {
 
   return (
     <Container>
-      <IconContainer onClick={() => navigate(`${classId}`)}>
+      <IconContainer onClick={() => navigate(`/class/${classId}`)}>
         <img src={dashboard} alt="dashboard" />
       </IconContainer>
-      <IconContainer onClick={() => navigate(`${classId}/sessions`)}>
+      <IconContainer onClick={() => navigate(`/class/${classId}/sessions`)}>
         <img src={sessions} alt="sessions" />
       </IconContainer>
-      <IconContainer onClick={() => navigate(`${classId}/attendees`)}>
+      <IconContainer onClick={() => navigate(`/class/${classId}/attendees`)}>
         <img src={attendees} alt="attendees" />
       </IconContainer>
-      <IconContainer onClick={() => navigate(`${classId}/statistics`)}>
+      <IconContainer onClick={() => navigate(`/class/${classId}/statistics`)}>
         <img src={statistics} alt="statistics" />
       </IconContainer>
-      <IconContainer onClick={() => navigate(`${classId}/settings`)}>
+      <IconContainer onClick={() => navigate(`/class/${classId}/settings`)}>
         <img src={settings} alt="settings" />
       </IconContainer>
     </Container>
