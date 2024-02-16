@@ -1,35 +1,114 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
 
-import attendees from "../assets/sideBar/attendees.svg";
-import dashboard from "../assets/sideBar/dashboard.svg";
-import sessions from "../assets/sideBar/sessions.svg";
-import settings from "../assets/sideBar/settings.svg";
-import statistics from "../assets/sideBar/statistics.svg";
+import attendeesDefault from "../assets/sidebar/attendeesDefault.svg";
+import attendeesHover from "../assets/sidebar/attendeesHover.svg";
+import attendeesOnClick from "../assets/sidebar/attendeesOnClick.svg";
+import classListDefault from "../assets/sidebar/classListDefault.svg";
+import classListHover from "../assets/sidebar/classListHover.svg";
+import dashboardDefault from "../assets/sidebar/dashBoardDefault.svg";
+import dashboardHover from "../assets/sidebar/dashBoardHover.svg";
+import dashboardOnClick from "../assets/sidebar/dashBoardOnClick.svg";
+import logo from "../assets/sidebar/logo.svg";
+import sessionsDefault from "../assets/sidebar/sessionsDefault.svg";
+import sessionsHover from "../assets/sidebar/sessionsHover.svg";
+import sessionsOnClick from "../assets/sidebar/sessionsOnClick.svg";
+import settingsDefault from "../assets/sidebar/settingsDefault.svg";
+import settingsHover from "../assets/sidebar/settingsHover.svg";
+import settingsOnClick from "../assets/sidebar/settingsOnClick.svg";
+import statisticsDefault from "../assets/sidebar/statisticsDefault.svg";
+import statisticsHover from "../assets/sidebar/statisticsHover.svg";
+import statisticsOnClick from "../assets/sidebar/statisticsOnClick.svg";
 import Theme from "../styles/Theme.tsx";
+
+interface MenuItem {
+  path: string;
+  defaultIcon: string;
+  hoverIcon: string;
+  onClickIcon: string;
+}
 
 function SideBar() {
   const navigate = useNavigate();
-  // const classId = useParams();
-  const classId = 1;
+  const location = useLocation().pathname;
+
+  const { classId } = useParams();
+
+  const menuItems = [
+    {
+      path: "/class",
+      defaultIcon: classListDefault,
+      hoverIcon: classListHover,
+      onClickIcon: classListDefault,
+    },
+    {
+      path: `/class/${classId}`,
+      defaultIcon: dashboardDefault,
+      hoverIcon: dashboardHover,
+      onClickIcon: dashboardOnClick,
+    },
+    {
+      path: `/class/${classId}/sessions`,
+      defaultIcon: sessionsDefault,
+      hoverIcon: sessionsHover,
+      onClickIcon: sessionsOnClick,
+    },
+    {
+      path: `/class/${classId}/attendees`,
+      defaultIcon: attendeesDefault,
+      hoverIcon: attendeesHover,
+      onClickIcon: attendeesOnClick,
+    },
+    {
+      path: `/class/${classId}/statistics`,
+      defaultIcon: statisticsDefault,
+      hoverIcon: statisticsHover,
+      onClickIcon: statisticsOnClick,
+    },
+    {
+      path: `/class/${classId}/settings`,
+      defaultIcon: settingsDefault,
+      hoverIcon: settingsHover,
+      onClickIcon: settingsOnClick,
+    },
+  ];
+
+  const determineIcon = (item: MenuItem) => {
+    const currentPath = location.split("?")[0].split("#")[0];
+
+    if (currentPath === "/class" && item.path === "/class") {
+      return item.defaultIcon;
+    }
+
+    if (currentPath === item.path) {
+      return item.onClickIcon;
+    } else if (currentPath.startsWith(item.path) && item.path !== "/class") {
+      return item.defaultIcon;
+    } else if (item.path === "/class") {
+      if (currentPath.startsWith("/class/") && currentPath !== "/class") {
+        return item.defaultIcon;
+      }
+    }
+
+    return item.defaultIcon;
+  };
 
   return (
     <Container>
-      <IconContainer onClick={() => navigate(`/class/${classId}`)}>
-        <img src={dashboard} alt="dashboard" />
+      <IconContainer onClick={() => navigate("/")}>
+        <img src={logo} alt="logo" />
       </IconContainer>
-      <IconContainer onClick={() => navigate(`/class/${classId}/sessions`)}>
-        <img src={sessions} alt="sessions" />
-      </IconContainer>
-      <IconContainer onClick={() => navigate(`/class/${classId}/attendees`)}>
-        <img src={attendees} alt="attendees" />
-      </IconContainer>
-      <IconContainer onClick={() => navigate(`/class/${classId}/statistics`)}>
-        <img src={statistics} alt="statistics" />
-      </IconContainer>
-      <IconContainer onClick={() => navigate(`/class/${classId}/settings`)}>
-        <img src={settings} alt="settings" />
-      </IconContainer>
+      {location !== "/class" &&
+        menuItems.map((item, index) => (
+          <IconContainer key={index} onClick={() => navigate(item.path)}>
+            <img
+              src={determineIcon(item)}
+              alt={`${item.path}-icon`}
+              onMouseOver={(e) => (e.currentTarget.src = item.hoverIcon)}
+              onMouseOut={(e) => (e.currentTarget.src = determineIcon(item))}
+            />
+          </IconContainer>
+        ))}
     </Container>
   );
 }
@@ -39,33 +118,27 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-
   position: fixed;
   top: 0;
   left: 0;
-
-  width: 8.2rem;
+  width: 8rem;
   height: 100vh;
-
-  padding: 4rem 0 4rem 0;
-
-  background-color: ${Theme.colors.darkGrey};
+  padding: 3rem 0;
+  background-color: ${Theme.colors.white};
 `;
 
 const IconContainer = styled.div`
+  width: 3.4rem;
+  height: 3.4rem;
+  margin-bottom: 2.5rem;
+  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
 
-  width: 5rem;
-  height: 5rem;
-  margin-bottom: 1rem;
-
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out;
-
-  &:hover {
-    transform: scale(1.2);
+  img {
+    width: 100%;
+    height: 100%;
   }
 `;
 

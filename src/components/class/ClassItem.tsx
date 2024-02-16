@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+import dotsVerticalGrey from "../../assets/class/dotsVerticalGrey.svg";
 import Theme from "../../styles/Theme.tsx";
 
 interface ClassItemProps {
@@ -26,6 +27,7 @@ function ClassItem({
       onClick={() => navigate(`/class/${id}`)}
     >
       <h4>{name}</h4>
+      <img src={dotsVerticalGrey} alt="menu" />
       <p className="description">{description}</p>
       <p className="attendeeNumber">{attendeeNumber}</p>
     </Container>
@@ -39,32 +41,30 @@ const Container = styled.div`
 
   width: 36rem;
   height: 24rem;
+  gap: 1.7rem;
 
   border: 0.1rem solid ${Theme.colors.grey};
   border-radius: 1rem;
 
   padding: 3.3rem;
-  gap: 1.7rem;
 
   cursor: pointer;
+  position: relative;
 
   h4 {
-    font-size: 2.4rem;
     width: 100%;
-    height: 25%;
+    height: 3.2rem;
 
+    ${({ theme }) => theme.typography.h4};
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   p {
-    font-size: 1.6rem;
     width: 100%;
 
-    height: 5rem;
-    white-space: normal;
-
+    ${({ theme }) => theme.typography.b3};
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -73,11 +73,25 @@ const Container = styled.div`
   }
 
   p.description {
-    height: 60%;
+    height: 10rem;
   }
 
   p.attendeeNumber {
-    height: 15%;
+    height: 2rem;
+  }
+
+  &:hover img {
+    opacity: 1;
+  }
+
+  img {
+    position: absolute;
+    top: 2.4rem;
+    right: 1.2rem;
+
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    cursor: pointer;
   }
 `;
 
