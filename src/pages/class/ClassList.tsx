@@ -21,7 +21,7 @@ function ClassList() {
     <Container>
       <TitleBar label="Classes">
         <PrimaryButton onClick={() => navigate("/class/create")}>
-          New Class
+          Create New Class
         </PrimaryButton>
       </TitleBar>
       {classList.length === 0 ? (

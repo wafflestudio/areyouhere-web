@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
+import crossBlack from "../../assets/class/crossBlack.svg";
+import NamesakeModal from "../../components/class/NamesakeModal.tsx";
 import UnknownNameCheckbox from "../../components/class/UnknownNameCheckbox.tsx";
 import TextField from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
+import { modalStateType } from "../../type.ts";
 
 function CreateClass() {
   const [className, setClassName] = useState("");
@@ -47,9 +50,12 @@ function CreateClass() {
     setAttendeeList(attendeeList.filter((_, i) => i !== index));
   };
 
+  // 동명이인 관련 모달
+  const [namesakeModal, setNamesakeModal] = useState<modalStateType>("closed");
+
   return (
     <Container>
-      <TitleBar label="Create a new class" />
+      <TitleBar label="Create a New Class" />
       <TextFieldContainer>
         <TextField
           label="Name of your class"
@@ -64,7 +70,7 @@ function CreateClass() {
         <TextField
           label="Attendee name"
           value={attendeeInput}
-          placeholder="Copy and paste the list of the participant names here."
+          placeholder="Add attendee names using the 'enter' key or paste from a spreadsheet."
           onChange={(e) => setAttendeeInput(e.target.value)}
           onKeyDown={handleEnterDown}
           onPaste={handlePaste}
@@ -73,13 +79,27 @@ function CreateClass() {
         />
         <UnknownNameCheckbox />
       </TextFieldContainer>
-      <div>
+      <ChipContainer>
+        <p>
+          Attendee List<span>{` (${attendeeList.length})`}</span>
+        </p>
         {attendeeList.map((name, index) => (
           <Chip key={index} onClick={() => removeChip(index)}>
-            {name}
+            <p>{name}</p>
+            <img src={crossBlack} alt="delete" />
           </Chip>
         ))}
-      </div>
+      </ChipContainer>
+      <button onClick={() => setNamesakeModal("open")}>modal</button>
+      {namesakeModal !== "closed" && (
+        <NamesakeModal
+          close={() => {
+            setNamesakeModal("closing");
+            setTimeout(() => setNamesakeModal("closed"), 300);
+          }}
+          isClosing={namesakeModal === "closing"}
+        />
+      )}
     </Container>
   );
 }
@@ -98,19 +118,69 @@ const TextFieldContainer = styled.div`
   margin-left: 6rem;
 
   & > * {
-    width: 43.5rem;
+    width: 45rem;
     margin-bottom: 3.4rem;
+  }
+`;
+
+const ChipContainer = styled.div`
+  background-color: #eeeeee;
+  width: 45rem;
+  min-height: 14rem;
+  height: auto;
+
+  margin-left: 6rem;
+
+  padding: 1rem;
+
+  & p {
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: #4f4f4f;
+    margin-bottom: 1.5rem;
   }
 `;
 
 const Chip = styled.span`
   display: inline-flex;
+  flex-direction: row;
   align-items: center;
-  padding: 5px 10px;
-  margin: 4px;
-  background-color: #e0e0e0;
-  border-radius: 16px;
+  justify-content: center;
+
+  height: 2.8rem;
+  padding: 0.5rem 1.2rem;
+  margin: 0 0.5rem 0.5rem 0;
+
+  background-color: #ffffff;
+  border: 0.1rem solid #000000;
+  border-radius: 1.6rem;
   cursor: pointer;
+
+  & p {
+    ${({ theme }) => theme.typography.button1};
+    color: #4f4f4f;
+
+    height: fit-content;
+    max-width: 39rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin: 0;
+  }
+
+  & img {
+    margin-left: 0.5rem;
+  }
+
+  &:hover {
+    & p {
+      color: #000000;
+    }
+
+    & img {
+      filter: invert(1);
+    }
+  }
 `;
 
 export default CreateClass;
