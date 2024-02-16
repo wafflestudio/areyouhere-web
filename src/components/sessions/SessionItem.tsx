@@ -2,8 +2,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-import dotsVerticalGrey from "../../assets/class/dotsVerticalGrey.svg";
 import trashRed from "../../assets/class/trashRed.svg";
+import {
+  DropdownButton,
+  DropdownContainer,
+  DropdownMenu,
+  DropdownMenuButton,
+} from "../Dropdown";
 
 interface SessionItemProps extends React.HTMLAttributes<HTMLDivElement> {
   to: string;
@@ -41,7 +46,7 @@ function SessionItem({
           {absentees}
         </SessionCardLabel>
       </SessionCardLink>
-      <SessionDropdownContainer
+      <DropdownContainer
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget as Node)) {
             console.log("2");
@@ -49,14 +54,8 @@ function SessionItem({
           }
         }}
       >
-        <SessionMoreButton
-          type="button"
-          onClick={() => {
-            setIsMoreMenuOpened(true);
-          }}
-        />
-        <SessionMoreMenu isOpened={isMoreMenuOpened}>
-          <SessionMenuButton
+        <DropdownMenu isOpened={isMoreMenuOpened}>
+          <DropdownDeleteButton
             type="button"
             onClick={() => {
               setIsMoreMenuOpened(false);
@@ -65,9 +64,15 @@ function SessionItem({
           >
             <img src={trashRed} alt="Delete" width={20} height={20} />
             Delete
-          </SessionMenuButton>
-        </SessionMoreMenu>
-      </SessionDropdownContainer>
+          </DropdownDeleteButton>
+        </DropdownMenu>
+        <DropdownButton
+          type="button"
+          onClick={() => {
+            setIsMoreMenuOpened(true);
+          }}
+        />
+      </DropdownContainer>
     </SessionCard>
   );
 }
@@ -78,6 +83,11 @@ const SessionCard = styled.div`
 
   border: 1px solid ${({ theme }) => theme.colors.grey};
   border-radius: 2rem;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-right: 1.8rem;
 `;
 
 const SessionCardLink = styled(Link)`
@@ -94,48 +104,11 @@ const SessionCardLabel = styled.span`
   color: ${({ theme }) => theme.colors.black};
 `;
 
-const SessionDropdownContainer = styled.div`
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  right: 1.8rem;
-  z-index: 1;
-`;
-
-const SessionMoreButton = styled.button`
-  width: 2.4rem;
-  height: 2.4rem;
-  background: none;
-  border: none;
-  background-image: url(${dotsVerticalGrey});
-
-  cursor: pointer;
-`;
-
-const SessionMoreMenu = styled.div<{ isOpened: boolean }>`
-  position: absolute;
-  top: 2.4rem;
-  right: 1.2rem;
-
-  display: ${({ isOpened: isOpened }) => (isOpened ? "flex" : "none")};
-  flex-direction: column;
-  box-shadow: ${({ theme }) => theme.effects.blur};
-
-  background-color: ${({ theme }) => theme.colors.white};
-  border-radius: 0.8rem;
-`;
-
-const SessionMenuButton = styled.button`
-  display: flex;
-  flex-direction: row;
-  padding: 1.1rem 2.1rem;
-  gap: 3rem;
-
+const DropdownDeleteButton = styled(DropdownMenuButton)`
   color: ${({ theme }) => theme.colors.red["500"]};
-  ${({ theme }) => theme.typography.button1};
-  border: none;
-  background: none;
-  cursor: pointer;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.red["50"]};
+  }
 `;
 
 export default SessionItem;

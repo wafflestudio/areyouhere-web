@@ -15,7 +15,7 @@ function TransferBanner(props: TransferBannerProps) {
           If you are Attendees
         </BannerLink>
       ) : (
-        <BannerLink from={props.from} to="/admin">
+        <BannerLink from={props.from} to="/class">
           If you are Admin
         </BannerLink>
       )}

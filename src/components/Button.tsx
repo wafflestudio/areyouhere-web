@@ -4,7 +4,7 @@ const ButtonBase = styled.button`
   padding: 1.2rem 2rem;
   ${({ theme }) => theme.typography.button1};
   border-radius: 0.8rem;
-  border: none;
+  border: solid 1px transparent;
   cursor: pointer;
 
   display: flex;

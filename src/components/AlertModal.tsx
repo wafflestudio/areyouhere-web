@@ -1,13 +1,14 @@
 import styled from "styled-components";
 
 import alertCircleBlue from "../assets/class/alertCircleBlue.svg";
-import crossDarkBlue from "../assets/class/crossDarkBlue.svg";
 import trashRed from "../assets/class/trashRed.svg";
+import { ModalStateType } from "../type";
 
 import { GreyButton, PrimaryButton } from "./Button";
+import Modal from "./Modal";
 
-interface AlertModalProps extends React.HTMLAttributes<HTMLDivElement> {
-  isOpened: boolean;
+interface AlertModalProps {
+  state: ModalStateType;
   type: "info" | "delete";
   title: string;
   content: React.ReactNode;
@@ -16,17 +17,17 @@ interface AlertModalProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 function AlertModal({
+  state,
   type,
   title,
   content,
   onCancel,
   onConfirm,
-  ...props
 }: AlertModalProps) {
   const colorScheme = type === "info" ? "primary" : "red";
   return (
-    <AlertModalContainer {...props}>
-      <AlertModalContent>
+    <Modal onBackgroundClick={onCancel} state={state}>
+      <Container>
         <img
           width={40}
           height={40}
@@ -49,26 +50,12 @@ function AlertModal({
             {type === "info" ? "Confirm" : "Delete"}
           </PrimaryButton>
         </AlertModalButtonContainer>
-        <AlertModalCloseButton onClick={onCancel} />
-      </AlertModalContent>
-    </AlertModalContainer>
+      </Container>
+    </Modal>
   );
 }
 
-const AlertModalContainer = styled.div<{ isOpened: boolean }>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  width: 100%;
-  height: 100%;
-  display: ${({ isOpened }) => (isOpened ? "flex" : "none")};
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.5);
-`;
-
-const AlertModalContent = styled.div`
+const Container = styled.div`
   position: relative;
   width: 35.5rem;
   padding: 4rem;
@@ -99,20 +86,6 @@ const AlertModalButtonContainer = styled.div`
 
   display: flex;
   gap: 1rem;
-`;
-
-const AlertModalCloseButton = styled.button`
-  position: absolute;
-  top: 1.6rem;
-  right: 1.6rem;
-
-  width: 2.4rem;
-  height: 2.4rem;
-
-  background: none;
-  border: none;
-  background-image: url(${crossDarkBlue});
-  cursor: pointer;
 `;
 
 export default AlertModal;

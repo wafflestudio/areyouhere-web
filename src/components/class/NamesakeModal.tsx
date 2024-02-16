@@ -1,17 +1,18 @@
 import styled from "styled-components";
 
 import exclamationMarkBlue from "../../assets/alert/exclamationMarkBlue.svg";
+import { ModalStateType } from "../../type.ts";
 import Modal from "../Modal.tsx";
 
 function NamesakeModal({
   close,
-  isClosing,
+  state,
 }: {
   close: () => void;
-  isClosing: boolean;
+  state: ModalStateType;
 }) {
   return (
-    <Modal onBackgroundClick={close} isClosing={isClosing}>
+    <Modal onBackgroundClick={close} state={state}>
       <Container>
         <img src={exclamationMarkBlue} alt="alert" />
         <h4>Namesake alert</h4>

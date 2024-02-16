@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import styled from "styled-components";
 
 import crossBlack from "../../assets/class/crossBlack.svg";
+import AlertModal from "../../components/AlertModal.tsx";
 import NamesakeModal from "../../components/class/NamesakeModal.tsx";
 import UnknownNameCheckbox from "../../components/class/UnknownNameCheckbox.tsx";
 import TextField from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
-import { modalStateType } from "../../type.ts";
+import useModalState from "../../hooks/modal.tsx";
 
 function CreateClass() {
   const [className, setClassName] = useState("");
@@ -51,7 +52,8 @@ function CreateClass() {
   };
 
   // 동명이인 관련 모달
-  const [namesakeModal, setNamesakeModal] = useState<modalStateType>("closed");
+  const [namesakeModal, openNamesakeModal, closeNamesakeModal] =
+    useModalState();
 
   return (
     <Container>
@@ -90,16 +92,16 @@ function CreateClass() {
           </Chip>
         ))}
       </ChipContainer>
-      <button onClick={() => setNamesakeModal("open")}>modal</button>
-      {namesakeModal !== "closed" && (
-        <NamesakeModal
-          close={() => {
-            setNamesakeModal("closing");
-            setTimeout(() => setNamesakeModal("closed"), 300);
-          }}
-          isClosing={namesakeModal === "closing"}
-        />
-      )}
+      <button onClick={openNamesakeModal}>modal</button>
+      <AlertModal
+        state={namesakeModal}
+        type="info"
+        title="Namesake Alert"
+        content={<span>There are attendees with same name.</span>}
+        onCancel={closeNamesakeModal}
+        onConfirm={closeNamesakeModal}
+      />
+      {/* <NamesakeModal state={namesakeModal} close={closeNamesakeModal} /> */}
     </Container>
   );
 }
