@@ -9,11 +9,11 @@ import CreateClass from "./pages/class/CreateClass.tsx";
 import Home from "./pages/Home";
 import Attendees from "./pages/main/Attendees.tsx";
 import Dashboard from "./pages/main/Dashboard.tsx";
+import SessionDetail from "./pages/main/session/SessionDetail.tsx";
 import Sessions from "./pages/main/Sessions.tsx";
 import Settings from "./pages/main/Settings.tsx";
 import Statistics from "./pages/main/Statistics.tsx";
 import Result from "./pages/Result";
-import SessionDetail from "./pages/session/SessionDetail.tsx";
 
 const router = createBrowserRouter([
   {
