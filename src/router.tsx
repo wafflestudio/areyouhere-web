@@ -13,6 +13,7 @@ import Sessions from "./pages/main/Sessions.tsx";
 import Settings from "./pages/main/Settings.tsx";
 import Statistics from "./pages/main/Statistics.tsx";
 import Result from "./pages/Result";
+import SessionDetail from "./pages/session/SessionDetail.tsx";
 
 const router = createBrowserRouter([
   {
@@ -31,11 +32,16 @@ const router = createBrowserRouter([
           { path: "/class", element: <ClassList /> },
           { path: "/class/create", element: <CreateClass /> },
           // 클래스 선택 후
-          { path: "/:classId", element: <Dashboard /> },
-          { path: "/:classId/sessions", element: <Sessions /> },
-          { path: "/:classId/attendees", element: <Attendees /> },
-          { path: "/:classId/statistics", element: <Statistics /> },
-          { path: "/:classId/settings", element: <Settings /> },
+          { path: "/class/:classId", element: <Dashboard /> },
+          { path: "/class/:classId/sessions", element: <Sessions /> },
+          { path: "/class/:classId/attendees", element: <Attendees /> },
+          { path: "/class/:classId/statistics", element: <Statistics /> },
+          { path: "/class/:classId/settings", element: <Settings /> },
+          // 세션 선택 후
+          {
+            path: "/class/:classId/sessions/:sessionId",
+            element: <SessionDetail />,
+          },
         ],
       },
     ],

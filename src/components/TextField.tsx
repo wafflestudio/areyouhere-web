@@ -1,7 +1,5 @@
 import styled from "styled-components";
 
-import Theme from "../styles/Theme.tsx";
-
 const StyledInput = styled.input`
   padding: 1rem 1.5rem;
   ${({ theme }) => theme.typography.b3};
@@ -13,7 +11,7 @@ const StyledInput = styled.input`
   }
 
   ::placeholder {
-    color: ${Theme.colors.lightGrey};
+    color: #9b9b9b;
   }
 `;
 

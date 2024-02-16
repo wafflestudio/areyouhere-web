@@ -31,6 +31,8 @@ function AuthRequiredRoute() {
 
 const Container = styled.div`
   padding-left: 8.2rem;
+  background-color: ${({ theme }) => theme.colors.lightGrey};
+  min-height: 100vh;
 `;
 
 export default AuthRequiredRoute;

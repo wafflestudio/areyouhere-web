@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import addClass from "../../assets/class/addClass.svg";
-import Button from "../../components/Button.tsx";
+import { PrimaryButton } from "../../components/Button.tsx";
 import ClassItem from "../../components/class/ClassItem.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 
@@ -19,7 +19,9 @@ function ClassList() {
   return (
     <Container>
       <TitleBar label="Classes">
-        <Button onClick={() => navigate("/class/create")}>New Class</Button>
+        <PrimaryButton onClick={() => navigate("/class/create")}>
+          New Class
+        </PrimaryButton>
       </TitleBar>
       {classList.length === 0 ? (
         <EmptyClassContainer>

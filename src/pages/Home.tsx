@@ -4,7 +4,8 @@ import styled from "styled-components";
 
 import sendIcon from "../assets/send.svg";
 import TransferBanner from "../components/admin/TransferBanner.tsx";
-import Button from "../components/Button";
+import Alert from "../components/Alert.tsx";
+import { PrimaryButton } from "../components/Button.tsx";
 import TextField from "../components/TextField";
 
 function Home() {
@@ -21,6 +22,8 @@ function Home() {
 
   const [name, setName] = useState("");
   const [passcode, setPasscode] = useState("");
+
+  const [hasError, setHasError] = useState(false);
 
   return (
     <Container>
@@ -41,9 +44,12 @@ function Home() {
         <InputContainer
           onSubmit={(e) => {
             e.preventDefault();
-            console.log(name, passcode);
             // TODO: Send name and passcode to server
-            navigate("/result");
+            if (passcode === "1234") {
+              navigate("/result");
+            } else {
+              setHasError(true);
+            }
           }}
         >
           <TextField
@@ -60,17 +66,24 @@ function Home() {
             onChange={(e) => setPasscode(e.target.value)}
             style={{ marginTop: "1.1rem" }}
           />
-          <Button
+          {hasError && (
+            <Alert type="warning" style={{ marginTop: "2rem" }}>
+              Could not find a session corresponding to your name and passcode.
+              Please check your credentials or contact the administrator for
+              help.
+            </Alert>
+          )}
+          <PrimaryButton
             type="submit"
             style={{
-              marginTop: "4rem",
-              width: "9.5rem",
+              marginTop: "4.4rem",
+              width: "11.5rem",
               marginLeft: "auto",
             }}
           >
             <img src={sendIcon} alt="Send" width={20} height={20} />
             Send
-          </Button>
+          </PrimaryButton>
         </InputContainer>
       </LoginContainer>
     </Container>
@@ -100,7 +113,7 @@ const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 32rem;
+  width: 41rem;
 `;
 
 const BannerContainer = styled.div`

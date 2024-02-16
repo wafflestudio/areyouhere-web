@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import Button from "../components/Button";
+import { PrimaryButton } from "../components/Button";
 
 function Result() {
   const navigate = useNavigate();
@@ -16,14 +16,14 @@ function Result() {
         <InfoLabel>Name</InfoLabel>
         <InfoLabel>Class / Session</InfoLabel>
         <InfoLabel>Sent Time</InfoLabel>
-        <Button
+        <PrimaryButton
           style={{ width: "13rem", marginTop: "4rem" }}
           onClick={() => {
             navigate("/");
           }}
         >
           Confirm
-        </Button>
+        </PrimaryButton>
       </InfoCard>
     </Container>
   );

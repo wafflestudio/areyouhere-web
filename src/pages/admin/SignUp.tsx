@@ -9,7 +9,7 @@ import {
   OptionalActionLink,
 } from "../../components/admin/OptionalAction.tsx";
 import TransferBanner from "../../components/admin/TransferBanner.tsx";
-import Button from "../../components/Button";
+import { PrimaryButton } from "../../components/Button.tsx";
 import TextField from "../../components/TextField.tsx";
 
 function SignUp() {
@@ -68,7 +68,7 @@ function SignUp() {
           style={{ marginTop: "1.4rem" }}
           onChange={(e) => setRepeatPassword(e.target.value)}
         />
-        <Button style={{ marginTop: "3.0rem" }}>Sign up</Button>
+        <PrimaryButton style={{ marginTop: "3.0rem" }}>Sign up</PrimaryButton>
         <OptionalActionLabel style={{ marginTop: "5.0rem" }}>
           Already a member?{" "}
           <OptionalActionLink to="/admin/signin">Sign in</OptionalActionLink>

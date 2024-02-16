@@ -9,7 +9,7 @@ import {
   OptionalActionLink,
 } from "../../components/admin/OptionalAction";
 import TransferBanner from "../../components/admin/TransferBanner";
-import Button from "../../components/Button";
+import { PrimaryButton } from "../../components/Button";
 import TextField from "../../components/TextField";
 
 function SignIn() {
@@ -24,7 +24,7 @@ function SignIn() {
     mutationFn: postSignIn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      navigate("/admin");
+      navigate("/class");
     },
   });
 
@@ -65,9 +65,9 @@ function SignIn() {
           >
             Forgot Password
           </ForgotPasswordLink>
-          <Button type="submit" style={{ marginTop: "3.0rem" }}>
+          <PrimaryButton type="submit" style={{ marginTop: "3.0rem" }}>
             Sign In
-          </Button>
+          </PrimaryButton>
           <OptionalActionLabel style={{ marginTop: "5.0rem" }}>
             Don't have an account?{" "}
             <OptionalActionLink to="/admin/signup">
