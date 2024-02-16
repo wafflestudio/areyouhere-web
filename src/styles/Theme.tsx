@@ -25,8 +25,7 @@ const Theme: DefaultTheme = {
 
     red: {
       "50": "#FFEEEA",
-      "75": "#FFCBC3",
-      "100": "#FFB7B7",
+      "100": "#FFCBC3",
       "200": "#FFA99E",
       "300": "#FF877D",
       "400": "#FF6660",
@@ -59,7 +58,7 @@ const Theme: DefaultTheme = {
     h4: "font-size: 2.4rem; font-weight: 700;",
     h5: "font-size: 2rem; font-weight: 700;",
     b1: "font-size: 1.6rem; font-weight: 400; line-height: 2.4rem;",
-    b2: "font-size: 1.6rem; font-weight: 700;",
+    b2: "font-size: 1.6rem; font-weight: 700; line-height: 2.4rem;",
     b3: "font-size: 1.4rem; font-weight: 400; line-height: 2.1rem;",
     b4: "font-size: 1.2rem; font-weight: 400; line-height: 1.8rem;",
     button1: "font-size: 1.4rem; font-weight: 600; line-height: 1.8rem;",

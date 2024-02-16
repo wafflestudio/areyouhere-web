@@ -25,7 +25,7 @@ const Container = styled.div`
   align-self: flex-start;
 
   width: 100%;
-  padding: 5.6rem 0 0 6.3rem;
+  padding: 5.6rem 4.9rem 0 6.3rem;
 
   & h2 {
     ${({ theme }) => theme.typography.h2};
