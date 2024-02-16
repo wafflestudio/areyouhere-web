@@ -1,9 +1,9 @@
 import { useState } from "react";
 import styled from "styled-components";
 
-import AlertModal from "../../components/AlertModal.tsx";
-import SessionItem from "../../components/sessions/SessionItem.tsx";
-import TitleBar from "../../components/TitleBar.tsx";
+import AlertModal from "../../../components/AlertModal.tsx";
+import SessionItem from "../../../components/sessions/SessionItem.tsx";
+import TitleBar from "../../../components/TitleBar.tsx";
 
 function Sessions() {
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
@@ -12,7 +12,6 @@ function Sessions() {
     <>
       <Container>
         <TitleBar label="Sessions" />
-        <Divider />
         <Content>
           <TopBar>
             <TopBarLabel style={{ width: "20rem" }}>Date</TopBarLabel>
@@ -64,12 +63,6 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   padding-bottom: 4rem;
-`;
-
-const Divider = styled.div`
-  width: calc(100% - 7rem);
-  border-top: ${({ theme }) => theme.colors.grey} 1px solid;
-  margin: 2.1rem 2.9rem 3.3rem 4.1rem;
 `;
 
 const Content = styled.div`

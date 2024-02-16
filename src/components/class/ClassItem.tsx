@@ -23,7 +23,7 @@ function ClassItem({
   return (
     <Container
       style={{ backgroundColor: color }}
-      onClick={() => navigate(`/${id}`)}
+      onClick={() => navigate(`/class/${id}`)}
     >
       <h4>{name}</h4>
       <p className="description">{description}</p>

@@ -9,10 +9,13 @@ function TitleBar({
   children?: React.ReactNode;
 }) {
   return (
-    <Container>
-      <h2>{label}</h2>
-      {children}
-    </Container>
+    <>
+      <Container>
+        <h2>{label}</h2>
+        {children}
+      </Container>
+      <Divider />
+    </>
   );
 }
 
@@ -30,6 +33,12 @@ const Container = styled.div`
   & h2 {
     ${({ theme }) => theme.typography.h2};
   }
+`;
+
+const Divider = styled.div`
+  width: calc(100% - 7rem);
+  border-top: ${({ theme }) => theme.colors.grey} 1px solid;
+  margin: 2.1rem 2.9rem 3.3rem 4.1rem;
 `;
 
 export default TitleBar;
