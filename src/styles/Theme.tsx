@@ -54,9 +54,9 @@ const Theme: DefaultTheme = {
   typography: {
     h1: "font-size: 4.8rem; font-weight: 800; line-height: 6rem;",
     h2: "font-size: 3.6rem; font-weight: 700; line-height: 4.8rem;",
-    h3: "font-size: 3.2rem; font-weight: 800;",
-    h4: "font-size: 2.4rem; font-weight: 700;",
-    h5: "font-size: 2rem; font-weight: 700;",
+    h3: "font-size: 3.2rem; font-weight: 800; line-height: 4.8rem;",
+    h4: "font-size: 2.4rem; font-weight: 700; line-height: 3.2rem;",
+    h5: "font-size: 2rem; font-weight: 700; line-height: 3rem;",
     b1: "font-size: 1.6rem; font-weight: 400; line-height: 2.4rem;",
     b2: "font-size: 1.6rem; font-weight: 700; line-height: 2.4rem;",
     b3: "font-size: 1.4rem; font-weight: 400; line-height: 2.1rem;",

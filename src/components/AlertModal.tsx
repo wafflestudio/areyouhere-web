@@ -1,7 +1,6 @@
 import styled from "styled-components";
 
 import alertCircleBlue from "../assets/class/alertCircleBlue.svg";
-import crossDarkBlue from "../assets/class/crossDarkBlue.svg";
 import trashRed from "../assets/class/trashRed.svg";
 
 import { GreyButton, PrimaryButton } from "./Button";
@@ -49,7 +48,6 @@ function AlertModal({
             {type === "info" ? "Confirm" : "Delete"}
           </PrimaryButton>
         </AlertModalButtonContainer>
-        <AlertModalCloseButton onClick={onCancel} />
       </AlertModalContent>
     </AlertModalContainer>
   );
@@ -99,20 +97,6 @@ const AlertModalButtonContainer = styled.div`
 
   display: flex;
   gap: 1rem;
-`;
-
-const AlertModalCloseButton = styled.button`
-  position: absolute;
-  top: 1.6rem;
-  right: 1.6rem;
-
-  width: 2.4rem;
-  height: 2.4rem;
-
-  background: none;
-  border: none;
-  background-image: url(${crossDarkBlue});
-  cursor: pointer;
 `;
 
 export default AlertModal;

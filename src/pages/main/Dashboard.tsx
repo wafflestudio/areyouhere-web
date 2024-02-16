@@ -1,8 +1,8 @@
+import { useState } from "react";
 import styled from "styled-components";
 
-import { PrimaryButton, SecondaryButton } from "../../components/Button.tsx";
+import { PrimaryButton } from "../../components/Button.tsx";
 import InfoCards from "../../components/dashboard/InfoCards.tsx";
-import AttendanceChip from "../../components/sessions/AttendanceChip.tsx";
 import {
   SessionTable,
   SessionTableHead,
@@ -12,16 +12,40 @@ import {
 } from "../../components/sessions/SessionTable.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 
+interface SessionData {
+  date: string;
+  title: string;
+  attendance: number;
+  absence: number;
+}
+
 function Dashboard() {
+  const [sessions, setSessions] = useState<SessionData[]>([]);
+
+  const addSession = () => {
+    setSessions([
+      ...sessions,
+      {
+        date: "2021-07-01",
+        title: "Waruru Hackerton",
+        attendance: 5,
+        absence: 0,
+      },
+    ]);
+  };
+
   return (
     <Container>
       <TitleBar label="Class Name">
-        <PrimaryButton>Create New Session</PrimaryButton>
+        <PrimaryButton onClick={addSession}>Create New Session</PrimaryButton>
       </TitleBar>
       <Divider />
       <ContentContainer>
         <Subtitle>Current Session</Subtitle>
-        <InfoCards />
+        <InfoCards
+          hasSession={sessions.length > 0}
+          onCreateNewSession={addSession}
+        />
         <Subtitle style={{ marginTop: "5rem" }}>Previous Session</Subtitle>
         <ElevatedSessionTable>
           <SessionTableHead>
@@ -39,66 +63,26 @@ function Dashboard() {
             </tr>
           </SessionTableHead>
           <SessionTableBody>
-            <tr>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                2024.01.01
-              </SessionTableItem>
-              <SessionTableItem>asd</SessionTableItem>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                5
-              </SessionTableItem>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                5
-              </SessionTableItem>
-            </tr>
-            <tr>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                2024.01.01
-              </SessionTableItem>
-              <SessionTableItem>asd</SessionTableItem>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                5
-              </SessionTableItem>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                5
-              </SessionTableItem>
-            </tr>
-            <tr>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                2024.01.01
-              </SessionTableItem>
-              <SessionTableItem>asd</SessionTableItem>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                5
-              </SessionTableItem>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                5
-              </SessionTableItem>
-            </tr>
-            <tr>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                2024.01.01
-              </SessionTableItem>
-              <SessionTableItem>asd</SessionTableItem>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                5
-              </SessionTableItem>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                5
-              </SessionTableItem>
-            </tr>
-            <tr>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                2024.01.01
-              </SessionTableItem>
-              <SessionTableItem>asd</SessionTableItem>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                5
-              </SessionTableItem>
-              <SessionTableItem style={{ width: "17.5rem" }}>
-                5
-              </SessionTableItem>
-            </tr>
+            {sessions.length == 0 ? (
+              <tr>
+                <EmptyTableBody colSpan={4} />
+              </tr>
+            ) : (
+              sessions.map((session) => (
+                <tr>
+                  <SessionTableItem style={{ width: "17.5rem" }}>
+                    {session.date}
+                  </SessionTableItem>
+                  <SessionTableItem>{session.title}</SessionTableItem>
+                  <SessionTableItem style={{ width: "17.5rem" }}>
+                    {session.attendance}
+                  </SessionTableItem>
+                  <SessionTableItem style={{ width: "17.5rem" }}>
+                    {session.absence}
+                  </SessionTableItem>
+                </tr>
+              ))
+            )}
           </SessionTableBody>
         </ElevatedSessionTable>
       </ContentContainer>
@@ -136,6 +120,11 @@ const Subtitle = styled.p`
 
 const ElevatedSessionTable = styled(SessionTable)`
   box-shadow: ${({ theme }) => theme.effects.blur};
+`;
+
+const EmptyTableBody = styled.td`
+  height: 15rem;
+  background-color: ${({ theme }) => theme.colors.white};
 `;
 
 export default Dashboard;

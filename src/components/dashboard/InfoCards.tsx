@@ -4,62 +4,89 @@ import styled from "styled-components";
 import expandDarkGrey from "../../assets/dashboard/expandDarkGrey.svg";
 import { SecondaryButton } from "../Button";
 
-function InfoCards() {
+interface InfoCardsProps extends React.HTMLAttributes<HTMLDivElement> {
+  hasSession?: boolean;
+  onCreateNewSession?: () => void;
+}
+
+function InfoCards({
+  hasSession,
+  onCreateNewSession,
+  ...props
+}: InfoCardsProps) {
   // TODO: implement passcode activation
   const [activated, setActivated] = useState(false);
 
   return (
-    <InfoCardContainer>
-      <InfoCard style={{ width: activated ? "28rem" : "24rem" }}>
-        <InfoCardTitle>Passcode</InfoCardTitle>
-        {activated ? (
-          <>
-            <ExpandButton onClick={() => setActivated(false)}>
-              <img src={expandDarkGrey} width={18} height={18} alt="expand" />
-            </ExpandButton>
-            <Passcode style={{ marginTop: "1.8rem" }}>NAHD</Passcode>
-            <PasscodeButtonContainer style={{ marginTop: "2.3rem" }}>
-              <SecondaryButton style={{ borderRadius: "3rem" }}>
-                Change
-              </SecondaryButton>
-              <SecondaryButton
-                style={{ borderRadius: "3rem" }}
-                colorScheme="red"
-              >
-                Deactivate
-              </SecondaryButton>
-            </PasscodeButtonContainer>
-          </>
-        ) : (
-          <ActivateButton onClick={() => setActivated(true)}>
-            Activate
-          </ActivateButton>
-        )}
-      </InfoCard>
-      <InfoCard>
-        <InfoCardTitle>Attendance</InfoCardTitle>
-        <AttendanceContainer>
-          <AttendanceCount>5</AttendanceCount>
-          <AttendanceTotal>/</AttendanceTotal>
-          <AttendanceTotal>20</AttendanceTotal>
-        </AttendanceContainer>
-        <Absentees>5 absentees</Absentees>
-      </InfoCard>
-      <InfoCard>
-        <InfoCardTitle>Details</InfoCardTitle>
-        <DetailsBar style={{ marginTop: "2.1rem" }}>
-          <DetailsLabel>Name</DetailsLabel>
-          <DetailsValue>Kick-off Meeting</DetailsValue>
-        </DetailsBar>
-        <DetailsBar style={{ marginTop: "1.6rem" }}>
-          <DetailsLabel>Date</DetailsLabel>
-          <DetailsValue>2024-02-13 (Tue)</DetailsValue>
-        </DetailsBar>
-        <DetailsBar style={{ marginTop: "1.6rem" }}>
-          <DetailsLabel>Start Time</DetailsLabel>
-          <DetailsValue>AM 10:00</DetailsValue>
-        </DetailsBar>
-      </InfoCard>
+    <InfoCardContainer {...props}>
+      {hasSession ? (
+        <>
+          <InfoCard style={{ width: activated ? "28rem" : "24rem" }}>
+            <InfoCardTitle>Passcode</InfoCardTitle>
+            {activated ? (
+              <>
+                <ExpandButton onClick={() => setActivated(false)}>
+                  <img
+                    src={expandDarkGrey}
+                    width={18}
+                    height={18}
+                    alt="expand"
+                  />
+                </ExpandButton>
+                <Passcode style={{ marginTop: "1.8rem" }}>NAHD</Passcode>
+                <PasscodeButtonContainer style={{ marginTop: "2.3rem" }}>
+                  <SecondaryButton style={{ borderRadius: "3rem" }}>
+                    Change
+                  </SecondaryButton>
+                  <SecondaryButton
+                    style={{ borderRadius: "3rem" }}
+                    colorScheme="red"
+                  >
+                    Deactivate
+                  </SecondaryButton>
+                </PasscodeButtonContainer>
+              </>
+            ) : (
+              <ActivateButton onClick={() => setActivated(true)}>
+                Activate
+              </ActivateButton>
+            )}
+          </InfoCard>
+          <InfoCard>
+            <InfoCardTitle>Attendance</InfoCardTitle>
+            <AttendanceContainer>
+              <AttendanceCount>5</AttendanceCount>
+              <AttendanceTotal>/</AttendanceTotal>
+              <AttendanceTotal>20</AttendanceTotal>
+            </AttendanceContainer>
+            <Absentees>5 absentees</Absentees>
+          </InfoCard>
+          <InfoCard>
+            <InfoCardTitle>Details</InfoCardTitle>
+            <DetailsBar style={{ marginTop: "2.1rem" }}>
+              <DetailsLabel>Name</DetailsLabel>
+              <DetailsValue>Kick-off Meeting</DetailsValue>
+            </DetailsBar>
+            <DetailsBar style={{ marginTop: "1.6rem" }}>
+              <DetailsLabel>Date</DetailsLabel>
+              <DetailsValue>2024-02-13 (Tue)</DetailsValue>
+            </DetailsBar>
+            <DetailsBar style={{ marginTop: "1.6rem" }}>
+              <DetailsLabel>Start Time</DetailsLabel>
+              <DetailsValue>AM 10:00</DetailsValue>
+            </DetailsBar>
+          </InfoCard>
+        </>
+      ) : (
+        <InfoCard style={{ width: "100rem" }}>
+          <NoSessionCard onClick={onCreateNewSession}>
+            <NoSessionTitle>No Sessions have been opened yet.</NoSessionTitle>
+            <NoSessionDescription>
+              Press 'Create New Session' or click here.
+            </NoSessionDescription>
+          </NoSessionCard>
+        </InfoCard>
+      )}
     </InfoCardContainer>
   );
 }
@@ -82,8 +109,6 @@ const InfoCard = styled.div`
 
   background-color: ${({ theme }) => theme.colors.white};
   box-shadow: ${({ theme }) => theme.effects.blur};
-
-  transition: width 0.3s;
 `;
 
 const InfoCardTitle = styled.p`
@@ -191,6 +216,31 @@ const DetailsLabel = styled.span`
 const DetailsValue = styled.span`
   ${({ theme }) => theme.typography.b3};
   font-weight: 700;
+  color: ${({ theme }) => theme.colors.darkGrey};
+`;
+
+const NoSessionCard = styled.button`
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+
+  background: none;
+  border: none;
+  cursor: pointer;
+`;
+
+const NoSessionTitle = styled.p`
+  ${({ theme }) => theme.typography.h5};
+  color: ${({ theme }) => theme.colors.darkGrey};
+`;
+
+const NoSessionDescription = styled.p`
+  ${({ theme }) => theme.typography.b1};
   color: ${({ theme }) => theme.colors.darkGrey};
 `;
 
