@@ -3,12 +3,13 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { postSignIn } from "../../api/user";
+import { EMAIL_REGEX, postSignIn } from "../../api/user";
 import {
   OptionalActionLabel,
   OptionalActionLink,
 } from "../../components/admin/OptionalAction";
 import TransferBanner from "../../components/admin/TransferBanner";
+import Alert from "../../components/Alert";
 import { PrimaryButton } from "../../components/Button";
 import TextField from "../../components/TextField";
 
@@ -18,7 +19,11 @@ function SignIn() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | undefined>();
+
+  const emailError = email.match(EMAIL_REGEX) == null;
+  const [showError, setShowError] = useState(false);
+
+  const [resultError, setResultError] = useState<string | undefined>();
 
   // TODO: handle failure cases
   const { mutate } = useMutation({
@@ -28,7 +33,7 @@ function SignIn() {
       navigate("/class");
     },
     onError: (error) => {
-      setError(error.message);
+      setResultError(error.message);
     },
   });
 
@@ -46,6 +51,10 @@ function SignIn() {
         <InputContainer
           onSubmit={(e) => {
             e.preventDefault();
+            if (emailError) {
+              setShowError(true);
+              return;
+            }
             mutate({ email, password });
           }}
         >
@@ -55,7 +64,10 @@ function SignIn() {
             autoComplete="username"
             label="Email address"
             onChange={(e) => setEmail(e.target.value)}
-            errorMessage={error}
+            supportingText={
+              showError && emailError ? "Invalid email address" : undefined
+            }
+            hasError={showError && emailError}
           />
           <TextField
             type="password"
@@ -70,6 +82,11 @@ function SignIn() {
           >
             Forgot Password
           </ForgotPasswordLink>
+          {resultError && (
+            <Alert type="error" style={{ marginTop: "1.2rem" }}>
+              The email or password you entered is incorrect. Please try again.
+            </Alert>
+          )}
           <PrimaryButton type="submit" style={{ marginTop: "3.0rem" }}>
             Sign In
           </PrimaryButton>

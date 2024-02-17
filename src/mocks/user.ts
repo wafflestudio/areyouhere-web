@@ -3,15 +3,15 @@ import AxiosMockAdapter from "axios-mock-adapter";
 
 const mock = new AxiosMockAdapter(axios);
 
-let logined = true;
+let logined = false;
 
-mock.onPost("/api/user").reply((_) => {
-  console.log("post /api/user");
+mock.onPost("/api/manager").reply(() => {
+  console.log("post /api/manager");
   logined = true;
   return [HttpStatusCode.Ok];
 });
 
-mock.onPost("/api/user/login").reply((config) => {
+mock.onPost("/api/manager/login").reply((config) => {
   const data = JSON.parse(config.data);
   if (data.email === "test@example.com") {
     logined = true;
@@ -21,12 +21,12 @@ mock.onPost("/api/user/login").reply((config) => {
   }
 });
 
-mock.onGet("/api/user/logout").reply((_) => {
+mock.onGet("/api/manager/logout").reply(() => {
   logined = false;
   return [HttpStatusCode.Ok];
 });
 
-mock.onGet("/api/user").reply((_) => {
+mock.onGet("/api/manager").reply(() => {
   if (logined) {
     return [
       HttpStatusCode.Ok,
@@ -39,7 +39,7 @@ mock.onGet("/api/user").reply((_) => {
   }
 });
 
-mock.onGet(/\/api\/user\/.+/).reply((config) => {
+mock.onGet(/\/api\/manager\/.+/).reply((config) => {
   const email = config.url?.split("/").pop();
   if (email === "test@example.com") {
     return [HttpStatusCode.Conflict];

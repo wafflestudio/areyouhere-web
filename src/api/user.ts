@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios, { HttpStatusCode } from "axios";
 
 export type SignUpRequest = {
-  name: string;
+  nickname: string;
   email: string;
   password: string;
 };
@@ -13,15 +13,25 @@ export type SignInRequest = {
 };
 
 export type User = {
+  email: string;
   name: string;
 };
 
+export const EMAIL_REGEX =
+  "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+export const PASSWORD_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$";
+export const NICKNAME_REGEX = "^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,16}$";
+
+export const getUser = async (): Promise<User> => {
+  return (await axios.get<User>("/api/manager")).data;
+};
+
 export const postSignUp = async (request: SignUpRequest): Promise<void> => {
-  return axios.post("/api/user", request);
+  return axios.post("/api/manager", request);
 };
 
 export const postSignIn = async (request: SignInRequest): Promise<void> => {
-  const res = await axios.post("/api/user/login", request, {
+  const res = await axios.post("/api/manager/login", request, {
     validateStatus: () => true,
   });
 
@@ -33,11 +43,11 @@ export const postSignIn = async (request: SignInRequest): Promise<void> => {
 };
 
 export const getLogout = async (): Promise<void> => {
-  return axios.get("/api/user/logout");
+  return axios.get("/api/manager/logout");
 };
 
 export const getEmailConflict = async (email: string): Promise<boolean> => {
-  const res = await axios.get(`/api/user/${email}`, {
+  const res = await axios.get(`/api/manager/${email}`, {
     validateStatus: () => true,
   });
 
@@ -46,10 +56,6 @@ export const getEmailConflict = async (email: string): Promise<boolean> => {
   } else {
     return false;
   }
-};
-
-export const getUser = async (): Promise<User> => {
-  return (await axios.get<User>("/api/user")).data;
 };
 
 export const useUser = () => {
