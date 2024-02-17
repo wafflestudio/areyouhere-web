@@ -13,21 +13,21 @@ const courses: Course[] = [
     name: "Course 1",
     description: "Description for Course 1",
     allowOnlyRegistered: true,
-    attendees: ["User 1", "User 2"],
+    manager: ["User 1", "User 2"],
   },
   {
     id: 2,
     name: "Course 2",
     description: "Description for Course 2",
     allowOnlyRegistered: false,
-    attendees: ["User 3", "User 4"],
+    manager: ["User 3", "User 4"],
   },
   {
     id: 3,
     name: "Course 3",
     description: "Description for Course 3",
     allowOnlyRegistered: true,
-    attendees: ["User 5", "User 6", "User 7"],
+    manager: ["User 5", "User 6", "User 7"],
   },
 ];
 
@@ -43,7 +43,7 @@ function addCourseMock(mock: AxiosMockAdapter) {
       name: data.name,
       description: data.description,
       allowOnlyRegistered: data.onlyListNameAllowed,
-      attendees: data.attendees,
+      manager: data.attendees,
     });
     return [HttpStatusCode.Ok];
   });

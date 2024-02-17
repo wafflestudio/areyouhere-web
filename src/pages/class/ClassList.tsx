@@ -55,7 +55,7 @@ function ClassList() {
                   id={classItem.id}
                   name={classItem.name}
                   description={classItem.description}
-                  attendeeNumber={classItem.attendees.length}
+                  attendeeNumber={classItem.manager.length}
                   color={"#ffffff"}
                   onDelete={() => {
                     setDeleteTarget(classItem.id);
