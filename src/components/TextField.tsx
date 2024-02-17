@@ -1,4 +1,11 @@
+import React from "react";
 import styled from "styled-components";
+
+interface TextAreaProps
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string;
+  textareaStyle?: React.CSSProperties;
+}
 
 const StyledInput = styled.input<{ hasError?: boolean }>`
   padding: 1rem 1.5rem;
@@ -31,6 +38,25 @@ interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   errorMessage?: string;
 }
 
+const StyledTextArea = styled.textarea`
+  padding: 1rem 1.5rem;
+  ${({ theme }) => theme.typography.b3};
+  border: 0.1rem solid #e3e3e3;
+  border-radius: 1rem;
+
+  width: 45rem;
+
+  resize: none;
+
+  :focus {
+    outline: none;
+  }
+
+  ::placeholder {
+    color: #9b9b9b;
+  }
+`;
+
 function TextField({
   label,
   style,
@@ -39,7 +65,7 @@ function TextField({
   ...props
 }: TextFieldProps) {
   return (
-    <TextFieldContainer style={style}>
+    <InputContainer style={style}>
       {label && <TextFieldLabel>{label}</TextFieldLabel>}
       <StyledInput
         {...props}
@@ -47,15 +73,27 @@ function TextField({
         hasError={errorMessage != null}
       />
       {errorMessage != null && <ErrorLabel>{errorMessage}</ErrorLabel>}
-    </TextFieldContainer>
+    </InputContainer>
   );
 }
 
-const TextFieldContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-`;
+function MultiLineTextField({
+  label,
+  style,
+  textareaStyle,
+  ...props
+}: TextAreaProps) {
+  return (
+    <TextAreaContainer style={style}>
+      {label && (
+        <div>
+          <TextFieldLabel>{label}</TextFieldLabel>
+        </div>
+      )}
+      <StyledTextArea {...props} style={textareaStyle} />
+    </TextAreaContainer>
+  );
+}
 
 const TextFieldLabel = styled.label`
   ${({ theme }) => theme.typography.b3};
@@ -69,4 +107,23 @@ const ErrorLabel = styled.p`
   margin-top: 0.1rem;
 `;
 
+const InputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+`;
+
+const TextAreaContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 1.8rem;
+
+  div {
+    width: 18rem;
+    text-align: right;
+    padding-top: 1rem;
+  }
+`;
+
 export default TextField;
+export { MultiLineTextField };

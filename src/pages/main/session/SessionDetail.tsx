@@ -79,12 +79,6 @@ const Container = styled.div`
   justify-content: center;
 `;
 
-const Divider = styled.div`
-  width: calc(100% - 7rem);
-  border-top: ${({ theme }) => theme.colors.grey} 1px solid;
-  margin: 2.1rem 2.9rem 3.3rem 4.1rem;
-`;
-
 const ContentContainer = styled.div`
   width: 118.1rem;
   display: flex;
