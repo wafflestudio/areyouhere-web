@@ -21,7 +21,15 @@ export const postSignUp = async (request: SignUpRequest): Promise<void> => {
 };
 
 export const postSignIn = async (request: SignInRequest): Promise<void> => {
-  return axios.post("/api/user/login", request);
+  const res = await axios.post("/api/user/login", request, {
+    validateStatus: () => true,
+  });
+
+  if (res.status == HttpStatusCode.Ok) {
+    return;
+  } else {
+    throw new Error("Failed to sign in");
+  }
 };
 
 export const getLogout = async (): Promise<void> => {

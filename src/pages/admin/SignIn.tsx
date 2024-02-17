@@ -18,6 +18,7 @@ function SignIn() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | undefined>();
 
   // TODO: handle failure cases
   const { mutate } = useMutation({
@@ -25,6 +26,9 @@ function SignIn() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       navigate("/class");
+    },
+    onError: (error) => {
+      setError(error.message);
     },
   });
 
@@ -51,6 +55,7 @@ function SignIn() {
             autoComplete="username"
             label="Email address"
             onChange={(e) => setEmail(e.target.value)}
+            errorMessage={error}
           />
           <TextField
             type="password"
