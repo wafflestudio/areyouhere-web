@@ -34,12 +34,15 @@ export const getUser = async (): Promise<User | null> => {
 };
 
 export const signUp = async (request: SignUpRequest): Promise<void> => {
-  return await axios.post("/api/manager", request);
+  return await axios.post("/api/manager", request, {
+    withCredentials: true,
+  });
 };
 
 export const signIn = async (request: SignInRequest): Promise<void> => {
   const res = await axios.post("/api/manager/login", request, {
     validateStatus: () => true,
+    withCredentials: true,
   });
 
   if (res.status == HttpStatusCode.Ok) {
@@ -50,7 +53,9 @@ export const signIn = async (request: SignInRequest): Promise<void> => {
 };
 
 export const logout = async (): Promise<void> => {
-  return axios.get("/api/manager/logout");
+  return axios.get("/api/manager/logout", {
+    withCredentials: true,
+  });
 };
 
 let isEmailConflictRequestId = 0;
