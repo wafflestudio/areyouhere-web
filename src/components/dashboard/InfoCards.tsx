@@ -3,9 +3,11 @@ import dateFormat from "dateformat";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
+import { useAttendanceStatus } from "../../api/attendance";
 import { createAuthCode, deactivateAuthCode } from "../../api/authCode";
 import { useCurrentSessionInfo } from "../../api/dashboard";
 import expandDarkGrey from "../../assets/dashboard/expandDarkGrey.svg";
+import { useClassId } from "../../hooks/urlParse";
 import { SecondaryButton } from "../Button";
 
 interface InfoCardsProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -19,7 +21,7 @@ function InfoCards({
   ...props
 }: InfoCardsProps) {
   const location = useLocation();
-  const classId = parseInt(location.pathname.split("/")[2], 10);
+  const classId = useClassId();
 
   const queryClient = useQueryClient();
 
@@ -28,6 +30,7 @@ function InfoCards({
 
   const { mutate: activateSession } = useMutation({
     mutationFn: createAuthCode,
+    mutationKey: ["createAuthCode"],
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["currentSessionInfo", classId],
@@ -37,12 +40,18 @@ function InfoCards({
 
   const { mutate: deactivateSession } = useMutation({
     mutationFn: deactivateAuthCode,
+    mutationKey: ["deactivateAuthCode"],
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["currentSessionInfo", classId],
       });
     },
   });
+
+  const { data: attendanceStatus } = useAttendanceStatus(
+    classId,
+    currentSessionInfo?.id
+  );
 
   return (
     <InfoCardContainer {...props}>
@@ -90,7 +99,7 @@ function InfoCards({
                   // TODO: Activate session
                   if (currentSessionInfo?.id != null) {
                     activateSession({
-                      courseId: classId,
+                      courseId: classId!,
                       sessionId: currentSessionInfo.id,
                     });
                   }
@@ -103,9 +112,11 @@ function InfoCards({
           <InfoCard>
             <InfoCardTitle>Attendance</InfoCardTitle>
             <AttendanceContainer>
-              <AttendanceCount>5</AttendanceCount>
+              <AttendanceCount>
+                {attendanceStatus?.attendances ?? 0}
+              </AttendanceCount>
               <AttendanceTotal>/</AttendanceTotal>
-              <AttendanceTotal>20</AttendanceTotal>
+              <AttendanceTotal>{attendanceStatus?.total ?? 0}</AttendanceTotal>
             </AttendanceContainer>
             <Absentees>5 absentees</Absentees>
           </InfoCard>

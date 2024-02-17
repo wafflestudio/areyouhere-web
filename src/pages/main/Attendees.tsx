@@ -29,6 +29,7 @@ function Attendees() {
   const queryClient = useQueryClient();
   const { mutate: deleteAttendees } = useMutation({
     mutationFn: deleteAttendee,
+    mutationKey: ["deleteAttendee"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
     },

@@ -1,3 +1,4 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -6,6 +7,7 @@ import {
   useCurrentSessionInfo,
   usePreviousSessions,
 } from "../../../api/dashboard.ts";
+import { createSession } from "../../../api/session.ts";
 import { PrimaryButton } from "../../../components/Button.tsx";
 import CreateSessionModal from "../../../components/dashboard/CreateSessionModal.tsx";
 import InfoCards from "../../../components/dashboard/InfoCards.tsx";
@@ -33,6 +35,15 @@ function Dashboard() {
 
   const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
   const { data: previousSessions } = usePreviousSessions(classId);
+
+  const queryClient = useQueryClient();
+  const { mutate: createSessionMutate } = useMutation({
+    mutationFn: createSession,
+    mutationKey: ["createSession"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sessions"] });
+    },
+  });
 
   return (
     <>
@@ -100,6 +111,10 @@ function Dashboard() {
           onClose={closeCreateSessionModal}
           onSubmit={(sessionName) => {
             // TODO: create a new session
+            createSessionMutate({
+              courseId: classId,
+              sessionName,
+            });
           }}
         />
       )}

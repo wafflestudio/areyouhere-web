@@ -1,8 +1,10 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
+import { updateAttendances, UpdateAttendee } from "../../../api/attendance";
 import {
   SessionAttendee,
   useSession,
@@ -30,6 +32,15 @@ function SessionDetail() {
   const { data: session } = useSession(sessionId);
   const { data: sessionAttendees } = useSessionAttendees(sessionId);
 
+  const queryClient = useQueryClient();
+  const { mutate: updateAttendees } = useMutation({
+    mutationFn: updateAttendances,
+    mutationKey: ["updateAttendances"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["session"] });
+    },
+  });
+
   return (
     <Container>
       <TitleBar label="Session Details" />
@@ -47,6 +58,13 @@ function SessionDetail() {
               setTempAttendees(sessionAttendees ?? []);
             } else {
               // TODO: send changed attendance status
+              const updateData: UpdateAttendee[] = tempAttendees.map(
+                (attendee) => ({
+                  attendeeId: attendee.attendeeId,
+                  attendanceStatus: attendee.attendanceStatus,
+                })
+              );
+              updateAttendees(updateData);
             }
             setIsEditing(!isEditing);
           }}

@@ -29,6 +29,7 @@ function Home() {
 
   const { mutate: performAttendance } = useMutation({
     mutationFn: attend,
+    mutationKey: ["attend"],
     onSuccess: () => {
       navigate("/result");
     },

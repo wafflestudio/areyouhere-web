@@ -10,6 +10,7 @@ export type Session = {
 };
 
 export type SessionAttendee = {
+  attendeeId: number;
   attendeeName: string;
   attendanceStatus: boolean;
   attendanceTime: Date;

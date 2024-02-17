@@ -2,11 +2,11 @@ import { HttpStatusCode } from "axios";
 import AxiosMockAdapter from "axios-mock-adapter";
 
 function addAuthCodeMock(mock: AxiosMockAdapter) {
-  mock.onPost("/api/authCode").reply(() => {
+  mock.onPost("/api/auth-code").reply(() => {
     return [HttpStatusCode.Ok, { authCode: "HAHA" }];
   });
 
-  mock.onPost("/api/authCode/deactivate").reply(() => {
+  mock.onPost("/api/auth-code/deactivate").reply(() => {
     return [HttpStatusCode.Ok];
   });
 }

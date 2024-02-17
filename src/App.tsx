@@ -1,11 +1,12 @@
 import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Outlet } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 
 import queryClient from "./api/queryClient";
 import GlobalStyles from "./styles/GlobalStyles";
 import Theme from "./styles/Theme";
-import "./mocks/index";
+// import "./mocks/index";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <GlobalStyles />
         <Outlet />
       </ThemeProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

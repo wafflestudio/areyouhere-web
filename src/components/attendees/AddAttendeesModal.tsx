@@ -34,6 +34,7 @@ function AddAttendeesModal({
   const queryClient = useQueryClient();
   const { mutate: createAttendees } = useMutation({
     mutationFn: createAttendee,
+    mutationKey: ["createAttendee"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
     },

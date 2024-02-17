@@ -19,6 +19,7 @@ function ClassList() {
 
   const { mutate: deleteClass } = useMutation({
     mutationFn: deleteCourse,
+    mutationKey: ["deleteCourse"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
     },

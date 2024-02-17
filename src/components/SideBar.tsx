@@ -40,6 +40,7 @@ function SideBar() {
   const queryClient = useQueryClient();
   const { mutate: logoutAndRedirect } = useMutation({
     mutationFn: logout,
+    mutationKey: ["logout"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       navigate("/admin/signin");

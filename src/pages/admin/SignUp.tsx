@@ -37,6 +37,7 @@ function SignUp() {
   // TODO: handle failure cases
   const { mutate } = useMutation({
     mutationFn: signUp,
+    mutationKey: ["signUp"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       navigate("/class");

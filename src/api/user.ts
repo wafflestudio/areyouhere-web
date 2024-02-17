@@ -84,7 +84,7 @@ export const isEmailConflict = async (
 };
 
 export const useUser = () => {
-  return useQuery<User>({
+  return useQuery<User | null>({
     queryKey: ["user"],
     queryFn: getUser,
     staleTime: Infinity,

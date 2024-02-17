@@ -12,6 +12,11 @@ function addAttendanceMock(mock: AxiosMockAdapter) {
       return [HttpStatusCode.NoContent];
     }
   });
+
+  // /api/attendance/:courseId/:sessionId
+  mock.onGet(/\/api\/attendance\/\d+\/\d+/).reply((config) => {
+    return [HttpStatusCode.Ok, { attendances: 10, total: 20 }];
+  });
 }
 
 export default addAttendanceMock;

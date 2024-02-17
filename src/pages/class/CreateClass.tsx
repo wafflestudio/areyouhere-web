@@ -16,6 +16,7 @@ function CreateClass() {
 
   const { mutate: createClass } = useMutation({
     mutationFn: createCourse,
+    mutationKey: ["createClass"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
       navigate("/class");
