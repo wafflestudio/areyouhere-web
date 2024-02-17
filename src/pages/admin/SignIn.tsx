@@ -87,7 +87,11 @@ function SignIn() {
               The email or password you entered is incorrect. Please try again.
             </Alert>
           )}
-          <PrimaryButton type="submit" style={{ marginTop: "3.0rem" }}>
+          <PrimaryButton
+            type="submit"
+            style={{ marginTop: "3.0rem" }}
+            disabled={email === "" || password === ""}
+          >
             Sign In
           </PrimaryButton>
           <OptionalActionLabel style={{ marginTop: "5.0rem" }}>

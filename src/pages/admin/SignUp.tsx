@@ -121,7 +121,17 @@ function SignUp() {
           }
           hasError={showError && confirmPasswordError}
         />
-        <PrimaryButton style={{ marginTop: "3.0rem" }}>Sign up</PrimaryButton>
+        <PrimaryButton
+          style={{ marginTop: "3.0rem" }}
+          disabled={
+            nickname === "" ||
+            email === "" ||
+            password === "" ||
+            confirmPassword === ""
+          }
+        >
+          Sign up
+        </PrimaryButton>
         <OptionalActionLabel style={{ marginTop: "5.0rem" }}>
           Already a member?{" "}
           <OptionalActionLink to="/admin/signin">Sign in</OptionalActionLink>
