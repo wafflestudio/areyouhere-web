@@ -1,8 +1,14 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-import dotsVerticalGrey from "../../assets/class/dotsVerticalGrey.svg";
-import Theme from "../../styles/Theme.tsx";
+import trashRed from "../../assets/class/trashRed.svg";
+import {
+  DropdownContainer,
+  DropdownMenu,
+  DropdownButton,
+  DropdownMenuButton,
+} from "../Dropdown.tsx";
 
 interface ClassItemProps {
   id: number;
@@ -10,6 +16,7 @@ interface ClassItemProps {
   description: string;
   attendeeNumber: number;
   color: string;
+  onDelete?: () => void;
 }
 
 function ClassItem({
@@ -18,39 +25,71 @@ function ClassItem({
   description,
   attendeeNumber,
   color,
+  onDelete,
 }: ClassItemProps) {
-  const navigate = useNavigate();
+  const [isMoreMenuOpened, setIsMoreMenuOpened] = useState(false);
 
   return (
-    <Container
-      style={{ backgroundColor: color }}
-      onClick={() => navigate(`/class/${id}`)}
-    >
-      <h4>{name}</h4>
-      <img src={dotsVerticalGrey} alt="menu" />
-      <p className="description">{description}</p>
-      <p className="attendeeNumber">{attendeeNumber}</p>
+    <Container style={{ backgroundColor: color }}>
+      <ContentLink to={`/class/${id}`}>
+        <h4>{name}</h4>
+        <p className="description">{description}</p>
+        <p className="attendeeNumber">{attendeeNumber}</p>
+      </ContentLink>
+      <DropdownContainer
+        style={{ position: "absolute", top: "3.5rem", right: "1.6rem" }}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+            console.log("2");
+            setIsMoreMenuOpened(false);
+          }
+        }}
+      >
+        <DropdownMenu isOpened={isMoreMenuOpened}>
+          <DropdownDeleteButton
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              setIsMoreMenuOpened(false);
+              onDelete?.();
+            }}
+          >
+            <img src={trashRed} alt="Delete" width={20} height={20} />
+            Delete
+          </DropdownDeleteButton>
+        </DropdownMenu>
+        <DropdownButton
+          type="button"
+          onClick={() => {
+            setIsMoreMenuOpened(!isMoreMenuOpened);
+          }}
+        />
+      </DropdownContainer>
     </Container>
   );
 }
 
 const Container = styled.div`
+  position: relative;
+  width: 36rem;
+  height: 24rem;
+
+  border: 0.1rem solid ${({ theme }) => theme.colors.grey};
+  border-radius: 1rem;
+  box-shadow: ${({ theme }) => theme.effects.dropShadow};
+`;
+
+const ContentLink = styled(Link)`
+  width: 100%;
+  height: 100%;
+  padding: 3.5rem 4rem;
+
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-
-  width: 36rem;
-  height: 24rem;
   gap: 1.7rem;
 
-  border: 0.1rem solid ${Theme.colors.grey};
-  border-radius: 1rem;
-
-  padding: 3.3rem;
-
-  cursor: pointer;
-  position: relative;
-
+  text-decoration: none;
   h4 {
     width: 100%;
     height: 3.2rem;
@@ -59,6 +98,8 @@ const Container = styled.div`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    color: ${({ theme }) => theme.colors.black};
   }
 
   p {
@@ -70,28 +111,19 @@ const Container = styled.div`
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 5;
     text-overflow: ellipsis;
+
+    color: ${({ theme }) => theme.colors.darkGrey};
   }
 
   p.description {
-    height: 10rem;
+    flex: 1;
   }
+`;
 
-  p.attendeeNumber {
-    height: 2rem;
-  }
-
-  &:hover img {
-    opacity: 1;
-  }
-
-  img {
-    position: absolute;
-    top: 2.4rem;
-    right: 1.2rem;
-
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-    cursor: pointer;
+const DropdownDeleteButton = styled(DropdownMenuButton)`
+  color: ${({ theme }) => theme.colors.red["500"]};
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.red["50"]};
   }
 `;
 
