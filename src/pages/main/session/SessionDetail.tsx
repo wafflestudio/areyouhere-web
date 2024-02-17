@@ -123,7 +123,9 @@ function SessionDetail() {
                     </AttendanceChipContainer>
                   </SessionTableItem>
                   <SessionTableItem>
-                    {dateFormat(attendee?.attendanceTime, "HH:MM")}
+                    {sessionAttendees?.[index]?.attendanceStatus === true
+                      ? dateFormat(attendee?.attendanceTime, "HH:mm:ss")
+                      : "--:--:--"}
                   </SessionTableItem>
                 </tr>
               ))}
