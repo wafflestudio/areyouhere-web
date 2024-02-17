@@ -38,7 +38,7 @@ const TextFieldContainer = styled.div`
 const TextFieldLabel = styled.label`
   ${({ theme }) => theme.typography.b3};
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 0.4rem;
 `;
 
 export default TextField;
