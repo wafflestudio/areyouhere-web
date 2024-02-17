@@ -2,6 +2,7 @@ import { HttpStatusCode } from "axios";
 import AxiosMockAdapter from "axios-mock-adapter";
 
 const currentSessionInfo = {
+  id: 1,
   name: "Current Session",
   startTime: new Date().toISOString(),
   authCode: "HAHA",

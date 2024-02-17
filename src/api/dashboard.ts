@@ -4,6 +4,7 @@ import axios, { HttpStatusCode } from "axios";
 import { Session } from "./session";
 
 export type CurrentSessionInfo = {
+  id: number;
   authCode?: string;
   name: string;
   startTime?: Date;
