@@ -26,11 +26,11 @@ export const getUser = async (): Promise<User> => {
   return (await axios.get<User>("/api/manager")).data;
 };
 
-export const postSignUp = async (request: SignUpRequest): Promise<void> => {
+export const signUp = async (request: SignUpRequest): Promise<void> => {
   return axios.post("/api/manager", request);
 };
 
-export const postSignIn = async (request: SignInRequest): Promise<void> => {
+export const signIn = async (request: SignInRequest): Promise<void> => {
   const res = await axios.post("/api/manager/login", request, {
     validateStatus: () => true,
   });
@@ -42,28 +42,27 @@ export const postSignIn = async (request: SignInRequest): Promise<void> => {
   }
 };
 
-export const getLogout = async (): Promise<void> => {
+export const logout = async (): Promise<void> => {
   return axios.get("/api/manager/logout");
 };
 
-const getEmailConflictRequestId = 0;
+const isEmailConflictRequestId = 0;
 
-export const getEmailConflict = async (
+export const isEmailConflict = async (
   email: string,
   enabled: boolean
 ): Promise<boolean> => {
-  console.log("getEmailConflict", email, enabled);
   if (!enabled) {
     return false;
   }
 
-  // 1000개 이상의 요청이 100ms 안에 들어오지는 않을 것이라 가정
+  // 10000000개 이상의 요청이 100ms 안에 들어오지는 않을 것이라 가정
   const requestId =
-    getEmailConflictRequestId > 1000 ? 0 : getEmailConflictRequestId + 1;
+    isEmailConflictRequestId > 10000000 ? 0 : isEmailConflictRequestId + 1;
 
   await new Promise((resolve) => setTimeout(resolve, 100));
 
-  if (requestId !== getEmailConflictRequestId) {
+  if (requestId !== isEmailConflictRequestId) {
     return false;
   }
 
@@ -88,6 +87,6 @@ export const useUser = () => {
 export const useEmailConflict = (email: string, enabled: boolean) => {
   return useQuery<boolean>({
     queryKey: ["user", email],
-    queryFn: () => getEmailConflict(email, enabled),
+    queryFn: () => isEmailConflict(email, enabled),
   });
 };

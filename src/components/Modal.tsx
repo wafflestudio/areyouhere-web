@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import styled from "styled-components";
 
 import { ModalProps } from "../type";
@@ -87,6 +88,18 @@ export default function Modal({
   onBackgroundClick,
   state,
 }: ModalProps) {
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && state === "open") {
+        onBackgroundClick();
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+    };
+  }, [onBackgroundClick, state]);
+
   return (
     <>
       {state !== "closed" && (

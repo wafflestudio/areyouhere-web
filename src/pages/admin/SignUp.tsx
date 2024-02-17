@@ -7,7 +7,7 @@ import {
   EMAIL_REGEX,
   NICKNAME_REGEX,
   PASSWORD_REGEX,
-  postSignUp,
+  signUp,
   useEmailConflict,
 } from "../../api/user";
 import {
@@ -36,7 +36,7 @@ function SignUp() {
 
   // TODO: handle failure cases
   const { mutate } = useMutation({
-    mutationFn: postSignUp,
+    mutationFn: signUp,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       navigate("/class");
