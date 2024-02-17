@@ -1,22 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
 import { Navigate, Outlet } from "react-router-dom";
 import styled from "styled-components";
 
-import { User, getUser } from "../../api/user.ts";
+import { useUser } from "../../api/user.ts";
 import SideBar from "../SideBar.tsx";
 
 function AuthRequiredRoute() {
   // TODO: handle isError
-  const { isLoading, data } = useQuery<User>({
-    queryKey: ["user"],
-    queryFn: getUser,
-  });
+  const { data: user, isLoading } = useUser();
 
   if (isLoading) {
     // TODO: apply design
-    return <div>Loading...</div>;
+    return <div></div>;
   } else {
-    if (data) {
+    if (user) {
       return (
         <Container>
           <SideBar />
