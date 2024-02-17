@@ -5,19 +5,19 @@ import styled from "styled-components";
 import {
   useCurrentSessionInfo,
   usePreviousSessions,
-} from "../../api/dashboard.ts";
-import { PrimaryButton } from "../../components/Button.tsx";
-import CreateSessionModal from "../../components/dashboard/CreateSessionModal.tsx";
-import InfoCards from "../../components/dashboard/InfoCards.tsx";
+} from "../../../api/dashboard.ts";
+import { PrimaryButton } from "../../../components/Button.tsx";
+import CreateSessionModal from "../../../components/dashboard/CreateSessionModal.tsx";
+import InfoCards from "../../../components/dashboard/InfoCards.tsx";
 import {
   SessionTable,
   SessionTableHead,
   SessionTableHeadItem,
   SessionTableBody,
   SessionTableItem,
-} from "../../components/sessions/SessionTable.tsx";
-import TitleBar from "../../components/TitleBar.tsx";
-import useModalState from "../../hooks/modal.tsx";
+} from "../../../components/sessions/SessionTable.tsx";
+import TitleBar from "../../../components/TitleBar.tsx";
+import useModalState from "../../../hooks/modal.tsx";
 
 function Dashboard() {
   const navigate = useNavigate();

@@ -134,7 +134,11 @@ function AddAttendeesModal({
             onCompositionStart={() => setIsComposing(true)}
             onCompositionEnd={() => setIsComposing(false)}
           />
-          <ChipBox attendeeList={attendeeList} removeChip={removeChip} />
+          <ChipBox
+            attendeeList={attendeeList}
+            removeChip={removeChip}
+            chipContainerStyle={{ height: "14rem", overflowY: "scroll" }}
+          />
         </ContentContainer>
         <ButtonContainer>
           <GreyButton onClick={onCancel}>Cancel</GreyButton>
@@ -147,6 +151,7 @@ function AddAttendeesModal({
               });
               onCancel();
             }}
+            disabled={attendeeList.length === 0}
           >
             Add New Attendees
           </PrimaryButton>

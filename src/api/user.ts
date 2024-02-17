@@ -70,11 +70,7 @@ export const isEmailConflict = async (
     validateStatus: () => true,
   });
 
-  if (res.status == HttpStatusCode.Conflict) {
-    return true;
-  } else {
-    return false;
-  }
+  return res.status == HttpStatusCode.Conflict;
 };
 
 export const useUser = () => {

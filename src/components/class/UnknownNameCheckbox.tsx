@@ -16,7 +16,7 @@ function UnknownNameCheckbox({ checkboxId, checked, onChange }: checkboxProps) {
   return (
     <Container>
       <Checkbox checkboxId={checkboxId} checked={checked} onChange={onChange} />
-      <Label htmlFor="checkbox">Only Listed Names Allowed</Label>
+      <Label htmlFor={checkboxId}>Only Listed Names Allowed</Label>
       <TooltipIcon>
         <TooltipText>
           If checked, unlisted attendees won't be added even with the passcode.

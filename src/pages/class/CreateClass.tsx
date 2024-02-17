@@ -161,6 +161,7 @@ function CreateClass() {
               onlyListNameAllowed: isCheckedUnknownName,
             });
           }}
+          disabled={className === ""}
         >
           Create a New Class
         </PrimaryButton>

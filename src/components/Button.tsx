@@ -26,7 +26,7 @@ const PrimaryButton = styled(ButtonBase)<{ colorScheme?: string }>`
     theme.colors[colorScheme ?? "primary"]["500"]};
   color: ${({ theme }) => theme.colors.white};
 
-  &:hover {
+  &:not(:disabled):hover {
     background-color: ${({ theme, colorScheme }) =>
       theme.colors[colorScheme ?? "primary"]["700"]};
   }
@@ -34,6 +34,7 @@ const PrimaryButton = styled(ButtonBase)<{ colorScheme?: string }>`
   &:disabled {
     background-color: ${({ theme, colorScheme }) =>
       theme.colors[colorScheme ?? "primary"]["300"]};
+    cursor: default;
   }
 `;
 
@@ -43,7 +44,7 @@ const SecondaryButton = styled(ButtonBase)<{ colorScheme?: string }>`
   color: ${({ theme, colorScheme }) =>
     theme.colors[colorScheme ?? "primary"]["500"]};
 
-  &:hover {
+  &:not(:disabled):hover {
     background-color: ${({ theme, colorScheme }) =>
       theme.colors[colorScheme ?? "primary"]["300"]};
     color: ${({ theme, colorScheme }) =>
@@ -55,6 +56,7 @@ const SecondaryButton = styled(ButtonBase)<{ colorScheme?: string }>`
       theme.colors[colorScheme ?? "primary"]["75"]};
     color: ${({ theme, colorScheme }) =>
       theme.colors[colorScheme ?? "primary"]["300"]};
+    cursor: default;
   }
 `;
 
@@ -65,7 +67,7 @@ const TertiaryButton = styled(ButtonBase)<{ colorScheme?: string }>`
   border: 1px solid
     ${({ theme, colorScheme }) => theme.colors[colorScheme ?? "primary"]["500"]};
 
-  &:hover {
+  &:not(:disabled):hover {
     background-color: ${({ theme, colorScheme }) =>
       theme.colors[colorScheme ?? "primary"]["50"]};
   }
@@ -77,6 +79,7 @@ const TertiaryButton = styled(ButtonBase)<{ colorScheme?: string }>`
     border: 1px solid
       ${({ theme, colorScheme }) =>
         theme.colors[colorScheme ?? "primary"]["300"]};
+    cursor: default;
   }
 `;
 
@@ -84,12 +87,13 @@ const GreyButton = styled(ButtonBase)`
   background-color: #b0b0b0;
   color: ${({ theme }) => theme.colors.white};
 
-  &:hover {
+  &:not(:disabled):hover {
     background-color: #727272;
   }
 
   &:disabled {
     background-color: ${({ theme }) => theme.colors.grey};
+    cursor: default;
   }
 `;
 

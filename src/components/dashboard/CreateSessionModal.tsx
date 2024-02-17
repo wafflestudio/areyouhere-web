@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
 
+import sessions from "../../pages/main/session/Sessions.tsx";
 import { ModalStateType } from "../../type";
 import { GreyButton, PrimaryButton } from "../Button";
 import Modal from "../Modal";
@@ -31,7 +32,10 @@ function CreateSessionModal({
         />
         <ButtonContainer>
           <GreyButton onClick={onClose}>Cancel</GreyButton>
-          <PrimaryButton onClick={() => onSubmit?.(sessionName)}>
+          <PrimaryButton
+            onClick={() => onSubmit?.(sessionName)}
+            disabled={sessionName === ""}
+          >
             Create a New Session
           </PrimaryButton>
         </ButtonContainer>
