@@ -1,3 +1,4 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
 
@@ -35,6 +36,15 @@ function SideBar() {
   const location = useLocation().pathname;
 
   const { classId } = useParams();
+
+  const queryClient = useQueryClient();
+  const { mutate: logoutAndRedirect } = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      navigate("/admin/signin");
+    },
+  });
 
   const menuItems = [
     {
@@ -119,7 +129,10 @@ function SideBar() {
             </IconContainer>
           );
         })}
-      <IconContainer onClick={logout} style={{ marginTop: "auto" }}>
+      <IconContainer
+        onClick={() => logoutAndRedirect()}
+        style={{ marginTop: "auto" }}
+      >
         <img src={logoutIcon} alt="logout" />
       </IconContainer>
     </Container>
