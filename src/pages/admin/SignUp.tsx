@@ -9,6 +9,7 @@ import {
   PASSWORD_REGEX,
   signUp,
   useEmailConflict,
+  useUser,
 } from "../../api/user";
 import {
   OptionalActionLabel,
@@ -34,17 +35,23 @@ function SignUp() {
 
   const [showError, setShowError] = useState(false);
 
+  const { data: user } = useUser();
+
   // TODO: handle failure cases
   const { mutate } = useMutation({
     mutationFn: signUp,
     mutationKey: ["signUp"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      navigate("/class");
+      // navigate("/class");
     },
   });
 
   const { data: isEmailConflict } = useEmailConflict(email, !emailError);
+
+  if (user != null) {
+    navigate("/class");
+  }
 
   return (
     <Container>

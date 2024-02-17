@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { EMAIL_REGEX, signIn } from "../../api/user";
+import { EMAIL_REGEX, signIn, useUser } from "../../api/user";
 import {
   OptionalActionLabel,
   OptionalActionLink,
@@ -25,18 +25,24 @@ function SignIn() {
 
   const [resultError, setResultError] = useState<string | undefined>();
 
+  const { data: user } = useUser();
+
   // TODO: handle failure cases
   const { mutate } = useMutation({
     mutationFn: signIn,
     mutationKey: ["signIn"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      navigate("/class");
+      // navigate("/class");
     },
     onError: (error) => {
       setResultError(error.message);
     },
   });
+
+  if (user != null) {
+    navigate("/class");
+  }
 
   return (
     <Container>
