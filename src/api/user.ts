@@ -26,15 +26,6 @@ export const getUser = async (): Promise<User> => {
   return (await axios.get<User>("/api/manager")).data;
 };
 
-export const EMAIL_REGEX =
-  "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
-export const PASSWORD_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$";
-export const NICKNAME_REGEX = "^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,16}$";
-
-export const getUser = async (): Promise<User> => {
-  return (await axios.get<User>("/api/manager")).data;
-};
-
 export const signUp = async (request: SignUpRequest): Promise<void> => {
   return axios.post("/api/manager", request);
 };

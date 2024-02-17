@@ -24,7 +24,6 @@ function CreateClass() {
 
   const [className, setClassName] = useState("");
   const [description, setDescription] = useState("");
-  const [onlyListNameAllowed, setOnlyListNameAllowed] = useState(false);
 
   // 이름 목록 chip으로 저장, 관리
   const [attendeeInput, setAttendeeInput] = useState("");
@@ -152,7 +151,17 @@ function CreateClass() {
           onChange={handleUnknownNameCheckbox}
         />
         <ChipBox attendeeList={attendeeList} removeChip={removeChip} />
-        <PrimaryButton style={{ width: "45rem" }}>
+        <PrimaryButton
+          style={{ width: "45rem" }}
+          onClick={() => {
+            createClass({
+              name: className,
+              description,
+              attendees: attendeeList,
+              onlyListNameAllowed: isCheckedUnknownName,
+            });
+          }}
+        >
           Create a New Class
         </PrimaryButton>
       </CreatClassContainer>
