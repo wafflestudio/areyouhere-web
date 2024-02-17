@@ -171,7 +171,7 @@ function Attendees() {
         content={
           <p>
             Are you sure you want to delete
-            <p style={{ fontWeight: "700" }}>{`${checkedCount} Attendees?`}</p>
+            <p style={{ fontWeight: "700" }}>{checkedCount} Attendees?</p>
             You can't undo this action.
           </p>
         }

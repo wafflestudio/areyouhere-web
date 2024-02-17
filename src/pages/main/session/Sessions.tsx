@@ -9,12 +9,15 @@ import TitleBar from "../../../components/TitleBar.tsx";
 import useModalState from "../../../hooks/modal.tsx";
 
 function Sessions() {
-  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
-  const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
-
   const location = useLocation();
   const classId = parseInt(location.pathname.split("/")[2], 10);
+
   const { data: sessions } = useSessions(classId);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const deleteTargetName =
+    sessions?.find((session) => session.id === deleteTarget)?.name ?? "";
+
+  const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
 
   return (
     <>
@@ -33,7 +36,7 @@ function Sessions() {
                 key={session.id}
                 to={`/class/${classId}/sessions/${session.id}`}
                 date={session.date}
-                sessionName="asd"
+                sessionName={session.name}
                 attendance={session.attendee}
                 absence={session.absentee}
                 onDelete={() => {
@@ -49,11 +52,11 @@ function Sessions() {
         type="delete"
         title="Delete Session?"
         content={
-          <span>
-            Are you sure you want to delete "<b>asd</b>"?
-            <br />
+          <p>
+            Are you sure you want to delete
+            <p style={{ fontWeight: "700" }}>{deleteTargetName}</p>
             You can't undo this action.
-          </span>
+          </p>
         }
         onCancel={() => {
           closeDeleteModal();
