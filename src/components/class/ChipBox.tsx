@@ -1,3 +1,4 @@
+import React from "react";
 import styled from "styled-components";
 
 import crossBlack from "../../assets/class/crossBlack.svg";
@@ -5,12 +6,14 @@ import crossBlack from "../../assets/class/crossBlack.svg";
 function ChipBox({
   attendeeList,
   removeChip,
+  chipContainerStyle,
 }: {
   attendeeList: string[];
   removeChip: (index: number) => void;
+  chipContainerStyle?: React.CSSProperties;
 }) {
   return (
-    <ChipContainer>
+    <ChipContainer style={chipContainerStyle}>
       <p>
         Attendee List<span>{` (${attendeeList.length})`}</span>
       </p>
