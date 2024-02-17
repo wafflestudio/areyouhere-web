@@ -71,15 +71,13 @@ function ClassList() {
         type="delete"
         title="Delete Class?"
         content={
-          <span>
-            Are you sure you want to delete{" "}
-            <span style={{ fontWeight: "700" }}>
-              "{classList?.find((c) => c.id === deleteTarget)?.name}"
-            </span>
-            ?
-            <br />
+          <p>
+            Are you sure you want to delete
+            <p style={{ fontWeight: "700" }}>
+              {classList?.find((c) => c.id === deleteTarget)?.name}
+            </p>
             You can't undo this action.
-          </span>
+          </p>
         }
         onCancel={() => {
           closeDeleteModal();

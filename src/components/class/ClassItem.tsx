@@ -34,13 +34,12 @@ function ClassItem({
       <ContentLink to={`/class/${id}`}>
         <h4>{name}</h4>
         <p className="description">{description}</p>
-        <p className="attendeeNumber">{attendeeNumber}</p>
+        <p className="attendeeNumber">{attendeeNumber} Attendees</p>
       </ContentLink>
       <DropdownContainer
         style={{ position: "absolute", top: "3.5rem", right: "1.6rem" }}
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget as Node)) {
-            console.log("2");
             setIsMoreMenuOpened(false);
           }
         }}
