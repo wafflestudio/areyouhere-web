@@ -2,7 +2,10 @@ import dateFormat from "dateformat";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { usePreviousSessions } from "../../api/dashboard.ts";
+import {
+  useCurrentSessionInfo,
+  usePreviousSessions,
+} from "../../api/dashboard.ts";
 import { PrimaryButton } from "../../components/Button.tsx";
 import CreateSessionModal from "../../components/dashboard/CreateSessionModal.tsx";
 import InfoCards from "../../components/dashboard/InfoCards.tsx";
@@ -28,12 +31,13 @@ function Dashboard() {
   const location = useLocation();
   const classId = parseInt(location.pathname.split("/")[2], 10);
 
+  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
   const { data: previousSessions } = usePreviousSessions(classId);
 
   return (
     <>
       <Container>
-        <TitleBar label="Class Name">
+        <TitleBar label={currentSessionInfo?.name ?? ""}>
           <PrimaryButton onClick={() => openCreateSessionModal()}>
             Create New Session
           </PrimaryButton>
