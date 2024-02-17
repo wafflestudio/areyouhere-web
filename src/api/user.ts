@@ -20,14 +20,21 @@ export type User = {
 export const EMAIL_REGEX =
   "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 export const PASSWORD_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$";
-export const NICKNAME_REGEX = "^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,16}$";
+export const NICKNAME_REGEX = "^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣]{2,16}$";
 
-export const getUser = async (): Promise<User> => {
-  return (await axios.get<User>("/api/manager")).data;
+export const getUser = async (): Promise<User | null> => {
+  const res = await axios.get<User>("/api/manager", {
+    validateStatus: () => true,
+  });
+  if (res.status === HttpStatusCode.Ok) {
+    return res.data;
+  } else {
+    return null;
+  }
 };
 
 export const signUp = async (request: SignUpRequest): Promise<void> => {
-  return axios.post("/api/manager", request);
+  return await axios.post("/api/manager", request);
 };
 
 export const signIn = async (request: SignInRequest): Promise<void> => {
@@ -46,7 +53,7 @@ export const logout = async (): Promise<void> => {
   return axios.get("/api/manager/logout");
 };
 
-const isEmailConflictRequestId = 0;
+let isEmailConflictRequestId = 0;
 
 export const isEmailConflict = async (
   email: string,
@@ -59,12 +66,15 @@ export const isEmailConflict = async (
   // 10000000개 이상의 요청이 100ms 안에 들어오지는 않을 것이라 가정
   const requestId =
     isEmailConflictRequestId > 10000000 ? 0 : isEmailConflictRequestId + 1;
+  isEmailConflictRequestId = requestId;
 
   await new Promise((resolve) => setTimeout(resolve, 100));
 
   if (requestId !== isEmailConflictRequestId) {
     return false;
   }
+
+  console.log("isEmailConflict", email);
 
   const res = await axios.get(`/api/manager/${email}`, {
     validateStatus: () => true,
@@ -77,6 +87,8 @@ export const useUser = () => {
   return useQuery<User>({
     queryKey: ["user"],
     queryFn: getUser,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 };
 
