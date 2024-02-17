@@ -83,7 +83,12 @@ function AddAttendeesModal({
         </ContentContainer>
         <ButtonContainer>
           <GreyButton onClick={onCancel}>Cancel</GreyButton>
-          <PrimaryButton onClick={() => {}}>Add New Attendees</PrimaryButton>
+          <PrimaryButton
+            onClick={() => {}}
+            disabled={attendeeList.length === 0}
+          >
+            Add New Attendees
+          </PrimaryButton>
         </ButtonContainer>
       </Container>
     </Modal>

@@ -41,7 +41,9 @@ function Settings() {
           checked={isCheckedUnknownName}
           onChange={handleUnknownNameCheckbox}
         />
-        <PrimaryButton style={{ width: "45rem" }}>Save Changes</PrimaryButton>
+        <PrimaryButton style={{ width: "45rem" }} disabled={className === ""}>
+          Save Changes
+        </PrimaryButton>
       </CreatClassContainer>
     </Container>
   );

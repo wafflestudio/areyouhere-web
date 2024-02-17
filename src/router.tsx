@@ -9,7 +9,7 @@ import CreateClass from "./pages/class/CreateClass.tsx";
 import Home from "./pages/Home";
 import Attendees from "./pages/main/Attendees.tsx";
 import CodePopup from "./pages/main/dashboard/CodePopup.tsx";
-import Dashboard from "./pages/main/Dashboard.tsx";
+import Dashboard from "./pages/main/dashboard/Dashboard.tsx";
 import SessionDetail from "./pages/main/session/SessionDetail.tsx";
 import Sessions from "./pages/main/session/Sessions.tsx";
 import Settings from "./pages/main/Settings.tsx";

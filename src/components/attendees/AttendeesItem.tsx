@@ -60,7 +60,7 @@ interface CustomTrProps {
 const CustomTr = styled.tr<CustomTrProps>`
   border: 1px solid ${({ theme }) => theme.colors.grey};
   background-color: ${({ isChecked, theme }) =>
-    isChecked ? theme.colors.primary["400"] : "transparent"};
+    isChecked ? theme.colors.primary["400"] : "white"};
 `;
 
 const CheckboxCell = styled.td`

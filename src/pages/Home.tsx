@@ -81,6 +81,7 @@ function Home() {
                 width: "11.5rem",
                 marginLeft: "auto",
               }}
+              disabled={name === "" || passcode === ""}
             >
               <img src={sendIcon} alt="Send" width={20} height={20} />
               Send
@@ -133,6 +134,7 @@ function Home() {
               borderRadius: "2rem",
               height: "4.2rem",
             }}
+            disabled={name === "" || passcode === ""}
           >
             <img src={sendIcon} alt="Send" width={20} height={20} />
           </PrimaryButton>
