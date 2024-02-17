@@ -131,7 +131,7 @@ const Container = styled.div`
   left: 0;
   width: 8rem;
   height: 100vh;
-  padding: 3rem 0;
+  padding: 4.7rem 0;
   background-color: ${Theme.colors.white};
 
   user-select: none;

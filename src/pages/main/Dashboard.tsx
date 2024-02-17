@@ -1,6 +1,8 @@
-import { useState } from "react";
+import dateFormat from "dateformat";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+import { usePreviousSessions } from "../../api/dashboard.ts";
 import { PrimaryButton } from "../../components/Button.tsx";
 import CreateSessionModal from "../../components/dashboard/CreateSessionModal.tsx";
 import InfoCards from "../../components/dashboard/InfoCards.tsx";
@@ -14,32 +16,19 @@ import {
 import TitleBar from "../../components/TitleBar.tsx";
 import useModalState from "../../hooks/modal.tsx";
 
-interface SessionData {
-  date: string;
-  title: string;
-  attendance: number;
-  absence: number;
-}
-
 function Dashboard() {
-  const [sessions, setSessions] = useState<SessionData[]>([]);
+  const navigate = useNavigate();
+
   const [
     createSessionModalState,
     openCreateSessionModal,
     closeCreateSessionModal,
   ] = useModalState();
 
-  const addSession = () => {
-    setSessions([
-      ...sessions,
-      {
-        date: "2021-07-01",
-        title: "Waruru Hackerton",
-        attendance: 5,
-        absence: 0,
-      },
-    ]);
-  };
+  const location = useLocation();
+  const classId = parseInt(location.pathname.split("/")[2], 10);
+
+  const { data: previousSessions } = usePreviousSessions(classId);
 
   return (
     <>
@@ -52,7 +41,7 @@ function Dashboard() {
         <ContentContainer>
           <Subtitle>Current Session</Subtitle>
           <InfoCards
-            hasSession={sessions.length > 0}
+            hasSession={(previousSessions?.length ?? 0) > 0}
             onCreateNewSession={() => openCreateSessionModal()}
           />
           <Subtitle style={{ marginTop: "5rem" }}>Previous Session</Subtitle>
@@ -72,22 +61,27 @@ function Dashboard() {
               </tr>
             </SessionTableHead>
             <SessionTableBody>
-              {sessions.length == 0 ? (
+              {previousSessions == null || previousSessions.length == 0 ? (
                 <tr>
                   <EmptyTableBody colSpan={4} />
                 </tr>
               ) : (
-                sessions.map((session) => (
-                  <tr>
+                previousSessions.map((session) => (
+                  <tr
+                    onClick={() => {
+                      navigate(`/class/${classId}/sessions/${session.id}`);
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
                     <SessionTableItem style={{ width: "17.5rem" }}>
-                      {session.date}
+                      {dateFormat(session.date, "yyyy-mm-dd")}
                     </SessionTableItem>
-                    <SessionTableItem>{session.title}</SessionTableItem>
+                    <SessionTableItem>{session.name}</SessionTableItem>
                     <SessionTableItem style={{ width: "17.5rem" }}>
-                      {session.attendance}
+                      {session.attendee}
                     </SessionTableItem>
                     <SessionTableItem style={{ width: "17.5rem" }}>
-                      {session.absence}
+                      {session.absentee}
                     </SessionTableItem>
                   </tr>
                 ))
@@ -102,7 +96,6 @@ function Dashboard() {
           onClose={closeCreateSessionModal}
           onSubmit={(sessionName) => {
             // TODO: create a new session
-            addSession();
           }}
         />
       )}
@@ -115,12 +108,6 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-`;
-
-const Divider = styled.div`
-  width: calc(100% - 7rem);
-  border-top: ${({ theme }) => theme.colors.grey} 1px solid;
-  margin: 2.1rem 2.9rem 5.4rem 4.1rem;
 `;
 
 const ContentContainer = styled.div`

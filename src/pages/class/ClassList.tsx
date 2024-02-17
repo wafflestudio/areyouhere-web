@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { deleteCourse, useCourses } from "../../api/course.ts";
@@ -15,7 +15,7 @@ function ClassList() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { data: classList, isLoading, isError } = useCourses();
+  const { data: classList } = useCourses();
 
   const { mutate: deleteClass } = useMutation({
     mutationFn: deleteCourse,
@@ -23,10 +23,6 @@ function ClassList() {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
     },
   });
-
-  useEffect(() => {
-    // TODO: fetch class list
-  }, []);
 
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
@@ -75,13 +71,16 @@ function ClassList() {
         title="Delete Class?"
         content={
           <span>
-            Are you sure you want to delete "Class 이름"?
+            Are you sure you want to delete{" "}
+            <span style={{ fontWeight: "700" }}>
+              "{classList?.find((c) => c.id === deleteTarget)?.name}"
+            </span>
+            ?
             <br />
             You can't undo this action.
           </span>
         }
         onCancel={() => {
-          setDeleteTarget(null);
           closeDeleteModal();
         }}
         onConfirm={() => {
@@ -89,7 +88,6 @@ function ClassList() {
             return;
           }
           deleteClass(deleteTarget);
-          setDeleteTarget(null);
           closeDeleteModal();
         }}
       />
