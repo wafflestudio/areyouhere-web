@@ -1,6 +1,9 @@
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
+import { createAttendee } from "../../api/attendee.ts";
+import { useClassId } from "../../hooks/urlParse.tsx";
 import { ModalStateType } from "../../type.ts";
 import { GreyButton, PrimaryButton } from "../Button.tsx";
 import ChipBox from "../class/ChipBox.tsx";
@@ -19,11 +22,30 @@ function AddAttendeesModal({
   const [attendeeList, setAttendeeList] = useState<string[]>([]);
   const [isComposing, setIsComposing] = useState(false); // 한글 입력 중인지 여부
 
-  // 모달 열면 초기화
+  const [attendeeListUndoHistory, setAttendeeListUndoHistory] = useState<
+    string[][]
+  >([[]]);
+
+  const [attendeeListRedoHistory, setAttendeeListRedoHistory] = useState<
+    string[][]
+  >([]);
+
+  const classId = useClassId();
+  const queryClient = useQueryClient();
+  const { mutate: createAttendees } = useMutation({
+    mutationFn: createAttendee,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
+    },
+  });
+
+  // 모달 닫히면 초기화
   useEffect(() => {
-    if (state === "open") {
+    if (state === "closed") {
       setAttendeeList([]);
       setAttendeeInput("");
+      setAttendeeListUndoHistory([[]]);
+      setAttendeeListRedoHistory([]);
     }
   }, [state]);
 
@@ -32,6 +54,37 @@ function AddAttendeesModal({
     if (e.key === "Enter" && !isComposing) {
       e.preventDefault();
       addAttendee(attendeeInput);
+    } else if (e.key === "z" && e.ctrlKey && !e.shiftKey) {
+      e.preventDefault();
+      if (attendeeListUndoHistory.length > 1) {
+        const newUndoHistory = [...attendeeListUndoHistory];
+        newUndoHistory.pop();
+
+        const newRedoHistory = [...attendeeListRedoHistory, [...attendeeList]];
+
+        setAttendeeList(newUndoHistory[newUndoHistory.length - 1]);
+        setAttendeeListUndoHistory(newUndoHistory.slice(-20));
+        setAttendeeListRedoHistory(newRedoHistory.slice(-20));
+      }
+    } else if (
+      (e.key === "y" && e.ctrlKey) ||
+      (e.key === "z" && e.ctrlKey && e.shiftKey)
+    ) {
+      e.preventDefault();
+      if (attendeeListRedoHistory.length > 0) {
+        const newRedoHistory = [...attendeeListRedoHistory];
+        newRedoHistory.pop();
+        const newUndoHistory = [
+          ...attendeeListUndoHistory,
+          attendeeListRedoHistory[attendeeListRedoHistory.length - 1],
+        ];
+
+        setAttendeeList(
+          attendeeListRedoHistory[attendeeListRedoHistory.length - 1]
+        );
+        setAttendeeListRedoHistory(newRedoHistory.slice(-20));
+        setAttendeeListUndoHistory(newUndoHistory.slice(-20));
+      }
     }
   };
 
@@ -52,12 +105,18 @@ function AddAttendeesModal({
     const newAttendee = text
       .split(/\r?\n/)
       .filter((name: string) => name.trim() !== "");
-    setAttendeeList([...attendeeList, ...newAttendee]);
+    const newAttendeeList = [...attendeeList, ...newAttendee];
+    setAttendeeList(newAttendeeList);
+    setAttendeeListUndoHistory([...attendeeListUndoHistory, newAttendeeList]);
+    setAttendeeListRedoHistory([]);
     setAttendeeInput("");
   };
 
   const removeChip = (index: number) => {
-    setAttendeeList(attendeeList.filter((_, i) => i !== index));
+    const newAttendeeList = attendeeList.filter((_, i) => i !== index);
+    setAttendeeList(newAttendeeList);
+    setAttendeeListUndoHistory([...attendeeListUndoHistory, newAttendeeList]);
+    setAttendeeListRedoHistory([]);
   };
 
   return (
@@ -84,7 +143,14 @@ function AddAttendeesModal({
         <ButtonContainer>
           <GreyButton onClick={onCancel}>Cancel</GreyButton>
           <PrimaryButton
-            onClick={() => {}}
+            onClick={() => {
+              // TODO: add new attendees
+              createAttendees({
+                courseId: classId!,
+                newAttendees: attendeeList,
+              });
+              onCancel();
+            }}
             disabled={attendeeList.length === 0}
           >
             Add New Attendees

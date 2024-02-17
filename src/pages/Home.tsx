@@ -1,7 +1,9 @@
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+import { attend } from "../api/attendance.ts";
 import sendIcon from "../assets/send.svg";
 import TransferBanner from "../components/admin/TransferBanner.tsx";
 import Alert from "../components/Alert.tsx";
@@ -25,6 +27,16 @@ function Home() {
 
   const [hasError, setHasError] = useState(false);
 
+  const { mutate: performAttendance } = useMutation({
+    mutationFn: attend,
+    onSuccess: () => {
+      navigate("/result");
+    },
+    onError: () => {
+      setHasError(true);
+    },
+  });
+
   return (
     <>
       <DesktopContainer>
@@ -45,12 +57,7 @@ function Home() {
           <InputContainer
             onSubmit={(e) => {
               e.preventDefault();
-              // TODO: Send name and passcode to server
-              if (passcode === "1234") {
-                navigate("/result");
-              } else {
-                setHasError(true);
-              }
+              performAttendance({ attendeeName: name, authCode: passcode });
             }}
           >
             <TextField
@@ -97,12 +104,7 @@ function Home() {
         <MobileInputContainer
           onSubmit={(e) => {
             e.preventDefault();
-            // TODO: Send name and passcode to server
-            if (passcode === "1234") {
-              navigate("/result");
-            } else {
-              setHasError(true);
-            }
+            performAttendance({ attendeeName: name, authCode: passcode });
           }}
         >
           <TextField

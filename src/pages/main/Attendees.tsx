@@ -1,6 +1,8 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
+import { deleteAttendee, useAttendees } from "../../api/attendee.ts";
 import AlertModal from "../../components/AlertModal.tsx";
 import AddAttendeesModal from "../../components/attendees/AddAttendeesModal.tsx";
 import AttendeesItem from "../../components/attendees/AttendeesItem.tsx";
@@ -13,20 +15,24 @@ import {
 } from "../../components/sessions/SessionTable.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 import useModalState from "../../hooks/modal.tsx";
+import { useClassId } from "../../hooks/urlParse.tsx";
 import theme from "../../styles/Theme.tsx";
-import attendeesData from "../../test/attendeesData.json";
 
 interface CheckedState {
   [key: number]: boolean;
 }
 
 function Attendees() {
-  // attendees data 관리
-  const [attendees, setAttendees] = useState(attendeesData.data);
+  const classId = useClassId();
+  const { data: attendees } = useAttendees(classId!);
 
-  useEffect(() => {
-    // Todo: fetch data from server
-  }, []);
+  const queryClient = useQueryClient();
+  const { mutate: deleteAttendees } = useMutation({
+    mutationFn: deleteAttendee,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
+    },
+  });
 
   // 체크 박스 관리
   const [checkedState, setCheckedState] = useState<CheckedState>({});
@@ -40,6 +46,7 @@ function Attendees() {
   };
 
   const handleMasterCheckboxChange = () => {
+    if (attendees == null) return;
     const newCheckedState = !isAllChecked;
     setIsAllChecked(newCheckedState);
 
@@ -58,6 +65,7 @@ function Attendees() {
 
   useEffect(() => {
     const allChecked =
+      attendees != null &&
       attendees.length > 0 &&
       attendees.every((attendee) => checkedState[attendee.id]);
     setIsAllChecked(allChecked);
@@ -70,11 +78,15 @@ function Attendees() {
   const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
 
   const handleDelete = () => {
-    const remainingAttendees = attendees.filter(
-      (attendee) => !checkedState[attendee.id]
-    );
+    if (attendees == null) return;
+    const deleteAttendeeIds = attendees
+      .filter((attendee) => checkedState[attendee.id])
+      .map((attendee) => attendee.id);
 
-    setAttendees(remainingAttendees);
+    // setAttendees(remainingAttendees);
+    deleteAttendees({
+      attendeeIds: deleteAttendeeIds,
+    });
 
     setIsAllChecked(false);
     setCheckedState({});
@@ -89,7 +101,7 @@ function Attendees() {
           </PrimaryButton>
         </TitleBar>
         <HeaderContainer>
-          <h5>{`${attendees.length} Attendees`}</h5>
+          <h5>{`${attendees?.length ?? 0} Attendees`}</h5>
           <SecondaryButton
             onClick={openDeleteModal}
             disabled={checkedCount === 0}
@@ -135,7 +147,7 @@ function Attendees() {
                 </SessionTableHeadItem>
               </tr>
             </SessionTableHead>
-            {attendees.map((attendee) => (
+            {attendees?.map((attendee) => (
               <AttendeesItem
                 key={attendee.id}
                 attendee={attendee}
