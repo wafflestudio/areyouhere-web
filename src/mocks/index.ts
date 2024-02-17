@@ -1,6 +1,7 @@
 import axios from "axios";
 import AxiosMockAdapter from "axios-mock-adapter";
 
+import addAuthCodeMock from "./authCode";
 import addCourseMock from "./course";
 import addDashboardMock from "./dashboard";
 import addSessionMock from "./session";
@@ -12,3 +13,4 @@ addUserMock(mock);
 addCourseMock(mock);
 addDashboardMock(mock);
 addSessionMock(mock);
+addAuthCodeMock(mock);

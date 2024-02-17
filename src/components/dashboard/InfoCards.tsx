@@ -1,7 +1,9 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
+import { createAuthCode, deactivateAuthCode } from "../../api/authCode";
 import { useCurrentSessionInfo } from "../../api/dashboard";
 import expandDarkGrey from "../../assets/dashboard/expandDarkGrey.svg";
 import { SecondaryButton } from "../Button";
@@ -19,8 +21,28 @@ function InfoCards({
   const location = useLocation();
   const classId = parseInt(location.pathname.split("/")[2], 10);
 
+  const queryClient = useQueryClient();
+
   const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
   const activated = currentSessionInfo?.authCode != null;
+
+  const { mutate: activateSession } = useMutation({
+    mutationFn: createAuthCode,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
+    },
+  });
+
+  const { mutate: deactivateSession } = useMutation({
+    mutationFn: deactivateAuthCode,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
+    },
+  });
 
   return (
     <InfoCardContainer {...props}>
@@ -54,6 +76,11 @@ function InfoCards({
                     colorScheme="red"
                     onClick={() => {
                       // TODO: Deactivate session
+                      if (currentSessionInfo?.authCode != null) {
+                        deactivateSession({
+                          authCode: currentSessionInfo.authCode,
+                        });
+                      }
                     }}
                   >
                     Deactivate
@@ -64,6 +91,12 @@ function InfoCards({
               <ActivateButton
                 onClick={() => {
                   // TODO: Activate session
+                  if (currentSessionInfo?.id != null) {
+                    activateSession({
+                      courseId: classId,
+                      sessionId: currentSessionInfo.id,
+                    });
+                  }
                 }}
               >
                 Activate
