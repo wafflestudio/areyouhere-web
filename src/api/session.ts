@@ -15,6 +15,15 @@ export type SessionAttendee = {
   attendanceTime: Date;
 };
 
+export type CreateSessionRequest = {
+  courseId: number;
+  sessionName: string;
+};
+
+export type DeleteSessionRequest = {
+  sessionId: number;
+};
+
 export type SessionWithoutId = Omit<Session, "id">;
 
 export const getSessions = async (courseId: number): Promise<Session[]> => {
@@ -85,6 +94,14 @@ export const getSessionAbsenteesOnly = async (
   } else {
     throw new Error("Failed to get session absentees");
   }
+};
+
+export const createSession = async (request: CreateSessionRequest) => {
+  return axios.post("/api/session", request);
+};
+
+export const deleteSession = async (request: DeleteSessionRequest) => {
+  return axios.delete(`/api/session/${request.sessionId}`);
 };
 
 export const useSessions = (courseId: number) => {

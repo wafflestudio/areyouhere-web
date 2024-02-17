@@ -1,6 +1,9 @@
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
+import { createAttendee } from "../../api/attendee.ts";
+import { useClassId } from "../../hooks/urlParse.tsx";
 import { ModalStateType } from "../../type.ts";
 import { GreyButton, PrimaryButton } from "../Button.tsx";
 import ChipBox from "../class/ChipBox.tsx";
@@ -18,6 +21,15 @@ function AddAttendeesModal({
   const [attendeeInput, setAttendeeInput] = useState("");
   const [attendeeList, setAttendeeList] = useState<string[]>([]);
   const [isComposing, setIsComposing] = useState(false); // 한글 입력 중인지 여부
+
+  const classId = useClassId();
+  const queryClient = useQueryClient();
+  const { mutate: createAttendees } = useMutation({
+    mutationFn: createAttendee,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
+    },
+  });
 
   // 모달 열면 초기화
   useEffect(() => {
@@ -79,7 +91,18 @@ function AddAttendeesModal({
         </ContentContainer>
         <ButtonContainer>
           <GreyButton onClick={onCancel}>Cancel</GreyButton>
-          <PrimaryButton onClick={() => {}}>Add New Attendees</PrimaryButton>
+          <PrimaryButton
+            onClick={() => {
+              // TODO: add new attendees
+              createAttendees({
+                courseId: classId!,
+                newAttendees: attendeeList,
+              });
+              onCancel();
+            }}
+          >
+            Add New Attendees
+          </PrimaryButton>
         </ButtonContainer>
       </Container>
     </Modal>
