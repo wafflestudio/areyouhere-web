@@ -1,6 +1,7 @@
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
 
+import { logout } from "../api/user.ts";
 import attendeesDefault from "../assets/sidebar/attendeesDefault.svg";
 import attendeesHover from "../assets/sidebar/attendeesHover.svg";
 import attendeesOnClick from "../assets/sidebar/attendeesOnClick.svg";
@@ -10,6 +11,7 @@ import dashboardDefault from "../assets/sidebar/dashBoardDefault.svg";
 import dashboardHover from "../assets/sidebar/dashBoardHover.svg";
 import dashboardOnClick from "../assets/sidebar/dashBoardOnClick.svg";
 import logo from "../assets/sidebar/logo.svg";
+import logoutIcon from "../assets/sidebar/logout.svg";
 import sessionsDefault from "../assets/sidebar/sessionsDefault.svg";
 import sessionsHover from "../assets/sidebar/sessionsHover.svg";
 import sessionsOnClick from "../assets/sidebar/sessionsOnClick.svg";
@@ -117,6 +119,9 @@ function SideBar() {
             </IconContainer>
           );
         })}
+      <IconContainer onClick={logout} style={{ marginTop: "auto" }}>
+        <img src={logoutIcon} alt="logout" />
+      </IconContainer>
     </Container>
   );
 }
