@@ -8,6 +8,7 @@ import {
   NICKNAME_REGEX,
   PASSWORD_REGEX,
   postSignUp,
+  useEmailConflict,
 } from "../../api/user";
 import {
   OptionalActionLabel,
@@ -41,6 +42,8 @@ function SignUp() {
       navigate("/class");
     },
   });
+
+  const { data: isEmailConflict } = useEmailConflict(email, !emailError);
 
   return (
     <Container>
@@ -82,9 +85,13 @@ function SignUp() {
           style={{ marginTop: "2.5rem" }}
           onChange={(e) => setEmail(e.target.value)}
           supportingText={
-            showError && emailError ? "Invalid email address" : undefined
+            showError && emailError
+              ? "Invalid email address"
+              : isEmailConflict
+                ? "Email already exists"
+                : undefined
           }
-          hasError={showError && emailError}
+          hasError={isEmailConflict || (showError && emailError)}
         />
         <TextField
           autoComplete="new-password"
