@@ -168,7 +168,7 @@ const TimeLabel = styled.span`
 const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: flex-start;
   width: 41rem;
 `;
 
@@ -176,7 +176,6 @@ const BannerContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 24.1rem;
 `;
 
 const BannerLabel = styled.p`
@@ -202,6 +201,7 @@ const BannerChatBubble = styled.div`
 `;
 
 const InputContainer = styled.form`
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -214,6 +214,7 @@ const MobileContainer = styled.div`
   @media (max-width: 768px) {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
   }
 
   padding: 4.7rem 3rem;
@@ -223,9 +224,6 @@ const MobileBannerContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-
-  max-width: 20.4rem;
-  width: 100%;
 `;
 
 const MobileBannerLabel = styled.p`
@@ -246,6 +244,7 @@ const MobileBannerChatBubble = styled.div`
 `;
 
 const MobileInputContainer = styled.form`
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1rem;

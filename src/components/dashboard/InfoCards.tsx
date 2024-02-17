@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import dateFormat from "dateformat";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
+import { createAuthCode, deactivateAuthCode } from "../../api/authCode";
+import { useCurrentSessionInfo } from "../../api/dashboard";
 import expandDarkGrey from "../../assets/dashboard/expandDarkGrey.svg";
 import { SecondaryButton } from "../Button";
 
@@ -14,8 +18,31 @@ function InfoCards({
   onCreateNewSession,
   ...props
 }: InfoCardsProps) {
-  // TODO: implement passcode activation
-  const [activated, setActivated] = useState(false);
+  const location = useLocation();
+  const classId = parseInt(location.pathname.split("/")[2], 10);
+
+  const queryClient = useQueryClient();
+
+  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
+  const activated = currentSessionInfo?.authCode != null;
+
+  const { mutate: activateSession } = useMutation({
+    mutationFn: createAuthCode,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
+    },
+  });
+
+  const { mutate: deactivateSession } = useMutation({
+    mutationFn: deactivateAuthCode,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
+    },
+  });
 
   return (
     <InfoCardContainer {...props}>
@@ -37,22 +64,38 @@ function InfoCards({
                     alt="expand"
                   />
                 </ExpandButton>
-                <Passcode style={{ marginTop: "1.8rem" }}>NAHD</Passcode>
+                <Passcode style={{ marginTop: "1.8rem" }}>
+                  {currentSessionInfo?.authCode}
+                </Passcode>
                 <PasscodeButtonContainer style={{ marginTop: "2.3rem" }}>
-                  <SecondaryButton style={{ borderRadius: "3rem" }}>
-                    Change
-                  </SecondaryButton>
                   <SecondaryButton
-                    style={{ borderRadius: "3rem" }}
+                    style={{ borderRadius: "3rem", width: "100%" }}
                     colorScheme="red"
-                    onClick={() => setActivated(false)}
+                    onClick={() => {
+                      // TODO: Deactivate session
+                      if (currentSessionInfo?.authCode != null) {
+                        deactivateSession({
+                          authCode: currentSessionInfo.authCode,
+                        });
+                      }
+                    }}
                   >
                     Deactivate
                   </SecondaryButton>
                 </PasscodeButtonContainer>
               </>
             ) : (
-              <ActivateButton onClick={() => setActivated(true)}>
+              <ActivateButton
+                onClick={() => {
+                  // TODO: Activate session
+                  if (currentSessionInfo?.id != null) {
+                    activateSession({
+                      courseId: classId,
+                      sessionId: currentSessionInfo.id,
+                    });
+                  }
+                }}
+              >
                 Activate
               </ActivateButton>
             )}
@@ -70,15 +113,19 @@ function InfoCards({
             <InfoCardTitle>Details</InfoCardTitle>
             <DetailsBar style={{ marginTop: "2.1rem" }}>
               <DetailsLabel>Name</DetailsLabel>
-              <DetailsValue>Kick-off Meeting</DetailsValue>
+              <DetailsValue>{currentSessionInfo?.name}</DetailsValue>
             </DetailsBar>
             <DetailsBar style={{ marginTop: "1.6rem" }}>
               <DetailsLabel>Date</DetailsLabel>
-              <DetailsValue>2024-02-13 (Tue)</DetailsValue>
+              <DetailsValue>
+                {dateFormat(currentSessionInfo?.startTime, "yyyy-mm-dd (ddd)")}
+              </DetailsValue>
             </DetailsBar>
             <DetailsBar style={{ marginTop: "1.6rem" }}>
               <DetailsLabel>Start Time</DetailsLabel>
-              <DetailsValue>AM 10:00</DetailsValue>
+              <DetailsValue>
+                {dateFormat(currentSessionInfo?.startTime, "TT HH:MM")}
+              </DetailsValue>
             </DetailsBar>
           </InfoCard>
         </>

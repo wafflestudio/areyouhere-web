@@ -1,6 +1,9 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+import { createCourse } from "../../api/course.ts";
 import { PrimaryButton } from "../../components/Button.tsx";
 import ChipBox from "../../components/class/ChipBox.tsx";
 import UnknownNameCheckbox from "../../components/class/UnknownNameCheckbox.tsx";
@@ -8,19 +11,70 @@ import { MultiLineTextField } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 
 function CreateClass() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const { mutate: createClass } = useMutation({
+    mutationFn: createCourse,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      navigate("/class");
+    },
+  });
+
   const [className, setClassName] = useState("");
   const [description, setDescription] = useState("");
+  const [onlyListNameAllowed, setOnlyListNameAllowed] = useState(false);
 
   // 이름 목록 chip으로 저장, 관리
   const [attendeeInput, setAttendeeInput] = useState("");
   const [attendeeList, setAttendeeList] = useState<string[]>([]);
   const [isComposing, setIsComposing] = useState(false); // 한글 입력 중인지 여부
 
+  const [attendeeListUndoHistory, setAttendeeListUndoHistory] = useState<
+    string[][]
+  >([[]]);
+
+  const [attendeeListRedoHistory, setAttendeeListRedoHistory] = useState<
+    string[][]
+  >([]);
+
   // 이름 넣고 엔터 치면 chip으로 저장
   const handleEnterDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !isComposing) {
       e.preventDefault();
       addAttendee(attendeeInput);
+    } else if (e.key === "z" && e.ctrlKey && !e.shiftKey) {
+      e.preventDefault();
+      if (attendeeListUndoHistory.length > 1) {
+        const newUndoHistory = [...attendeeListUndoHistory];
+        newUndoHistory.pop();
+
+        const newRedoHistory = [...attendeeListRedoHistory, [...attendeeList]];
+
+        setAttendeeList(newUndoHistory[newUndoHistory.length - 1]);
+        setAttendeeListUndoHistory(newUndoHistory.slice(-20));
+        setAttendeeListRedoHistory(newRedoHistory.slice(-20));
+      }
+    } else if (
+      (e.key === "y" && e.ctrlKey) ||
+      (e.key === "z" && e.ctrlKey && e.shiftKey)
+    ) {
+      e.preventDefault();
+      if (attendeeListRedoHistory.length > 0) {
+        const newRedoHistory = [...attendeeListRedoHistory];
+        newRedoHistory.pop();
+        const newUndoHistory = [
+          ...attendeeListUndoHistory,
+          attendeeListRedoHistory[attendeeListRedoHistory.length - 1],
+        ];
+
+        setAttendeeList(
+          attendeeListRedoHistory[attendeeListRedoHistory.length - 1]
+        );
+        setAttendeeListRedoHistory(newRedoHistory.slice(-20));
+        setAttendeeListUndoHistory(newUndoHistory.slice(-20));
+      }
     }
   };
 
@@ -41,12 +95,18 @@ function CreateClass() {
     const newAttendee = text
       .split(/\r?\n/)
       .filter((name: string) => name.trim() !== "");
-    setAttendeeList([...attendeeList, ...newAttendee]);
+    const newAttendeeList = [...attendeeList, ...newAttendee];
+    setAttendeeList(newAttendeeList);
+    setAttendeeListUndoHistory([...attendeeListUndoHistory, newAttendeeList]);
+    setAttendeeListRedoHistory([]);
     setAttendeeInput("");
   };
 
   const removeChip = (index: number) => {
-    setAttendeeList(attendeeList.filter((_, i) => i !== index));
+    const newAttendeeList = attendeeList.filter((_, i) => i !== index);
+    setAttendeeList(newAttendeeList);
+    setAttendeeListUndoHistory([...attendeeListUndoHistory, newAttendeeList]);
+    setAttendeeListRedoHistory([]);
   };
 
   // 이름 목록에 unknown name 허용 체크박스

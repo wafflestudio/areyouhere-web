@@ -35,7 +35,7 @@ function SessionItem({
     <SessionCard {...props}>
       <SessionCardLink to={to}>
         <SessionCardLabel style={{ width: "20rem" }}>
-          {dateFormat(date, "yyyy-MM-dd")}
+          {dateFormat(date, "yyyy-mm-dd")}
         </SessionCardLabel>
         <SessionCardLabel style={{ width: "45rem" }}>
           {sessionName}

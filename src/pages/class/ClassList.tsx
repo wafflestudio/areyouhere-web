@@ -1,23 +1,28 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+import { deleteCourse, useCourses } from "../../api/course.ts";
 import addClass from "../../assets/class/addClass.svg";
 import AlertModal from "../../components/AlertModal.tsx";
 import { PrimaryButton } from "../../components/Button.tsx";
 import ClassItem from "../../components/class/ClassItem.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 import useModalState from "../../hooks/modal.tsx";
-import classData from "../../test/classData.json";
 
 function ClassList() {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const [classList, setClassList] = useState(classData.data);
+  const { data: classList } = useCourses();
 
-  useEffect(() => {
-    // TODO: fetch class list
-  }, []);
+  const { mutate: deleteClass } = useMutation({
+    mutationFn: deleteCourse,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+    },
+  });
 
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
@@ -30,34 +35,35 @@ function ClassList() {
             Create New Class
           </PrimaryButton>
         </TitleBar>
-        {classList.length === 0 ? (
-          <EmptyClassContainer>
-            <img
-              src={addClass}
-              alt="Add Class"
-              onClick={() => navigate("/class/create")}
-            />
-            <h1>You don't have any classes yet.</h1>
-            <p>Click here to create your first class.</p>
-          </EmptyClassContainer>
-        ) : (
-          <ClassListContainer>
-            {classList.map((classItem) => (
-              <ClassItem
-                key={classItem.id}
-                id={classItem.id}
-                name={classItem.name}
-                description={classItem.description}
-                attendeeNumber={classItem.attendeeNumber}
-                color={classItem.color}
-                onDelete={() => {
-                  setDeleteTarget(classItem.id);
-                  openDeleteModal();
-                }}
+        {classList != null &&
+          (classList.length === 0 ? (
+            <EmptyClassContainer>
+              <img
+                src={addClass}
+                alt="Add Class"
+                onClick={() => navigate("/class/create")}
               />
-            ))}
-          </ClassListContainer>
-        )}
+              <h1>You don't have any classes yet.</h1>
+              <p>Click here to create your first class.</p>
+            </EmptyClassContainer>
+          ) : (
+            <ClassListContainer>
+              {classList.map((classItem) => (
+                <ClassItem
+                  key={classItem.id}
+                  id={classItem.id}
+                  name={classItem.name}
+                  description={classItem.description}
+                  attendeeNumber={classItem.attendees.length}
+                  color={"#ffffff"}
+                  onDelete={() => {
+                    setDeleteTarget(classItem.id);
+                    openDeleteModal();
+                  }}
+                />
+              ))}
+            </ClassListContainer>
+          ))}
       </Container>
       <AlertModal
         state={deleteModalState}
@@ -65,22 +71,24 @@ function ClassList() {
         title="Delete Class?"
         content={
           <span>
-            Are you sure you want to delete "Class 이름"?
+            Are you sure you want to delete{" "}
+            <span style={{ fontWeight: "700" }}>
+              "{classList?.find((c) => c.id === deleteTarget)?.name}"
+            </span>
+            ?
             <br />
             You can't undo this action.
           </span>
         }
         onCancel={() => {
-          setDeleteTarget(null);
           closeDeleteModal();
         }}
         onConfirm={() => {
-          // TODO: delete class actual
-          setDeleteTarget(null);
+          if (deleteTarget == null) {
+            return;
+          }
+          deleteClass(deleteTarget);
           closeDeleteModal();
-          setClassList(
-            classList.filter((classItem) => classItem.id !== deleteTarget)
-          );
         }}
       />
     </>

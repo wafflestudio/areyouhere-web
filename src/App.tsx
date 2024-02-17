@@ -5,7 +5,7 @@ import { ThemeProvider } from "styled-components";
 import queryClient from "./api/queryClient";
 import GlobalStyles from "./styles/GlobalStyles";
 import Theme from "./styles/Theme";
-import "./mocks/user";
+import "./mocks/index";
 
 function App() {
   return (

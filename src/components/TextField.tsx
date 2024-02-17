@@ -35,7 +35,8 @@ const StyledInput = styled.input<{ hasError?: boolean }>`
 interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   textFieldStyle?: React.CSSProperties;
-  errorMessage?: string;
+  hasError?: boolean;
+  supportingText?: React.ReactNode | string;
 }
 
 const StyledTextArea = styled.textarea`
@@ -61,18 +62,17 @@ function TextField({
   label,
   style,
   textFieldStyle,
-  errorMessage,
+  hasError,
+  supportingText,
   ...props
 }: TextFieldProps) {
   return (
     <InputContainer style={style}>
       {label && <TextFieldLabel>{label}</TextFieldLabel>}
-      <StyledInput
-        {...props}
-        style={textFieldStyle}
-        hasError={errorMessage != null}
-      />
-      {errorMessage != null && <ErrorLabel>{errorMessage}</ErrorLabel>}
+      <StyledInput {...props} style={textFieldStyle} hasError={hasError} />
+      {supportingText != null && (
+        <SupportingLabel hasError={hasError}>{supportingText}</SupportingLabel>
+      )}
     </InputContainer>
   );
 }
@@ -101,9 +101,10 @@ const TextFieldLabel = styled.label`
   margin-bottom: 0.4rem;
 `;
 
-const ErrorLabel = styled.p`
+const SupportingLabel = styled.p<{ hasError?: boolean }>`
   ${({ theme }) => theme.typography.b4};
-  color: ${({ theme }) => theme.colors.red["500"]};
+  color: ${({ theme, hasError }) =>
+    hasError ? theme.colors.red["500"] : theme.colors.black};
   margin-top: 0.1rem;
 `;
 

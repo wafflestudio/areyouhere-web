@@ -109,8 +109,9 @@ const ContentLink = styled(Link)`
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 5;
+    -webkit-line-clamp: 4;
     text-overflow: ellipsis;
+    word-wrap: break-word;
 
     color: ${({ theme }) => theme.colors.darkGrey};
   }
