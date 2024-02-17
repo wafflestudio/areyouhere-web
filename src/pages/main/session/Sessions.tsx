@@ -1,13 +1,22 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
+import { useSessions } from "../../../api/session.ts";
 import AlertModal from "../../../components/AlertModal.tsx";
 import SessionItem from "../../../components/sessions/SessionItem.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
 import useModalState from "../../../hooks/modal.tsx";
 
 function Sessions() {
+  const location = useLocation();
+  const classId = parseInt(location.pathname.split("/")[2], 10);
+
+  const { data: sessions } = useSessions(classId);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const deleteTargetName =
+    sessions?.find((session) => session.id === deleteTarget)?.name ?? "";
+
   const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
 
   return (
@@ -21,20 +30,21 @@ function Sessions() {
             <TopBarLabel style={{ width: "18rem" }}>Attendance</TopBarLabel>
             <TopBarLabel style={{ width: "18rem" }}>Absence</TopBarLabel>
           </TopBar>
-          {Array.from({ length: 10 }).map((_, index) => (
-            <SessionItem
-              key={index}
-              to="/class/1/sessions/1"
-              date={new Date()}
-              sessionName="asd"
-              attendance={10}
-              absence={2}
-              onDelete={() => {
-                setDeleteTarget(index);
-                openDeleteModal();
-              }}
-            />
-          ))}
+          {sessions != null &&
+            sessions.map((session) => (
+              <SessionItem
+                key={session.id}
+                to={`/class/${classId}/sessions/${session.id}`}
+                date={session.date}
+                sessionName={session.name}
+                attendance={session.attendee}
+                absence={session.absentee}
+                onDelete={() => {
+                  setDeleteTarget(session.id);
+                  openDeleteModal();
+                }}
+              />
+            ))}
         </Content>
       </Container>
       <AlertModal
@@ -42,19 +52,17 @@ function Sessions() {
         type="delete"
         title="Delete Session?"
         content={
-          <span>
-            Are you sure you want to delete "<b>asd</b>"?
-            <br />
+          <p>
+            Are you sure you want to delete
+            <p style={{ fontWeight: "700" }}>{deleteTargetName}</p>
             You can't undo this action.
-          </span>
+          </p>
         }
         onCancel={() => {
-          setDeleteTarget(null);
           closeDeleteModal();
         }}
         onConfirm={() => {
           // TODO: delete session
-          setDeleteTarget(null);
           closeDeleteModal();
         }}
       />

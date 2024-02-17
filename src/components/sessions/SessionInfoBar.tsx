@@ -1,10 +1,11 @@
+import dateFormat from "dateformat";
 import styled from "styled-components";
 
 interface SessionInfoBarProps extends React.HTMLAttributes<HTMLDivElement> {
-  date: Date;
-  sessionName: string;
-  attendance: number;
-  absence: number;
+  date?: Date;
+  sessionName?: string;
+  attendance?: number;
+  absence?: number;
 }
 
 function SessionInfoBar({
@@ -19,7 +20,7 @@ function SessionInfoBar({
       <SessionInfoItem style={{ width: "18rem" }}>
         <SessionInfoLabel>Date</SessionInfoLabel>
         <SessionInfoContent>
-          {date.toISOString().split("T")[0]}
+          {dateFormat(date, "yyyy-mm-dd")}
         </SessionInfoContent>
       </SessionInfoItem>
       <SessionInfoItem style={{ flex: "1" }}>

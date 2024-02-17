@@ -3,12 +3,13 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { postSignIn } from "../../api/user";
+import { EMAIL_REGEX, signIn } from "../../api/user";
 import {
   OptionalActionLabel,
   OptionalActionLink,
 } from "../../components/admin/OptionalAction";
 import TransferBanner from "../../components/admin/TransferBanner";
+import Alert from "../../components/Alert";
 import { PrimaryButton } from "../../components/Button";
 import TextField from "../../components/TextField";
 
@@ -19,12 +20,21 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const emailError = email.match(EMAIL_REGEX) == null;
+  const [showError, setShowError] = useState(false);
+
+  const [resultError, setResultError] = useState<string | undefined>();
+
   // TODO: handle failure cases
   const { mutate } = useMutation({
-    mutationFn: postSignIn,
+    mutationFn: signIn,
+    mutationKey: ["signIn"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       navigate("/class");
+    },
+    onError: (error) => {
+      setResultError(error.message);
     },
   });
 
@@ -42,6 +52,10 @@ function SignIn() {
         <InputContainer
           onSubmit={(e) => {
             e.preventDefault();
+            if (emailError) {
+              setShowError(true);
+              return;
+            }
             mutate({ email, password });
           }}
         >
@@ -51,6 +65,10 @@ function SignIn() {
             autoComplete="username"
             label="Email address"
             onChange={(e) => setEmail(e.target.value)}
+            supportingText={
+              showError && emailError ? "Invalid email address" : undefined
+            }
+            hasError={showError && emailError}
           />
           <TextField
             type="password"
@@ -65,7 +83,16 @@ function SignIn() {
           >
             Forgot Password
           </ForgotPasswordLink>
-          <PrimaryButton type="submit" style={{ marginTop: "3.0rem" }}>
+          {resultError && (
+            <Alert type="error" style={{ marginTop: "1.2rem" }}>
+              The email or password you entered is incorrect. Please try again.
+            </Alert>
+          )}
+          <PrimaryButton
+            type="submit"
+            style={{ marginTop: "3.0rem" }}
+            disabled={email === "" || password === ""}
+          >
             Sign In
           </PrimaryButton>
           <OptionalActionLabel style={{ marginTop: "5.0rem" }}>
@@ -89,17 +116,14 @@ const Container = styled.div`
 const LoginContainer = styled.div`
   display: flex;
   flex-direction: row;
+  justify-content: center;
 
-  margin-top: 14.7rem;
-  margin-left: 14.3rem;
-  margin-right: 14.6rem;
+  margin-top: 16.7rem;
 `;
 
 const DisplayMessage = styled.p`
-  font-size: 4.8rem;
-  line-height: 5.8rem;
+  ${({ theme }) => theme.typography.h1};
   color: #000000;
-  font-weight: 800;
   flex: 1;
   margin-right: 10rem;
   width: 60.7rem;
@@ -109,14 +133,13 @@ const InputContainer = styled.form`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 44.4rem;
+  width: 32rem;
 `;
 
 const ForgotPasswordLink = styled(Link)`
-  font-size: 1.6rem;
+  ${({ theme }) => theme.typography.b3};
   color: #4f4f4f;
   text-decoration: none;
-  font-weight: 400;
   margin-left: auto;
 `;
 

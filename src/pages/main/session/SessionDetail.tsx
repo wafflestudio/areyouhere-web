@@ -1,6 +1,15 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import dateFormat from "dateformat";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
+import { updateAttendances, UpdateAttendee } from "../../../api/attendance";
+import {
+  SessionAttendee,
+  useSession,
+  useSessionAttendees,
+} from "../../../api/session";
 import AttendanceChip from "../../../components/sessions/AttendanceChip";
 import SessionControl from "../../../components/sessions/SessionControl";
 import SessionInfoBar from "../../../components/sessions/SessionInfoBar";
@@ -16,23 +25,46 @@ import TitleBar from "../../../components/TitleBar";
 function SessionDetail() {
   const [filter, setFilter] = useState<"all" | "absentees">("all");
   const [isEditing, setIsEditing] = useState(false);
+  const [tempAttendees, setTempAttendees] = useState<SessionAttendee[]>([]);
+
+  const location = useLocation();
+  const sessionId = parseInt(location.pathname.split("/")[4], 10);
+  const { data: session } = useSession(sessionId);
+  const { data: sessionAttendees } = useSessionAttendees(sessionId);
+
+  const queryClient = useQueryClient();
+  const { mutate: updateAttendees } = useMutation({
+    mutationFn: updateAttendances,
+    mutationKey: ["updateAttendances"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["session"] });
+    },
+  });
 
   return (
     <Container>
       <TitleBar label="Session Details" />
       <ContentContainer>
         <SessionInfoBar
-          date={new Date()}
-          sessionName="Waruru Hackerton"
-          attendance={5}
-          absence={0}
+          date={session?.date}
+          sessionName={session?.name}
+          attendance={session?.attendee}
+          absence={session?.absentee}
         />
         <SessionControl
           onActionButtonClick={() => {
             if (!isEditing) {
               // TODO: copy current attendance status
+              setTempAttendees(sessionAttendees ?? []);
             } else {
               // TODO: send changed attendance status
+              const updateData: UpdateAttendee[] = tempAttendees.map(
+                (attendee) => ({
+                  attendeeId: attendee.attendeeId,
+                  attendanceStatus: attendee.attendanceStatus,
+                })
+              );
+              updateAttendees(updateData);
             }
             setIsEditing(!isEditing);
           }}
@@ -51,20 +83,70 @@ function SessionDetail() {
             </tr>
           </SessionTableHead>
           <SessionTableBody>
-            <tr>
-              <SessionTableItem style={{ width: "24rem" }}>
-                홍길동
-              </SessionTableItem>
-              <SessionTableItem>
-                <AttendanceChipContainer>
-                  {isEditing && (
-                    <AttendanceChip type="attendance" clickable={isEditing} />
-                  )}
-                  <AttendanceChip type="absence" active clickable={isEditing} />
-                </AttendanceChipContainer>
-              </SessionTableItem>
-              <SessionTableItem>12:00</SessionTableItem>
-            </tr>
+            {(isEditing ? tempAttendees : sessionAttendees)
+              ?.map((attendee, index) => ({
+                attendee,
+                index,
+              }))
+              .filter((entry) => {
+                if (filter === "all") {
+                  return true;
+                } else {
+                  return !entry.attendee.attendanceStatus;
+                }
+              })
+              .map(({ attendee, index }) => (
+                <tr>
+                  <SessionTableItem style={{ width: "24rem" }}>
+                    {attendee.attendeeName}
+                  </SessionTableItem>
+                  <SessionTableItem>
+                    <AttendanceChipContainer>
+                      {(isEditing || attendee.attendanceStatus) && (
+                        <AttendanceChip
+                          type="attendance"
+                          active={attendee.attendanceStatus}
+                          clickable={isEditing}
+                          onClick={() => {
+                            if (isEditing) {
+                              const newTempAttendees = [...tempAttendees];
+                              newTempAttendees[index] = {
+                                ...newTempAttendees[index],
+                                attendanceStatus:
+                                  !newTempAttendees[index].attendanceStatus,
+                              };
+                              setTempAttendees(newTempAttendees);
+                            }
+                          }}
+                        />
+                      )}
+                      {(isEditing || !attendee.attendanceStatus) && (
+                        <AttendanceChip
+                          type="absence"
+                          active={!attendee.attendanceStatus}
+                          clickable={isEditing}
+                          onClick={() => {
+                            if (isEditing) {
+                              const newTempAttendees = [...tempAttendees];
+                              newTempAttendees[index] = {
+                                ...newTempAttendees[index],
+                                attendanceStatus:
+                                  !newTempAttendees[index].attendanceStatus,
+                              };
+                              setTempAttendees(newTempAttendees);
+                            }
+                          }}
+                        />
+                      )}
+                    </AttendanceChipContainer>
+                  </SessionTableItem>
+                  <SessionTableItem>
+                    {sessionAttendees?.[index]?.attendanceStatus === true
+                      ? dateFormat(attendee?.attendanceTime, "HH:mm:ss")
+                      : "--:--:--"}
+                  </SessionTableItem>
+                </tr>
+              ))}
           </SessionTableBody>
         </SessionTable>
       </ContentContainer>
@@ -77,12 +159,6 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-`;
-
-const Divider = styled.div`
-  width: calc(100% - 7rem);
-  border-top: ${({ theme }) => theme.colors.grey} 1px solid;
-  margin: 2.1rem 2.9rem 3.3rem 4.1rem;
 `;
 
 const ContentContainer = styled.div`

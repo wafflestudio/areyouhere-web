@@ -1,6 +1,8 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
 
+import { logout } from "../api/user.ts";
 import attendeesDefault from "../assets/sidebar/attendeesDefault.svg";
 import attendeesHover from "../assets/sidebar/attendeesHover.svg";
 import attendeesOnClick from "../assets/sidebar/attendeesOnClick.svg";
@@ -10,6 +12,7 @@ import dashboardDefault from "../assets/sidebar/dashBoardDefault.svg";
 import dashboardHover from "../assets/sidebar/dashBoardHover.svg";
 import dashboardOnClick from "../assets/sidebar/dashBoardOnClick.svg";
 import logo from "../assets/sidebar/logo.svg";
+import logoutIcon from "../assets/sidebar/logout.svg";
 import sessionsDefault from "../assets/sidebar/sessionsDefault.svg";
 import sessionsHover from "../assets/sidebar/sessionsHover.svg";
 import sessionsOnClick from "../assets/sidebar/sessionsOnClick.svg";
@@ -33,6 +36,16 @@ function SideBar() {
   const location = useLocation().pathname;
 
   const { classId } = useParams();
+
+  const queryClient = useQueryClient();
+  const { mutate: logoutAndRedirect } = useMutation({
+    mutationFn: logout,
+    mutationKey: ["logout"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      navigate("/admin/signin");
+    },
+  });
 
   const menuItems = [
     {
@@ -117,6 +130,12 @@ function SideBar() {
             </IconContainer>
           );
         })}
+      <IconContainer
+        onClick={() => logoutAndRedirect()}
+        style={{ marginTop: "auto" }}
+      >
+        <img src={logoutIcon} alt="logout" />
+      </IconContainer>
     </Container>
   );
 }
@@ -131,7 +150,7 @@ const Container = styled.div`
   left: 0;
   width: 8rem;
   height: 100vh;
-  padding: 3rem 0;
+  padding: 4.7rem 0;
   background-color: ${Theme.colors.white};
 
   user-select: none;

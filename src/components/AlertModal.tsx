@@ -57,7 +57,7 @@ function AlertModal({
 
 const Container = styled.div`
   position: relative;
-  width: 35.5rem;
+  min-width: 35.5rem;
   padding: 4rem;
   background-color: white;
   border-radius: 2rem;

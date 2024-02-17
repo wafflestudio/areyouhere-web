@@ -1,3 +1,4 @@
+import dateFormat from "dateformat";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -34,7 +35,7 @@ function SessionItem({
     <SessionCard {...props}>
       <SessionCardLink to={to}>
         <SessionCardLabel style={{ width: "20rem" }}>
-          {date.toISOString().split("T")[0]}
+          {dateFormat(date, "yyyy-mm-dd")}
         </SessionCardLabel>
         <SessionCardLabel style={{ width: "45rem" }}>
           {sessionName}
@@ -69,7 +70,7 @@ function SessionItem({
         <DropdownButton
           type="button"
           onClick={() => {
-            setIsMoreMenuOpened(true);
+            setIsMoreMenuOpened(!isMoreMenuOpened);
           }}
         />
       </DropdownContainer>

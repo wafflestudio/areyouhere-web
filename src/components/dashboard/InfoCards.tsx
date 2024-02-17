@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import dateFormat from "dateformat";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
+import { useAttendanceStatus } from "../../api/attendance";
+import { createAuthCode, deactivateAuthCode } from "../../api/authCode";
+import { useCurrentSessionInfo } from "../../api/dashboard";
 import expandDarkGrey from "../../assets/dashboard/expandDarkGrey.svg";
+import { useClassId } from "../../hooks/urlParse";
 import { SecondaryButton } from "../Button";
 
 interface InfoCardsProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -14,8 +20,38 @@ function InfoCards({
   onCreateNewSession,
   ...props
 }: InfoCardsProps) {
-  // TODO: implement passcode activation
-  const [activated, setActivated] = useState(false);
+  const location = useLocation();
+  const classId = useClassId();
+
+  const queryClient = useQueryClient();
+
+  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
+  const activated = currentSessionInfo?.authCode != null;
+
+  const { mutate: activateSession } = useMutation({
+    mutationFn: createAuthCode,
+    mutationKey: ["createAuthCode"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
+    },
+  });
+
+  const { mutate: deactivateSession } = useMutation({
+    mutationFn: deactivateAuthCode,
+    mutationKey: ["deactivateAuthCode"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
+    },
+  });
+
+  const { data: attendanceStatus } = useAttendanceStatus(
+    classId,
+    currentSessionInfo?.id
+  );
 
   return (
     <InfoCardContainer {...props}>
@@ -25,7 +61,11 @@ function InfoCards({
             <InfoCardTitle>Passcode</InfoCardTitle>
             {activated ? (
               <>
-                <ExpandButton onClick={() => setActivated(false)}>
+                <ExpandButton
+                  onClick={() => {
+                    window.open("/class/1/sessions/1/code", "_blank");
+                  }}
+                >
                   <img
                     src={expandDarkGrey}
                     width={18}
@@ -33,21 +73,38 @@ function InfoCards({
                     alt="expand"
                   />
                 </ExpandButton>
-                <Passcode style={{ marginTop: "1.8rem" }}>NAHD</Passcode>
+                <Passcode style={{ marginTop: "1.8rem" }}>
+                  {currentSessionInfo?.authCode}
+                </Passcode>
                 <PasscodeButtonContainer style={{ marginTop: "2.3rem" }}>
-                  <SecondaryButton style={{ borderRadius: "3rem" }}>
-                    Change
-                  </SecondaryButton>
                   <SecondaryButton
-                    style={{ borderRadius: "3rem" }}
+                    style={{ borderRadius: "3rem", width: "100%" }}
                     colorScheme="red"
+                    onClick={() => {
+                      // TODO: Deactivate session
+                      if (currentSessionInfo?.authCode != null) {
+                        deactivateSession({
+                          authCode: currentSessionInfo.authCode,
+                        });
+                      }
+                    }}
                   >
                     Deactivate
                   </SecondaryButton>
                 </PasscodeButtonContainer>
               </>
             ) : (
-              <ActivateButton onClick={() => setActivated(true)}>
+              <ActivateButton
+                onClick={() => {
+                  // TODO: Activate session
+                  if (currentSessionInfo?.id != null) {
+                    activateSession({
+                      courseId: classId!,
+                      sessionId: currentSessionInfo.id,
+                    });
+                  }
+                }}
+              >
                 Activate
               </ActivateButton>
             )}
@@ -55,9 +112,11 @@ function InfoCards({
           <InfoCard>
             <InfoCardTitle>Attendance</InfoCardTitle>
             <AttendanceContainer>
-              <AttendanceCount>5</AttendanceCount>
+              <AttendanceCount>
+                {attendanceStatus?.attendances ?? 0}
+              </AttendanceCount>
               <AttendanceTotal>/</AttendanceTotal>
-              <AttendanceTotal>20</AttendanceTotal>
+              <AttendanceTotal>{attendanceStatus?.total ?? 0}</AttendanceTotal>
             </AttendanceContainer>
             <Absentees>5 absentees</Absentees>
           </InfoCard>
@@ -65,15 +124,19 @@ function InfoCards({
             <InfoCardTitle>Details</InfoCardTitle>
             <DetailsBar style={{ marginTop: "2.1rem" }}>
               <DetailsLabel>Name</DetailsLabel>
-              <DetailsValue>Kick-off Meeting</DetailsValue>
+              <DetailsValue>{currentSessionInfo?.name}</DetailsValue>
             </DetailsBar>
             <DetailsBar style={{ marginTop: "1.6rem" }}>
               <DetailsLabel>Date</DetailsLabel>
-              <DetailsValue>2024-02-13 (Tue)</DetailsValue>
+              <DetailsValue>
+                {dateFormat(currentSessionInfo?.startTime, "yyyy-mm-dd (ddd)")}
+              </DetailsValue>
             </DetailsBar>
             <DetailsBar style={{ marginTop: "1.6rem" }}>
               <DetailsLabel>Start Time</DetailsLabel>
-              <DetailsValue>AM 10:00</DetailsValue>
+              <DetailsValue>
+                {dateFormat(currentSessionInfo?.startTime, "TT HH:MM")}
+              </DetailsValue>
             </DetailsBar>
           </InfoCard>
         </>

@@ -25,13 +25,14 @@ function TransferBanner(props: TransferBannerProps) {
 
 const BannerLink = styled(Link)<{ from: "admin" | "attendees" }>`
   width: 100%;
+  height: 4rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
   background-color: #000000;
   color: white;
-  ${({ theme }) => theme.typography.b3};
+  ${({ theme, from }) =>
+    from === "admin" ? theme.typography.b2 : theme.typography.b3};
   text-decoration: none;
 `;
 
