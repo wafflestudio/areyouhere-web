@@ -1,12 +1,30 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
+import { deactivateAuthCode } from "../../../api/authCode";
+import { useCurrentSessionInfo } from "../../../api/dashboard";
 import logo from "../../../assets/dashboard/logo.svg";
 import { SecondaryButton } from "../../../components/Button";
+import { useClassId } from "../../../hooks/urlParse";
 
 function CodePopup() {
   const [time, setTime] = useState(new Date());
+
+  const classId = useClassId();
+  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
+
+  const queryClient = useQueryClient();
+  const { mutate: deactivate } = useMutation({
+    mutationFn: deactivateAuthCode,
+    mutationKey: ["deactivateAuthCode"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
+    },
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -20,10 +38,18 @@ function CodePopup() {
       <Logo src={logo} alt="Logo" />
       <ContentContainer>
         <Title>Passcode</Title>
-        <Passcode>NAHD</Passcode>
+        <Passcode>{currentSessionInfo?.authCode}</Passcode>
         <Time>{dateFormat(time, "HH : MM : ss")}</Time>
         <ButtonContainer>
           <SecondaryButton
+            onClick={() => {
+              const code = currentSessionInfo?.authCode;
+              if (code != null) {
+                deactivate({
+                  authCode: code,
+                });
+              }
+            }}
             style={{ borderRadius: "2rem", flex: "1" }}
             colorScheme="red"
           >
