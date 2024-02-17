@@ -19,7 +19,7 @@ function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // TODO: handle failure cases
   const { mutate } = useMutation({
@@ -51,22 +51,22 @@ function SignUp() {
           autoComplete="email"
           type="email"
           label="Email address"
-          style={{ marginTop: "1.4rem" }}
+          style={{ marginTop: "2.5rem" }}
           onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
           autoComplete="new-password"
           type="password"
           label="Password"
-          style={{ marginTop: "1.4rem" }}
+          style={{ marginTop: "2.5rem" }}
           onChange={(e) => setPassword(e.target.value)}
         />
         <TextField
           autoComplete="new-password"
           type="password"
-          label="Repeat password"
-          style={{ marginTop: "1.4rem" }}
-          onChange={(e) => setRepeatPassword(e.target.value)}
+          label="Confirm password"
+          style={{ marginTop: "2.5rem" }}
+          onChange={(e) => setConfirmPassword(e.target.value)}
         />
         <PrimaryButton style={{ marginTop: "3.0rem" }}>Sign up</PrimaryButton>
         <OptionalActionLabel style={{ marginTop: "5.0rem" }}>
@@ -89,13 +89,13 @@ const Title = styled.p`
   font-weight: 800;
   line-height: 3.8rem;
 
-  margin-top: 11.1rem;
-  margin-bottom: 6.6rem;
+  margin-top: 8.7rem;
+  margin-bottom: 3rem;
   text-align: center;
 `;
 
 const InputContainer = styled.form`
-  max-width: 44.4rem;
+  max-width: 32rem;
   width: 100%;
 
   display: flex;

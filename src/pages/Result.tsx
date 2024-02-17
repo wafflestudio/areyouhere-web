@@ -14,9 +14,18 @@ function Result() {
           We checked your attendance
         </Title>
         <InfoCard>
-          <InfoLabel>Name</InfoLabel>
-          <InfoLabel>Class / Session</InfoLabel>
-          <InfoLabel>Sent Time</InfoLabel>
+          <InfoItem>
+            <InfoLabel>Name</InfoLabel>
+            <InfoLabel>Name</InfoLabel>
+          </InfoItem>
+          <InfoItem style={{ marginTop: "2.6rem" }}>
+            <InfoLabel>Class / Session</InfoLabel>
+            <InfoLabel>Class / Session</InfoLabel>
+          </InfoItem>
+          <InfoItem style={{ marginTop: "2.6rem" }}>
+            <InfoLabel>Sent Time</InfoLabel>
+            <InfoLabel>Sent Time</InfoLabel>
+          </InfoItem>
           <PrimaryButton
             style={{ width: "13rem", marginTop: "4rem" }}
             onClick={() => {
@@ -90,17 +99,21 @@ const InfoCard = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 3.2rem 4rem;
+`;
 
-  & > p + p {
-    margin-top: 2.8rem;
-  }
+const InfoItem = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
 `;
 
 const InfoLabel = styled.p`
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   color: #4f4f4f;
   font-weight: 400;
   width: 100%;
+
+  flex: 1;
 `;
 
 const MobileContainer = styled.div`

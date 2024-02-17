@@ -18,6 +18,7 @@ function SignIn() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | undefined>();
 
   // TODO: handle failure cases
   const { mutate } = useMutation({
@@ -25,6 +26,9 @@ function SignIn() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       navigate("/class");
+    },
+    onError: (error) => {
+      setError(error.message);
     },
   });
 
@@ -51,6 +55,7 @@ function SignIn() {
             autoComplete="username"
             label="Email address"
             onChange={(e) => setEmail(e.target.value)}
+            errorMessage={error}
           />
           <TextField
             type="password"
@@ -89,17 +94,14 @@ const Container = styled.div`
 const LoginContainer = styled.div`
   display: flex;
   flex-direction: row;
+  justify-content: center;
 
-  margin-top: 14.7rem;
-  margin-left: 14.3rem;
-  margin-right: 14.6rem;
+  margin-top: 16.7rem;
 `;
 
 const DisplayMessage = styled.p`
-  font-size: 4.8rem;
-  line-height: 5.8rem;
+  ${({ theme }) => theme.typography.h1};
   color: #000000;
-  font-weight: 800;
   flex: 1;
   margin-right: 10rem;
   width: 60.7rem;
@@ -109,14 +111,13 @@ const InputContainer = styled.form`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 44.4rem;
+  width: 32rem;
 `;
 
 const ForgotPasswordLink = styled(Link)`
-  font-size: 1.6rem;
+  ${({ theme }) => theme.typography.b3};
   color: #4f4f4f;
   text-decoration: none;
-  font-weight: 400;
   margin-left: auto;
 `;
 
