@@ -61,7 +61,7 @@ function ClassItem({
         <DropdownButton
           type="button"
           onClick={() => {
-            setIsMoreMenuOpened(true);
+            setIsMoreMenuOpened(!isMoreMenuOpened);
           }}
         />
       </DropdownContainer>
