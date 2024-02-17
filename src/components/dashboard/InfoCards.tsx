@@ -25,7 +25,11 @@ function InfoCards({
             <InfoCardTitle>Passcode</InfoCardTitle>
             {activated ? (
               <>
-                <ExpandButton onClick={() => setActivated(false)}>
+                <ExpandButton
+                  onClick={() => {
+                    window.open("/class/1/sessions/1/code", "_blank");
+                  }}
+                >
                   <img
                     src={expandDarkGrey}
                     width={18}
@@ -41,6 +45,7 @@ function InfoCards({
                   <SecondaryButton
                     style={{ borderRadius: "3rem" }}
                     colorScheme="red"
+                    onClick={() => setActivated(false)}
                   >
                     Deactivate
                   </SecondaryButton>
