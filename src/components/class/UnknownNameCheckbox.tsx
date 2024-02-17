@@ -4,11 +4,21 @@ import checkBoxAlertBlack from "../../assets/class/tooltipBlack.svg";
 import checkBoxAlertGrey from "../../assets/class/tooltipGrey.svg";
 import Theme from "../../styles/Theme.tsx";
 
-function UnknownNameCheckbox() {
+interface UnknownNameCheckboxProps {
+  checked?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+function UnknownNameCheckbox({ checked, onChange }: UnknownNameCheckboxProps) {
   return (
     <Container>
       <CheckboxContainer>
-        <HiddenCheckbox id="checkbox" type="checkbox" />
+        <HiddenCheckbox
+          checked={checked}
+          onChange={onChange}
+          id="checkbox"
+          type="checkbox"
+        />
         <StyledCheckbox htmlFor="checkbox" />
       </CheckboxContainer>
       <Label htmlFor="checkbox">Only Listed Names Allowed</Label>
