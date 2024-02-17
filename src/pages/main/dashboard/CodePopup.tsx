@@ -23,11 +23,8 @@ function CodePopup() {
         <Passcode>NAHD</Passcode>
         <Time>{dateFormat(time, "HH : MM : ss")}</Time>
         <ButtonContainer>
-          <SecondaryButton style={{ borderRadius: "2rem", flex: "1" }}>
-            Change
-          </SecondaryButton>
           <SecondaryButton
-            style={{ borderRadius: "2rem", flex: "2" }}
+            style={{ borderRadius: "2rem", flex: "1" }}
             colorScheme="red"
           >
             Deactivate

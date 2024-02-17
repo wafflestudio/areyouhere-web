@@ -68,11 +68,8 @@ function InfoCards({
                   {currentSessionInfo?.authCode}
                 </Passcode>
                 <PasscodeButtonContainer style={{ marginTop: "2.3rem" }}>
-                  <SecondaryButton style={{ borderRadius: "3rem" }}>
-                    Change
-                  </SecondaryButton>
                   <SecondaryButton
-                    style={{ borderRadius: "3rem" }}
+                    style={{ borderRadius: "3rem", width: "100%" }}
                     colorScheme="red"
                     onClick={() => {
                       // TODO: Deactivate session
