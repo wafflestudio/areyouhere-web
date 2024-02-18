@@ -18,7 +18,7 @@ export type Course = {
   id: number;
   name: string;
   description: string;
-  manager: string[];
+  attendees: string[];
   allowOnlyRegistered: boolean;
 };
 

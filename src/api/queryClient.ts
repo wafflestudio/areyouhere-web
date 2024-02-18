@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import axios, { HttpStatusCode, isAxiosError } from "axios";
 
-axios.defaults.baseURL = "https://areyouhere-api.wafflestudio.com";
+axios.defaults.baseURL = "http://localhost:3000";
 axios.defaults.withCredentials = true;
 
 // 일부 에러 코드의 경우 서버에서 의도적으로 내려주는 코드이므로,

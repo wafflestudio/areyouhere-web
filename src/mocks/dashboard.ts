@@ -1,11 +1,11 @@
 import { HttpStatusCode } from "axios";
 import AxiosMockAdapter from "axios-mock-adapter";
 
-const currentSessionInfo = {
+export const currentSessionInfo: { [key: string]: unknown } = {
   id: 1,
   name: "Current Session",
-  startTime: new Date().toISOString(),
   authCode: "HAHA",
+  startTime: new Date().toISOString(),
 };
 
 // Mock data for previous sessions
@@ -27,8 +27,8 @@ const previousSessions = [
 ];
 
 function addDashboardMock(mock: AxiosMockAdapter) {
-  mock.onGet(/\/api\/course\/dashboard\/\d+\/previous/).reply((config) => {
-    const courseId = parseInt(config.url?.split("/")[4] || "0");
+  mock.onGet(/\/api\/course\/dashboard\/session\/\d+/).reply((config) => {
+    const courseId = parseInt(config.url?.split("/")[5] || "0");
     if (courseId === 1) {
       return [
         HttpStatusCode.Ok,
