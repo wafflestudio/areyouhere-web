@@ -41,7 +41,10 @@ function Dashboard() {
     mutationFn: createSession,
     mutationKey: ["createSession"],
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["previousSessions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
     },
   });
 
@@ -115,6 +118,7 @@ function Dashboard() {
               courseId: classId,
               sessionName,
             });
+            closeCreateSessionModal();
           }}
         />
       )}
