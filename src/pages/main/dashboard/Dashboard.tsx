@@ -41,7 +41,9 @@ function Dashboard() {
     mutationFn: createSession,
     mutationKey: ["createSession"],
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["previousSessions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["previousSessions", classId],
+      });
       queryClient.invalidateQueries({
         queryKey: ["currentSessionInfo", classId],
       });
@@ -51,17 +53,14 @@ function Dashboard() {
   return (
     <>
       <Container>
-        <TitleBar label={currentSessionInfo?.name ?? ""}>
+        <TitleBar label={"Class Dashboard"}>
           <PrimaryButton onClick={() => openCreateSessionModal()}>
             Create New Session
           </PrimaryButton>
         </TitleBar>
         <ContentContainer>
           <Subtitle>Current Session</Subtitle>
-          <InfoCards
-            hasSession={(previousSessions?.length ?? 0) > 0}
-            onCreateNewSession={() => openCreateSessionModal()}
-          />
+          <InfoCards onCreateNewSession={() => openCreateSessionModal()} />
           <Subtitle style={{ marginTop: "5rem" }}>Previous Session</Subtitle>
           <ElevatedSessionTable>
             <SessionTableHead>

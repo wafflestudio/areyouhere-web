@@ -11,15 +11,10 @@ import { useClassId } from "../../hooks/urlParse";
 import { SecondaryButton } from "../Button";
 
 interface InfoCardsProps extends React.HTMLAttributes<HTMLDivElement> {
-  hasSession?: boolean;
   onCreateNewSession?: () => void;
 }
 
-function InfoCards({
-  hasSession,
-  onCreateNewSession,
-  ...props
-}: InfoCardsProps) {
+function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
   const location = useLocation();
   const classId = useClassId();
 
@@ -45,6 +40,9 @@ function InfoCards({
       queryClient.invalidateQueries({
         queryKey: ["currentSessionInfo", classId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["previousSessions", classId],
+      });
     },
   });
 
@@ -55,7 +53,7 @@ function InfoCards({
 
   return (
     <InfoCardContainer {...props}>
-      {hasSession ? (
+      {currentSessionInfo?.id != null ? (
         <>
           <InfoCard style={{ width: activated ? "28rem" : "24rem" }}>
             <InfoCardTitle>Passcode</InfoCardTitle>
