@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
-import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 import { useAttendanceStatus } from "../../api/attendance";
@@ -15,7 +14,6 @@ interface InfoCardsProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
-  const location = useLocation();
   const classId = useClassId();
 
   const queryClient = useQueryClient();
@@ -83,6 +81,8 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
                       if (currentSessionInfo?.authCode != null) {
                         deactivateSession({
                           authCode: currentSessionInfo.authCode,
+                          sessionId: currentSessionInfo.id,
+                          courseId: classId!,
                         });
                       }
                     }}
