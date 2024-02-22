@@ -6,8 +6,8 @@ import { Session } from "./session";
 export type CurrentSessionInfo = {
   id: number;
   authCode?: string;
-  name: string;
-  startTime?: Date;
+  sessionName: string;
+  sessionTime?: Date;
 };
 
 export const getCurrentSessionInfo = async (
@@ -23,8 +23,8 @@ export const getCurrentSessionInfo = async (
   if (res.status === HttpStatusCode.NoContent) {
     return null;
   } else if (res.status === HttpStatusCode.Ok) {
-    if (res.data.startTime) {
-      res.data.startTime = new Date(res.data.startTime);
+    if (res.data.sessionTime) {
+      res.data.sessionTime = new Date(res.data.sessionTime);
     }
     return res.data;
   } else {

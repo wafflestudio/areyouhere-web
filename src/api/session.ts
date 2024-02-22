@@ -29,7 +29,7 @@ export type SessionWithoutId = Omit<Session, "id">;
 
 export const getSessions = async (courseId: number): Promise<Session[]> => {
   const res = await axios.get<{
-    sessionAttendanceInfos: Session[];
+    allSessionAttendanceInfo: Session[];
   }>(`/api/session/${courseId}`, {
     validateStatus: () => true,
   });
@@ -37,7 +37,7 @@ export const getSessions = async (courseId: number): Promise<Session[]> => {
   if (res.status === HttpStatusCode.NoContent) {
     return [];
   } else if (res.status === HttpStatusCode.Ok) {
-    const data = res.data.sessionAttendanceInfos;
+    const data = res.data.allSessionAttendanceInfo;
     data.forEach((info) => {
       info.date = new Date(info.date);
     });

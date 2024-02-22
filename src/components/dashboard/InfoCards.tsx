@@ -122,18 +122,21 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
             <InfoCardTitle>Details</InfoCardTitle>
             <DetailsBar style={{ marginTop: "2.1rem" }}>
               <DetailsLabel>Name</DetailsLabel>
-              <DetailsValue>{currentSessionInfo?.name}</DetailsValue>
+              <DetailsValue>{currentSessionInfo?.sessionName}</DetailsValue>
             </DetailsBar>
             <DetailsBar style={{ marginTop: "1.6rem" }}>
               <DetailsLabel>Date</DetailsLabel>
               <DetailsValue>
-                {dateFormat(currentSessionInfo?.startTime, "yyyy-mm-dd (ddd)")}
+                {dateFormat(
+                  currentSessionInfo?.sessionTime,
+                  "yyyy-mm-dd (ddd)"
+                )}
               </DetailsValue>
             </DetailsBar>
             <DetailsBar style={{ marginTop: "1.6rem" }}>
               <DetailsLabel>Start Time</DetailsLabel>
               <DetailsValue>
-                {dateFormat(currentSessionInfo?.startTime, "TT HH:MM")}
+                {dateFormat(currentSessionInfo?.sessionTime, "TT HH:MM")}
               </DetailsValue>
             </DetailsBar>
           </InfoCard>
