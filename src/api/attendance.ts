@@ -39,7 +39,7 @@ export const getAttendanceStatus = async (
 export const updateAttendances = async (
   updateAttendances: UpdateAttendee[]
 ): Promise<void> => {
-  await axios.post("/api/attendance/update", { updateAttendances });
+  await axios.put("/api/attendance/update", { updateAttendances });
 };
 
 export const useAttendanceStatus = (courseId: number, sessionId?: number) => {
