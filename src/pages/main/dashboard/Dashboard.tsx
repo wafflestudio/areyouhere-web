@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
+import { useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+import { useCourses } from "../../../api/course.ts";
 import {
   useCurrentSessionInfo,
   usePreviousSessions,
@@ -20,6 +22,7 @@ import {
 } from "../../../components/sessions/SessionTable.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
 import useModalState from "../../../hooks/modal.tsx";
+import { useClassId } from "../../../hooks/urlParse.tsx";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -50,10 +53,16 @@ function Dashboard() {
     },
   });
 
+  const { data: classList } = useCourses();
+  const classItem = useMemo(
+    () => classList?.find((item) => item.id === classId),
+    [classList, classId]
+  );
+
   return (
     <>
       <Container>
-        <TitleBar label={"Class Dashboard"}>
+        <TitleBar label={classItem?.name ?? ""}>
           <PrimaryButton onClick={() => openCreateSessionModal()}>
             Create New Session
           </PrimaryButton>

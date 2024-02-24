@@ -9,6 +9,7 @@ export type CourseCreationRequest = {
 };
 
 export type CourseUpdateRequest = {
+  id: number;
   name: string;
   description: string;
   onlyListNameAllowed: boolean;
@@ -33,10 +34,10 @@ export const createCourse = async (
 };
 
 export const updateCourse = async (
-  id: number,
   request: CourseUpdateRequest
 ): Promise<void> => {
-  return axios.put(`/api/course/${id}`, request);
+  const { id, ...rest } = request;
+  return axios.put(`/api/course/${id}`, rest);
 };
 
 export const deleteCourse = async (id: number): Promise<void> => {
