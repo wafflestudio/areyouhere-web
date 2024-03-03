@@ -12,7 +12,7 @@ export type AttendanceStatus = {
 };
 
 export type UpdateAttendee = {
-  attendeeId: number;
+  attendanceId: number;
   attendanceStatus: boolean;
 };
 

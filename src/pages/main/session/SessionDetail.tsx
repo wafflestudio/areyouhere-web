@@ -15,9 +15,9 @@ import SessionControl from "../../../components/sessions/SessionControl";
 import SessionInfoBar from "../../../components/sessions/SessionInfoBar";
 import {
   SessionTable,
+  SessionTableBody,
   SessionTableHead,
   SessionTableHeadItem,
-  SessionTableBody,
   SessionTableItem,
 } from "../../../components/sessions/SessionTable";
 import TitleBar from "../../../components/TitleBar";
@@ -37,7 +37,10 @@ function SessionDetail() {
     mutationFn: updateAttendances,
     mutationKey: ["updateAttendances"],
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["session"] });
+      queryClient.invalidateQueries({ queryKey: ["session", sessionId] });
+      queryClient.invalidateQueries({
+        queryKey: ["sessionAttendees", sessionId],
+      });
     },
   });
 
@@ -60,7 +63,7 @@ function SessionDetail() {
               // TODO: send changed attendance status
               const updateData: UpdateAttendee[] = tempAttendees.map(
                 (attendee) => ({
-                  attendeeId: attendee.attendeeId,
+                  attendanceId: attendee.id,
                   attendanceStatus: attendee.attendanceStatus,
                 })
               );
