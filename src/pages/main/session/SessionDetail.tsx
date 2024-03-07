@@ -63,11 +63,13 @@ function SessionDetail() {
               // TODO: send changed attendance status
               const updateData: UpdateAttendee[] = tempAttendees.map(
                 (attendee) => ({
-                  attendanceId: attendee.id,
+                  attendanceId: attendee.attendanceId,
                   attendanceStatus: attendee.attendanceStatus,
                 })
               );
-              updateAttendees(updateData);
+              updateAttendees({
+                updateAttendances: updateData,
+              });
             }
             setIsEditing(!isEditing);
           }}
