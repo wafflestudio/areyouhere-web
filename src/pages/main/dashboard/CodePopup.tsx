@@ -44,9 +44,11 @@ function CodePopup() {
           <SecondaryButton
             onClick={() => {
               const code = currentSessionInfo?.authCode;
-              if (code != null) {
+              if (code != null && currentSessionInfo?.id != null) {
                 deactivate({
                   authCode: code,
+                  courseId: classId,
+                  sessionId: currentSessionInfo.id,
                 });
               }
             }}
