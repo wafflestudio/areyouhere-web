@@ -34,7 +34,12 @@ export const getAttendanceStatus = async (
   if (sessionId == null) {
     return { attendances: 0, total: 0 };
   }
-  const res = await axios.get(`/api/attendance/${courseId}/${sessionId}`);
+  const res = await axios.get(`/api/attendance`, {
+    params: {
+      courseId,
+      sessionId,
+    },
+  });
   return res.data;
 };
 
@@ -43,7 +48,7 @@ export const getAttendanceStatus = async (
 export const updateAttendances = async (
   request: UpdateAttendeeRequest
 ): Promise<void> => {
-  await axios.put("/api/attendance/update", request);
+  await axios.put("/api/attendance", request);
 };
 
 export const useAttendanceStatus = (courseId: number, sessionId?: number) => {

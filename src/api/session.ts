@@ -30,7 +30,8 @@ export type SessionWithoutId = Omit<Session, "id">;
 export const getSessions = async (courseId: number): Promise<Session[]> => {
   const res = await axios.get<{
     allSessionAttendanceInfo: Session[];
-  }>(`/api/session/${courseId}`, {
+  }>(`/api/session`, {
+    params: { courseId },
     validateStatus: () => true,
   });
 
@@ -47,15 +48,17 @@ export const getSessions = async (courseId: number): Promise<Session[]> => {
   }
 };
 
-export const getSession = async (id: number): Promise<SessionWithoutId> => {
-  return (await axios.get<SessionWithoutId>(`/api/session/detail/${id}`)).data;
+export const getSession = async (
+  sessionId: number
+): Promise<SessionWithoutId> => {
+  return (await axios.get<SessionWithoutId>(`/api/session/${sessionId}`)).data;
 };
 
 export const getSessionAttendees = async (
   sessionId: number
 ): Promise<SessionAttendee[]> => {
   const res = await axios.get<{ sessionAttendees: SessionAttendee[] }>(
-    `/api/session/detail/attendee/${sessionId}`,
+    `/api/session/${sessionId}/attendee`,
     {
       validateStatus: () => true,
     }
@@ -78,7 +81,7 @@ export const getSessionAbsenteesOnly = async (
   sessionId: number
 ): Promise<SessionAttendee[]> => {
   const res = await axios.get<{ sessionAttendees: SessionAttendee[] }>(
-    `/api/session/detail/absentee/${sessionId}`,
+    `/api/session/${sessionId}/absentee`,
     {
       validateStatus: () => true,
     }

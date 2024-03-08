@@ -14,7 +14,7 @@ export const getCurrentSessionInfo = async (
   courseId: number
 ): Promise<CurrentSessionInfo | null> => {
   const res = await axios.get<CurrentSessionInfo>(
-    `/api/course/dashboard/${courseId}`,
+    `/api/course/${courseId}/dashboard`,
     {
       validateStatus: () => true,
     }
@@ -37,7 +37,7 @@ export const getPreviousSessions = async (
 ): Promise<Session[]> => {
   const res = await axios.get<{
     sessionAttendanceInfos: Session[];
-  }>(`/api/course/dashboard/session/${courseId}`, {
+  }>(`/api/course/${courseId}/dashboard/session`, {
     validateStatus: () => true,
   });
 

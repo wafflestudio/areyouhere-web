@@ -116,7 +116,11 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
               <AttendanceTotal>/</AttendanceTotal>
               <AttendanceTotal>{attendanceStatus?.total ?? 0}</AttendanceTotal>
             </AttendanceContainer>
-            <Absentees>5 absentees</Absentees>
+            <Absentees>
+              {(attendanceStatus?.total ?? 0) -
+                (attendanceStatus?.attendances ?? 0)}{" "}
+              absentees
+            </Absentees>
           </InfoCard>
           <InfoCard>
             <InfoCardTitle>Details</InfoCardTitle>
