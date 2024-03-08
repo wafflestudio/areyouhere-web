@@ -1,10 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { HttpStatusCode } from "axios";
 
 export type AttendanceRequest = {
   attendeeName: string;
   authCode: string;
 };
+
+export type AttendanceResponse = {
+  attendanceName: string;
+  sessionName: string;
+  courseName: string;
+  attendanceTime: Date;
+};
+
+export enum AttendanceErrorCode {
+  InvalidAuthCode = "InvalidAuthCode",
+  InvalidName = "InvalidName",
+  FailedToAttend = "FailedToAttend",
+}
 
 export type AttendanceStatus = {
   attendances: number;
@@ -20,10 +33,21 @@ export type UpdateAttendeeRequest = {
   updateAttendances: UpdateAttendee[];
 };
 
-export const attend = async (request: AttendanceRequest): Promise<void> => {
+export const attend = async (
+  request: AttendanceRequest
+): Promise<AttendanceResponse> => {
   const res = await axios.post("/api/attendance", request);
-  if (res.status !== 200) {
-    throw new Error("Invalid passcode");
+  if (res.status === HttpStatusCode.Ok) {
+    const data = res.data as AttendanceResponse;
+    data.attendanceTime = new Date(data.attendanceTime);
+
+    return data;
+  } else if (res.status === HttpStatusCode.NotFound) {
+    throw new Error(AttendanceErrorCode.InvalidAuthCode);
+  } else if (res.status === HttpStatusCode.NoContent) {
+    throw new Error(AttendanceErrorCode.InvalidName);
+  } else {
+    throw new Error(AttendanceErrorCode.FailedToAttend);
   }
 };
 

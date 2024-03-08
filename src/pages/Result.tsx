@@ -1,72 +1,95 @@
-import { useNavigate } from "react-router-dom";
+import { useMutationState } from "@tanstack/react-query";
+import dateFormat from "dateformat";
+import { Navigate, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+import { AttendanceResponse } from "../api/attendance.ts";
 import { PrimaryButton, SecondaryButton } from "../components/Button";
 
 function Result() {
   const navigate = useNavigate();
-  return (
-    <>
-      <DesktopContainer>
-        <Title>
-          Thank you for the register!
-          <br />
-          We checked your attendance
-        </Title>
-        <InfoCard>
-          <InfoItem>
-            <InfoLabel>Name</InfoLabel>
-            <InfoLabel>Name</InfoLabel>
-          </InfoItem>
-          <InfoItem style={{ marginTop: "2.6rem" }}>
-            <InfoLabel>Class / Session</InfoLabel>
-            <InfoLabel>Class / Session</InfoLabel>
-          </InfoItem>
-          <InfoItem style={{ marginTop: "2.6rem" }}>
-            <InfoLabel>Sent Time</InfoLabel>
-            <InfoLabel>Sent Time</InfoLabel>
-          </InfoItem>
-          <PrimaryButton
-            style={{ width: "13rem", marginTop: "4rem" }}
+  const attendanceResults = useMutationState<AttendanceResponse>({
+    filters: { mutationKey: ["attend"] },
+    select: (mutation) => mutation.state.data as AttendanceResponse,
+  });
+
+  if (attendanceResults.length === 0) {
+    return <Navigate to={"/"} />;
+  } else {
+    const result = attendanceResults[0];
+    return (
+      <>
+        <DesktopContainer>
+          <Title>
+            Thank you for the register!
+            <br />
+            We checked your attendance
+          </Title>
+          <InfoCard>
+            <InfoItem>
+              <InfoLabel>Name</InfoLabel>
+              <InfoLabel>{result.attendanceName}</InfoLabel>
+            </InfoItem>
+            <InfoItem style={{ marginTop: "2.6rem" }}>
+              <InfoLabel>Class / Session</InfoLabel>
+              <InfoLabel>
+                {result.courseName} / {result.sessionName}
+              </InfoLabel>
+            </InfoItem>
+            <InfoItem style={{ marginTop: "2.6rem" }}>
+              <InfoLabel>Sent Time</InfoLabel>
+              <InfoLabel>
+                {dateFormat(result.attendanceTime, "HH:MM:ss")}
+              </InfoLabel>
+            </InfoItem>
+            <PrimaryButton
+              style={{ width: "13rem", marginTop: "4rem" }}
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              Confirm
+            </PrimaryButton>
+          </InfoCard>
+        </DesktopContainer>
+        <MobileContainer>
+          <MobileTitle>
+            Your attendance has been successfully registered!
+          </MobileTitle>
+          <MobileContentContainer>
+            <MobileContentLabel>NAME</MobileContentLabel>
+            <MobileContent style={{ marginTop: "0.7rem" }}>
+              {result.attendanceName}
+            </MobileContent>
+            <MobileContentLabel style={{ marginTop: "1.8rem" }}>
+              CLASS / SESSION
+            </MobileContentLabel>
+            <MobileContent style={{ marginTop: "0.7rem" }}>
+              {result.courseName} / {result.sessionName}
+            </MobileContent>
+            <MobileContentLabel style={{ marginTop: "1.8rem" }}>
+              SENT TIME
+            </MobileContentLabel>
+            <MobileContent style={{ marginTop: "0.7rem" }}>
+              {dateFormat(result.attendanceTime, "HH:MM:ss")}
+            </MobileContent>
+          </MobileContentContainer>
+          <SecondaryButton
+            style={{
+              marginTop: "2rem",
+              borderRadius: "2rem",
+              fontWeight: "800",
+            }}
             onClick={() => {
               navigate("/");
             }}
           >
-            Confirm
-          </PrimaryButton>
-        </InfoCard>
-      </DesktopContainer>
-      <MobileContainer>
-        <MobileTitle>
-          Your attendance has been successfully registered!
-        </MobileTitle>
-        <MobileContentContainer>
-          <MobileContentLabel>NAME</MobileContentLabel>
-          <MobileContent style={{ marginTop: "0.7rem" }}>Name</MobileContent>
-          <MobileContentLabel style={{ marginTop: "1.8rem" }}>
-            CLASS / SESSION
-          </MobileContentLabel>
-          <MobileContent style={{ marginTop: "0.7rem" }}>
-            Class / Session
-          </MobileContent>
-          <MobileContentLabel style={{ marginTop: "1.8rem" }}>
-            SENT TIME
-          </MobileContentLabel>
-          <MobileContent style={{ marginTop: "0.7rem" }}>
-            HH:MM:SS
-          </MobileContent>
-        </MobileContentContainer>
-        <SecondaryButton
-          style={{ marginTop: "2rem", borderRadius: "2rem", fontWeight: "800" }}
-          onClick={() => {
-            navigate("/");
-          }}
-        >
-          CONFIRM
-        </SecondaryButton>
-      </MobileContainer>
-    </>
-  );
+            CONFIRM
+          </SecondaryButton>
+        </MobileContainer>
+      </>
+    );
+  }
 }
 
 const DesktopContainer = styled.div`
