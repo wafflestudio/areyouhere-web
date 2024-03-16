@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
+import dotsVerticalGrey from "../../assets/class/dotsVerticalGrey.svg";
 import trashRed from "../../assets/class/trashRed.svg";
 import {
   DropdownButton,
@@ -72,7 +73,9 @@ function SessionItem({
           onClick={() => {
             setIsMoreMenuOpened(!isMoreMenuOpened);
           }}
-        />
+        >
+          <img src={dotsVerticalGrey} alt="More" width={24} height={24} />
+        </DropdownButton>
       </DropdownContainer>
     </SessionCard>
   );

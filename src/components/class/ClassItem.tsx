@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
+import dotsVerticalGrey from "../../assets/class/dotsVerticalGrey.svg";
 import trashRed from "../../assets/class/trashRed.svg";
 import {
   DropdownContainer,
@@ -62,7 +63,9 @@ function ClassItem({
           onClick={() => {
             setIsMoreMenuOpened(!isMoreMenuOpened);
           }}
-        />
+        >
+          <img src={dotsVerticalGrey} alt="More" width={24} height={24} />
+        </DropdownButton>
       </DropdownContainer>
     </Container>
   );
@@ -89,6 +92,7 @@ const ContentLink = styled(Link)`
   gap: 1.7rem;
 
   text-decoration: none;
+
   h4 {
     width: 100%;
     height: 3.2rem;
@@ -122,6 +126,7 @@ const ContentLink = styled(Link)`
 
 const DropdownDeleteButton = styled(DropdownMenuButton)`
   color: ${({ theme }) => theme.colors.red["500"]};
+
   &:hover {
     background-color: ${({ theme }) => theme.colors.red["50"]};
   }

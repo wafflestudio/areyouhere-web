@@ -43,7 +43,7 @@ export const createAttendee = async (
 export const deleteAttendee = async (
   request: DeleteAttendeeRequest
 ): Promise<void> => {
-  return axios.post("/api/attendee/delete", { data: request });
+  return axios.post("/api/attendee/delete", request);
 };
 
 export const useAttendees = (courseId: number) => {
