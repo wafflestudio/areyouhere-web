@@ -27,6 +27,10 @@ export const getCourses = async (): Promise<Course[]> => {
   return (await axios.get<Course[]>("/api/course")).data;
 };
 
+export const getCourse = async (id: number): Promise<Course> => {
+  return (await axios.get<Course>(`/api/course/${id}`)).data;
+};
+
 export const createCourse = async (
   request: CourseCreationRequest
 ): Promise<void> => {
@@ -48,5 +52,12 @@ export const useCourses = () => {
   return useQuery<Course[]>({
     queryKey: ["courses"],
     queryFn: getCourses,
+  });
+};
+
+export const useCourse = (id: number) => {
+  return useQuery<Course>({
+    queryKey: ["course", id],
+    queryFn: () => getCourse(id),
   });
 };

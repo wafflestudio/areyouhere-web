@@ -1,28 +1,23 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
-import { useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { useCourses } from "../../../api/course.ts";
-import {
-  useCurrentSessionInfo,
-  usePreviousSessions,
-} from "../../../api/dashboard.ts";
+import { useCourse } from "../../../api/course.ts";
+import { usePreviousSessions } from "../../../api/dashboard.ts";
 import { createSession } from "../../../api/session.ts";
 import { PrimaryButton } from "../../../components/Button.tsx";
 import CreateSessionModal from "../../../components/dashboard/CreateSessionModal.tsx";
 import InfoCards from "../../../components/dashboard/InfoCards.tsx";
 import {
   SessionTable,
+  SessionTableBody,
   SessionTableHead,
   SessionTableHeadItem,
-  SessionTableBody,
   SessionTableItem,
 } from "../../../components/sessions/SessionTable.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
 import useModalState from "../../../hooks/modal.tsx";
-import { useClassId } from "../../../hooks/urlParse.tsx";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -36,7 +31,6 @@ function Dashboard() {
   const location = useLocation();
   const classId = parseInt(location.pathname.split("/")[2], 10);
 
-  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
   const { data: previousSessions } = usePreviousSessions(classId);
 
   const queryClient = useQueryClient();
@@ -53,11 +47,7 @@ function Dashboard() {
     },
   });
 
-  const { data: classList } = useCourses();
-  const classItem = useMemo(
-    () => classList?.find((item) => item.id === classId),
-    [classList, classId]
-  );
+  const { data: classItem } = useCourse(classId);
 
   return (
     <>
