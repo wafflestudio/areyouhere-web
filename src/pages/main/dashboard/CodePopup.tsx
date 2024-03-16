@@ -51,6 +51,7 @@ function CodePopup() {
                   sessionId: currentSessionInfo.id,
                 });
               }
+              window.close();
             }}
             style={{ borderRadius: "2rem", flex: "1" }}
             colorScheme="red"
