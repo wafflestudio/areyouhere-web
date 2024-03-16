@@ -7,6 +7,8 @@ type CreateAuthCodeRequest = {
 
 type DeactivateAuthCodeRequest = {
   authCode: string;
+  sessionId: number;
+  courseId: number;
 };
 
 export const createAuthCode = async (

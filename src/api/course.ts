@@ -9,6 +9,7 @@ export type CourseCreationRequest = {
 };
 
 export type CourseUpdateRequest = {
+  id: number;
   name: string;
   description: string;
   onlyListNameAllowed: boolean;
@@ -23,29 +24,40 @@ export type Course = {
 };
 
 export const getCourses = async (): Promise<Course[]> => {
-  return (await axios.get<Course[]>("/api/courses")).data;
+  return (await axios.get<Course[]>("/api/course")).data;
+};
+
+export const getCourse = async (id: number): Promise<Course> => {
+  return (await axios.get<Course>(`/api/course/${id}`)).data;
 };
 
 export const createCourse = async (
   request: CourseCreationRequest
 ): Promise<void> => {
-  return axios.post("/api/courses", request);
+  return axios.post("/api/course", request);
 };
 
 export const updateCourse = async (
-  id: number,
   request: CourseUpdateRequest
 ): Promise<void> => {
-  return axios.put(`/api/courses/${id}`, request);
+  const { id, ...rest } = request;
+  return axios.put(`/api/course/${id}`, rest);
 };
 
 export const deleteCourse = async (id: number): Promise<void> => {
-  return axios.delete(`/api/courses/${id}`);
+  return axios.delete(`/api/course/${id}`);
 };
 
 export const useCourses = () => {
   return useQuery<Course[]>({
     queryKey: ["courses"],
     queryFn: getCourses,
+  });
+};
+
+export const useCourse = (id: number) => {
+  return useQuery<Course>({
+    queryKey: ["course", id],
+    queryFn: () => getCourse(id),
   });
 };

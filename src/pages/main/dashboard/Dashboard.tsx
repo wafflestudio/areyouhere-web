@@ -3,19 +3,17 @@ import dateFormat from "dateformat";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import {
-  useCurrentSessionInfo,
-  usePreviousSessions,
-} from "../../../api/dashboard.ts";
+import { useCourse } from "../../../api/course.ts";
+import { usePreviousSessions } from "../../../api/dashboard.ts";
 import { createSession } from "../../../api/session.ts";
 import { PrimaryButton } from "../../../components/Button.tsx";
 import CreateSessionModal from "../../../components/dashboard/CreateSessionModal.tsx";
 import InfoCards from "../../../components/dashboard/InfoCards.tsx";
 import {
   SessionTable,
+  SessionTableBody,
   SessionTableHead,
   SessionTableHeadItem,
-  SessionTableBody,
   SessionTableItem,
 } from "../../../components/sessions/SessionTable.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
@@ -33,7 +31,6 @@ function Dashboard() {
   const location = useLocation();
   const classId = parseInt(location.pathname.split("/")[2], 10);
 
-  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
   const { data: previousSessions } = usePreviousSessions(classId);
 
   const queryClient = useQueryClient();
@@ -41,24 +38,28 @@ function Dashboard() {
     mutationFn: createSession,
     mutationKey: ["createSession"],
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sessions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["previousSessions", classId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
     },
   });
+
+  const { data: classItem } = useCourse(classId);
 
   return (
     <>
       <Container>
-        <TitleBar label={currentSessionInfo?.name ?? ""}>
+        <TitleBar label={classItem?.name ?? ""}>
           <PrimaryButton onClick={() => openCreateSessionModal()}>
             Create New Session
           </PrimaryButton>
         </TitleBar>
         <ContentContainer>
           <Subtitle>Current Session</Subtitle>
-          <InfoCards
-            hasSession={(previousSessions?.length ?? 0) > 0}
-            onCreateNewSession={() => openCreateSessionModal()}
-          />
+          <InfoCards onCreateNewSession={() => openCreateSessionModal()} />
           <Subtitle style={{ marginTop: "5rem" }}>Previous Session</Subtitle>
           <ElevatedSessionTable>
             <SessionTableHead>
@@ -115,6 +116,7 @@ function Dashboard() {
               courseId: classId,
               sessionName,
             });
+            closeCreateSessionModal();
           }}
         />
       )}

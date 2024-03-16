@@ -32,11 +32,11 @@ const courses: Course[] = [
 ];
 
 function addCourseMock(mock: AxiosMockAdapter) {
-  mock.onGet("/api/courses").reply(() => {
+  mock.onGet("/api/course").reply(() => {
     return [HttpStatusCode.Ok, courses];
   });
 
-  mock.onPost("/api/courses").reply((config) => {
+  mock.onPost("/api/course").reply((config) => {
     const data = JSON.parse(config.data) as CourseCreationRequest;
     courses.push({
       id: courses.length + 1,
@@ -48,7 +48,7 @@ function addCourseMock(mock: AxiosMockAdapter) {
     return [HttpStatusCode.Ok];
   });
 
-  mock.onPut(/\/api\/courses\/\d+/).reply((config) => {
+  mock.onPut(/\/api\/course\/\d+/).reply((config) => {
     const id = Number(config.url?.split("/").pop());
     const data = JSON.parse(config.data) as CourseUpdateRequest;
     const course = courses.find((c) => c.id === id);
@@ -62,7 +62,7 @@ function addCourseMock(mock: AxiosMockAdapter) {
     }
   });
 
-  mock.onDelete(/\/api\/courses\/\d+/).reply((config) => {
+  mock.onDelete(/\/api\/course\/\d+/).reply((config) => {
     const id = Number(config.url?.split("/").pop());
     const index = courses.findIndex((c) => c.id === id);
     if (index !== -1) {

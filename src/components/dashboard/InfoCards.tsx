@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
-import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 import { useAttendanceStatus } from "../../api/attendance";
@@ -11,16 +10,10 @@ import { useClassId } from "../../hooks/urlParse";
 import { SecondaryButton } from "../Button";
 
 interface InfoCardsProps extends React.HTMLAttributes<HTMLDivElement> {
-  hasSession?: boolean;
   onCreateNewSession?: () => void;
 }
 
-function InfoCards({
-  hasSession,
-  onCreateNewSession,
-  ...props
-}: InfoCardsProps) {
-  const location = useLocation();
+function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
   const classId = useClassId();
 
   const queryClient = useQueryClient();
@@ -45,6 +38,9 @@ function InfoCards({
       queryClient.invalidateQueries({
         queryKey: ["currentSessionInfo", classId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["previousSessions", classId],
+      });
     },
   });
 
@@ -55,7 +51,7 @@ function InfoCards({
 
   return (
     <InfoCardContainer {...props}>
-      {hasSession ? (
+      {currentSessionInfo?.id != null ? (
         <>
           <InfoCard style={{ width: activated ? "28rem" : "24rem" }}>
             <InfoCardTitle>Passcode</InfoCardTitle>
@@ -85,6 +81,8 @@ function InfoCards({
                       if (currentSessionInfo?.authCode != null) {
                         deactivateSession({
                           authCode: currentSessionInfo.authCode,
+                          sessionId: currentSessionInfo.id,
+                          courseId: classId!,
                         });
                       }
                     }}
@@ -118,24 +116,31 @@ function InfoCards({
               <AttendanceTotal>/</AttendanceTotal>
               <AttendanceTotal>{attendanceStatus?.total ?? 0}</AttendanceTotal>
             </AttendanceContainer>
-            <Absentees>5 absentees</Absentees>
+            <Absentees>
+              {(attendanceStatus?.total ?? 0) -
+                (attendanceStatus?.attendances ?? 0)}{" "}
+              absentees
+            </Absentees>
           </InfoCard>
           <InfoCard>
             <InfoCardTitle>Details</InfoCardTitle>
             <DetailsBar style={{ marginTop: "2.1rem" }}>
               <DetailsLabel>Name</DetailsLabel>
-              <DetailsValue>{currentSessionInfo?.name}</DetailsValue>
+              <DetailsValue>{currentSessionInfo?.sessionName}</DetailsValue>
             </DetailsBar>
             <DetailsBar style={{ marginTop: "1.6rem" }}>
               <DetailsLabel>Date</DetailsLabel>
               <DetailsValue>
-                {dateFormat(currentSessionInfo?.startTime, "yyyy-mm-dd (ddd)")}
+                {dateFormat(
+                  currentSessionInfo?.sessionTime,
+                  "yyyy-mm-dd (ddd)"
+                )}
               </DetailsValue>
             </DetailsBar>
             <DetailsBar style={{ marginTop: "1.6rem" }}>
               <DetailsLabel>Start Time</DetailsLabel>
               <DetailsValue>
-                {dateFormat(currentSessionInfo?.startTime, "TT HH:MM")}
+                {dateFormat(currentSessionInfo?.sessionTime, "TT HH:MM")}
               </DetailsValue>
             </DetailsBar>
           </InfoCard>

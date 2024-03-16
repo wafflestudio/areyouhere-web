@@ -25,7 +25,7 @@ function Home() {
   const [name, setName] = useState("");
   const [passcode, setPasscode] = useState("");
 
-  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { mutate: performAttendance } = useMutation({
     mutationFn: attend,
@@ -33,8 +33,8 @@ function Home() {
     onSuccess: () => {
       navigate("/result");
     },
-    onError: () => {
-      setHasError(true);
+    onError: (error) => {
+      setErrorMessage(error.message);
     },
   });
 
@@ -75,7 +75,7 @@ function Home() {
               onChange={(e) => setPasscode(e.target.value)}
               style={{ marginTop: "1.1rem" }}
             />
-            {hasError && (
+            {errorMessage && (
               <Alert type="warning" style={{ marginTop: "2rem" }}>
                 Could not find a session corresponding to your name and
                 passcode. Please check your credentials or contact the
@@ -121,7 +121,7 @@ function Home() {
             value={passcode}
             onChange={(e) => setPasscode(e.target.value)}
           />
-          {hasError && (
+          {errorMessage && (
             <Alert type="warning" style={{ marginTop: "1rem" }} size="small">
               Could not find a session corresponding to your name and passcode.
               Please check your credentials or contact the administrator for

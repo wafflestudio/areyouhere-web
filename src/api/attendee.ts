@@ -20,7 +20,8 @@ export type DeleteAttendeeRequest = {
 export const getAttendees = async (courseId: number): Promise<Attendee[]> => {
   const res = await axios.get<{
     classAttendees: Attendee[];
-  }>(`/api/attendee/${courseId}`, {
+  }>(`/api/attendee`, {
+    params: { courseId },
     validateStatus: () => true,
   });
 
@@ -42,7 +43,7 @@ export const createAttendee = async (
 export const deleteAttendee = async (
   request: DeleteAttendeeRequest
 ): Promise<void> => {
-  return axios.delete("/api/attendee", { data: request });
+  return axios.post("/api/attendee/delete", { data: request });
 };
 
 export const useAttendees = (courseId: number) => {

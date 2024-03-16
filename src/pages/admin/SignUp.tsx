@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -9,6 +9,7 @@ import {
   PASSWORD_REGEX,
   signUp,
   useEmailConflict,
+  useUser,
 } from "../../api/user";
 import {
   OptionalActionLabel,
@@ -34,17 +35,25 @@ function SignUp() {
 
   const [showError, setShowError] = useState(false);
 
+  const { data: user } = useUser();
+
   // TODO: handle failure cases
   const { mutate } = useMutation({
     mutationFn: signUp,
     mutationKey: ["signUp"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      navigate("/class");
+      // navigate("/class");
     },
   });
 
   const { data: isEmailConflict } = useEmailConflict(email, !emailError);
+
+  useEffect(() => {
+    if (user != null) {
+      navigate("/class");
+    }
+  }, [navigate, user]);
 
   return (
     <Container>

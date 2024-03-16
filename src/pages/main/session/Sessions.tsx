@@ -1,8 +1,9 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
-import { useSessions } from "../../../api/session.ts";
+import { deleteSession, useSessions } from "../../../api/session.ts";
 import AlertModal from "../../../components/AlertModal.tsx";
 import SessionItem from "../../../components/sessions/SessionItem.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
@@ -18,6 +19,17 @@ function Sessions() {
     sessions?.find((session) => session.id === deleteTarget)?.name ?? "";
 
   const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
+
+  const queryClient = useQueryClient();
+  const { mutate: deleteSessions } = useMutation({
+    mutationFn: deleteSession,
+    mutationKey: ["deleteSession"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["sessions", classId],
+      });
+    },
+  });
 
   return (
     <>
@@ -63,6 +75,9 @@ function Sessions() {
         }}
         onConfirm={() => {
           // TODO: delete session
+          deleteSessions({
+            sessionId: deleteTarget!,
+          });
           closeDeleteModal();
         }}
       />
