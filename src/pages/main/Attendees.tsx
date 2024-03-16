@@ -24,7 +24,7 @@ interface CheckedState {
 
 function Attendees() {
   const classId = useClassId();
-  const { data: attendees } = useAttendees(classId!);
+  const { data: attendees } = useAttendees(classId);
 
   const queryClient = useQueryClient();
   const { mutate: deleteAttendees } = useMutation({
@@ -84,7 +84,6 @@ function Attendees() {
       .filter((attendee) => checkedState[attendee.id])
       .map((attendee) => attendee.id);
 
-    // setAttendees(remainingAttendees);
     deleteAttendees({
       attendeeIds: deleteAttendeeIds,
     });
@@ -102,7 +101,7 @@ function Attendees() {
           </PrimaryButton>
         </TitleBar>
         <HeaderContainer>
-          <h5>{`${attendees?.length ?? 0} Attendees`}</h5>
+          <h5>{attendees?.length ?? 0} Attendees</h5>
           <SecondaryButton
             onClick={openDeleteModal}
             disabled={checkedCount === 0}
@@ -152,7 +151,7 @@ function Attendees() {
               <AttendeesItem
                 key={attendee.id}
                 attendee={attendee}
-                isChecked={!!checkedState[attendee.id]}
+                isChecked={checkedState[attendee.id]}
                 onCheckboxChange={() => handleCheckboxChange(attendee.id)}
               />
             ))}
@@ -160,11 +159,7 @@ function Attendees() {
         </ContentContainer>
       </Container>
       {/* 모달 */}
-      <AddAttendeesModal
-        state={addModalState}
-        onCancel={closeAddModal}
-      ></AddAttendeesModal>
-
+      <AddAttendeesModal state={addModalState} onCancel={closeAddModal} />
       <AlertModal
         state={deleteModalState}
         type="delete"

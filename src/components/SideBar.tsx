@@ -112,6 +112,7 @@ function SideBar() {
         <img src={logo} alt="logo" />
       </IconContainer>
       {location !== "/class" &&
+        location !== "/class/create" &&
         menuItems.map((item, index) => {
           const urlMatches = determineIcon(item);
           return (

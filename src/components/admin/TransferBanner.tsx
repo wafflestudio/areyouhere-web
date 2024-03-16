@@ -31,8 +31,7 @@ const BannerLink = styled(Link)<{ from: "admin" | "attendees" }>`
   align-items: center;
   background-color: #000000;
   color: white;
-  ${({ theme, from }) =>
-    from === "admin" ? theme.typography.b2 : theme.typography.b3};
+  ${({ theme }) => theme.typography.b3};
   text-decoration: none;
 `;
 

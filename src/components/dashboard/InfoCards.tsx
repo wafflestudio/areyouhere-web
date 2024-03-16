@@ -140,7 +140,9 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
             <DetailsBar style={{ marginTop: "1.6rem" }}>
               <DetailsLabel>Start Time</DetailsLabel>
               <DetailsValue>
-                {dateFormat(currentSessionInfo?.sessionTime, "TT HH:MM")}
+                {activated
+                  ? dateFormat(currentSessionInfo?.sessionTime, "TT hh:mm")
+                  : "-"}
               </DetailsValue>
             </DetailsBar>
           </InfoCard>
