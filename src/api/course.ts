@@ -23,8 +23,20 @@ export type Course = {
   allowOnlyRegistered: boolean;
 };
 
-export const getCourses = async (): Promise<Course[]> => {
-  return (await axios.get<Course[]>("/api/course")).data;
+export type CoursePreview = {
+  id: number;
+  name: string;
+  description: string;
+  attendees: number;
+  allowOnlyRegistered: boolean;
+};
+
+export type CourseListResponse = {
+  courses: CoursePreview[];
+};
+
+export const getCourses = async (): Promise<CoursePreview[]> => {
+  return (await axios.get<CourseListResponse>("/api/course")).data.courses;
 };
 
 export const getCourse = async (id: number): Promise<Course> => {
@@ -49,7 +61,7 @@ export const deleteCourse = async (id: number): Promise<void> => {
 };
 
 export const useCourses = () => {
-  return useQuery<Course[]>({
+  return useQuery<CoursePreview[]>({
     queryKey: ["courses"],
     queryFn: getCourses,
   });
