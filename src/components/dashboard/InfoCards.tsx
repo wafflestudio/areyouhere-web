@@ -6,7 +6,7 @@ import { useAttendanceStatus } from "../../api/attendance";
 import { createAuthCode, deactivateAuthCode } from "../../api/authCode";
 import { useCurrentSessionInfo } from "../../api/dashboard";
 import expandDarkGrey from "../../assets/dashboard/expandDarkGrey.svg";
-import { useClassId } from "../../hooks/urlParse";
+import { useClassId, useSessionId } from "../../hooks/urlParse";
 import { SecondaryButton } from "../Button";
 
 interface InfoCardsProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -15,6 +15,7 @@ interface InfoCardsProps extends React.HTMLAttributes<HTMLDivElement> {
 
 function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
   const classId = useClassId();
+  const sessionId = useSessionId();
 
   const queryClient = useQueryClient();
 
@@ -59,7 +60,10 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
               <>
                 <ExpandButton
                   onClick={() => {
-                    window.open("/class/1/sessions/1/code", "_blank");
+                    window.open(
+                      `/class/${classId}/sessions/${sessionId}/code`,
+                      "_blank"
+                    );
                   }}
                 >
                   <img
