@@ -15,7 +15,6 @@ interface InfoCardsProps extends React.HTMLAttributes<HTMLDivElement> {
 
 function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
   const classId = useClassId();
-  const sessionId = useSessionId();
 
   const queryClient = useQueryClient();
 
@@ -61,7 +60,7 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
                 <ExpandButton
                   onClick={() => {
                     window.open(
-                      `/class/${classId}/sessions/${sessionId}/code`,
+                      `/class/${classId}/sessions/${currentSessionInfo.id}/code`,
                       "_blank"
                     );
                   }}

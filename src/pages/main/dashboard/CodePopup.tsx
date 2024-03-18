@@ -118,6 +118,8 @@ const Passcode = styled.div`
   font-size: 12.7rem;
   line-height: 15.4rem;
   font-weight: bold;
+  text-align: center;
+  text-indent: 0.3em;
   letter-spacing: 0.3em;
   color: ${({ theme }) => theme.colors.black};
 `;
