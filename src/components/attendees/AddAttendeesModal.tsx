@@ -148,7 +148,7 @@ function AddAttendeesModal({
               // TODO: add new attendees
               createAttendees({
                 courseId: classId!,
-                newAttendees: attendeeList,
+                newAttendees: attendeeList.map((name) => ({ name })),
               });
               onCancel();
             }}

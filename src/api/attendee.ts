@@ -10,7 +10,10 @@ export type Attendee = {
 
 export type CreateAttendeeRequest = {
   courseId: number;
-  newAttendees: string[];
+  newAttendees: {
+    name: string;
+    note?: string;
+  }[];
 };
 
 export type DeleteAttendeeRequest = {
