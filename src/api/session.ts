@@ -105,7 +105,9 @@ export const createSession = async (request: CreateSessionRequest) => {
 };
 
 export const deleteSession = async (request: DeleteSessionRequest) => {
-  return axios.delete(`/api/session/${request.sessionId}`);
+  return axios.delete(`/api/session`, {
+    params: request,
+  });
 };
 
 export const useSessions = (courseId: number) => {

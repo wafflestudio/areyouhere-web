@@ -17,6 +17,8 @@ export enum AttendanceErrorCode {
   InvalidAuthCode = "InvalidAuthCode",
   InvalidName = "InvalidName",
   FailedToAttend = "FailedToAttend",
+  AlreadyAttended = "AlreadyAttended",
+  DifferentName = "DifferentName",
 }
 
 export type AttendanceStatus = {
@@ -36,7 +38,9 @@ export type UpdateAttendeeRequest = {
 export const attend = async (
   request: AttendanceRequest
 ): Promise<AttendanceResponse> => {
-  const res = await axios.post("/api/attendance", request);
+  const res = await axios.post("/api/attendance", request, {
+    validateStatus: () => true,
+  });
   if (res.status === HttpStatusCode.Ok) {
     const data = res.data as AttendanceResponse;
     data.attendanceTime = new Date(data.attendanceTime);
@@ -44,6 +48,10 @@ export const attend = async (
     return data;
   } else if (res.status === HttpStatusCode.NotFound) {
     throw new Error(AttendanceErrorCode.InvalidAuthCode);
+  } else if (res.status === HttpStatusCode.BadRequest) {
+    throw new Error(AttendanceErrorCode.AlreadyAttended);
+  } else if (res.status === HttpStatusCode.Forbidden) {
+    throw new Error(AttendanceErrorCode.DifferentName);
   } else if (res.status === HttpStatusCode.NoContent) {
     throw new Error(AttendanceErrorCode.InvalidName);
   } else {

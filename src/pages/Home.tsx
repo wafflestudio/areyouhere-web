@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { attend } from "../api/attendance.ts";
+import { attend, AttendanceErrorCode } from "../api/attendance.ts";
 import sendIcon from "../assets/send.svg";
 import TransferBanner from "../components/admin/TransferBanner.tsx";
 import Alert from "../components/Alert.tsx";
@@ -34,7 +34,32 @@ function Home() {
       navigate("/result");
     },
     onError: (error) => {
-      setErrorMessage(error.message);
+      console.error(error);
+      switch (error.message) {
+        case AttendanceErrorCode.InvalidAuthCode:
+          setErrorMessage(
+            `Could not find a session corresponding to passcode. Please check your credentials or contact the administrator for help.`
+          );
+          break;
+        case AttendanceErrorCode.InvalidName:
+          setErrorMessage(
+            `Could not find a session corresponding to your name. Please check your credentials or contact the administrator for help.`
+          );
+          break;
+        case AttendanceErrorCode.AlreadyAttended:
+          setErrorMessage(`You have already attended the session.`);
+          break;
+        case AttendanceErrorCode.DifferentName:
+          setErrorMessage(
+            `You have already attended the session with a different name.`
+          );
+          break;
+        case AttendanceErrorCode.FailedToAttend:
+          setErrorMessage(
+            `Failed to attend the session. Please try again later.`
+          );
+          break;
+      }
     },
   });
 
@@ -77,9 +102,7 @@ function Home() {
             />
             {errorMessage && (
               <Alert type="warning" style={{ marginTop: "2rem" }}>
-                Could not find a session corresponding to your name and
-                passcode. Please check your credentials or contact the
-                administrator for help.
+                {errorMessage}
               </Alert>
             )}
             <PrimaryButton
@@ -123,9 +146,7 @@ function Home() {
           />
           {errorMessage && (
             <Alert type="warning" style={{ marginTop: "1rem" }} size="small">
-              Could not find a session corresponding to your name and passcode.
-              Please check your credentials or contact the administrator for
-              help.
+              {errorMessage}
             </Alert>
           )}
           <PrimaryButton
