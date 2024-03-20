@@ -39,10 +39,10 @@ function addAttendeeMock(mock: AxiosMockAdapter) {
 
   mock.onPost("/api/attendee").reply((config) => {
     const data = JSON.parse(config.data) as CreateAttendeeRequest;
-    data.newAttendees.forEach((name) => {
+    data.newAttendees.forEach((attendee) => {
       attendees.push({
         id: id++,
-        name,
+        name: attendee.name,
         attendance: 0,
         absence: 0,
       });
