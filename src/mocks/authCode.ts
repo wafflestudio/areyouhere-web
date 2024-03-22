@@ -1,20 +1,29 @@
 import { HttpStatusCode } from "axios";
-import AxiosMockAdapter from "axios-mock-adapter";
 
-import { currentSessionInfo } from "./dashboard";
+import { PostMapping, RequestMapping } from "./base.ts";
+import { DashboardMock } from "./dashboard.ts";
 
-function addAuthCodeMock(mock: AxiosMockAdapter) {
-  mock.onPost("/api/auth-code").reply(() => {
-    currentSessionInfo.authCode = "HAHA";
-    currentSessionInfo.startTime = new Date();
-    return [HttpStatusCode.Ok, { authCode: "HAHA" }];
-  });
+@RequestMapping("/api/auth-code")
+export class AuthCodeMock {
+  static getRandomAuthCode() {
+    return Math.random().toString(36).substring(2, 6).toUpperCase();
+  }
 
-  mock.onPost("/api/auth-code/deactivate").reply(() => {
-    currentSessionInfo.authCode = undefined;
-    currentSessionInfo.startTime = undefined;
+  @PostMapping()
+  static createAuthCode() {
+    DashboardMock.currentSessionInfo.authCode =
+      AuthCodeMock.getRandomAuthCode();
+    DashboardMock.currentSessionInfo.sessionTime = new Date();
+    return [
+      HttpStatusCode.Ok,
+      { authCode: DashboardMock.currentSessionInfo.authCode },
+    ];
+  }
+
+  @PostMapping("/deactivate")
+  static deactivateAuthCode() {
+    DashboardMock.currentSessionInfo.authCode = undefined;
+    DashboardMock.currentSessionInfo.sessionTime = undefined;
     return [HttpStatusCode.Ok];
-  });
+  }
 }
-
-export default addAuthCodeMock;

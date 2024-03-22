@@ -1,65 +1,65 @@
 import { HttpStatusCode } from "axios";
-import AxiosMockAdapter from "axios-mock-adapter";
 
 import { CreateAttendeeRequest, DeleteAttendeeRequest } from "../api/attendee";
 
-const attendees = [
-  {
-    id: 1,
-    name: "User 1",
-    attendance: 3,
-    absence: 0,
-  },
-  {
-    id: 2,
-    name: "User 2",
-    attendance: 1,
-    absence: 1,
-  },
-  {
-    id: 3,
-    name: "User 3",
-    attendance: 2,
-    absence: 1,
-  },
-];
+import {
+  GetMapping,
+  PostMapping,
+  RequestConfig,
+  RequestMapping,
+} from "./base.ts";
 
-let id = 4;
+@RequestMapping("/api/attendee")
+export class AttendeeMock {
+  static attendees = [
+    {
+      id: 1,
+      name: "User 1",
+      attendance: 3,
+      absence: 0,
+    },
+    {
+      id: 2,
+      name: "User 2",
+      attendance: 1,
+      absence: 1,
+    },
+    {
+      id: 3,
+      name: "User 3",
+      attendance: 2,
+      absence: 1,
+    },
+  ];
 
-function addAttendeeMock(mock: AxiosMockAdapter) {
-  mock.onGet(/\/api\/attendee\/\d+/).reply(() => {
-    console.log("attendees", attendees);
-    return [
-      HttpStatusCode.Ok,
-      {
-        classAttendees: attendees,
-      },
-    ];
-  });
+  @GetMapping()
+  static getAttendees() {
+    return [HttpStatusCode.Ok, { classAttendees: this.attendees }];
+  }
 
-  mock.onPost("/api/attendee").reply((config) => {
+  @PostMapping()
+  static createAttendee(config: RequestConfig) {
     const data = JSON.parse(config.data) as CreateAttendeeRequest;
     data.newAttendees.forEach((attendee) => {
-      attendees.push({
-        id: id++,
+      this.attendees.push({
+        id: this.attendees.length + 1,
         name: attendee.name,
         attendance: 0,
         absence: 0,
       });
     });
     return [HttpStatusCode.Ok];
-  });
+  }
 
-  mock.onDelete("/api/attendee").reply((config) => {
+  @PostMapping("/delete")
+  static deleteAttendee(config: RequestConfig) {
     const data = JSON.parse(config.data) as DeleteAttendeeRequest;
     data.attendeeIds.forEach((id) => {
-      const index = attendees.findIndex((a) => a.id === id);
+      const index = this.attendees.findIndex((a) => a.id === id);
       if (index !== -1) {
-        attendees.splice(index, 1);
+        this.attendees.splice(index, 1);
       }
     });
     return [HttpStatusCode.Ok];
-  });
+  }
 }
-
-export default addAttendeeMock;

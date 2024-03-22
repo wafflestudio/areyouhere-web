@@ -1,57 +1,45 @@
 import { HttpStatusCode } from "axios";
-import AxiosMockAdapter from "axios-mock-adapter";
 
-export const currentSessionInfo: { [key: string]: unknown } = {
-  id: 1,
-  name: "Current Session",
-  authCode: "HAHA",
-  startTime: new Date().toISOString(),
-};
+import { CurrentSessionInfo } from "../api/dashboard.ts";
 
-// Mock data for previous sessions
-const previousSessions = [
-  {
+import { GetMapping, RequestMapping } from "./base.ts";
+
+@RequestMapping("/api/course/:courseId/dashboard")
+export class DashboardMock {
+  static currentSessionInfo: Partial<CurrentSessionInfo> = {
     id: 1,
-    name: "Previous Session 1",
-    date: new Date().toISOString(),
-    attendee: 10,
-    absentee: 2,
-  },
-  {
-    id: 2,
-    name: "Previous Session 2",
-    date: new Date().toISOString(),
-    attendee: 8,
-    absentee: 4,
-  },
-];
+    sessionName: "Session Name",
+    sessionTime: undefined,
+    authCode: undefined,
+  };
 
-function addDashboardMock(mock: AxiosMockAdapter) {
-  mock.onGet(/\/api\/course\/dashboard\/session\/\d+/).reply((config) => {
-    const courseId = parseInt(config.url?.split("/")[5] || "0");
-    if (courseId === 1) {
-      return [
-        HttpStatusCode.Ok,
-        {
-          sessionAttendanceInfos: previousSessions,
-        },
-      ];
-    } else {
-      return [HttpStatusCode.NoContent];
-    }
-  });
+  @GetMapping()
+  static getCurrentSessionInfo() {
+    return [HttpStatusCode.Ok, DashboardMock.currentSessionInfo];
+  }
 
-  mock.onGet(/\/api\/course\/dashboard\/\d+/).reply((config) => {
-    const courseId = parseInt(config.url?.split("/").pop() || "0");
-    console.log("courseId", config.url);
-    if (courseId === 1) {
-      return [HttpStatusCode.Ok, currentSessionInfo];
-    } else {
-      return [HttpStatusCode.NoContent];
-    }
-  });
-
-  // Mock GET request for previous sessions
+  @GetMapping("/session")
+  static getPreviousSessions() {
+    return [
+      HttpStatusCode.Ok,
+      {
+        sessionAttendanceInfos: [
+          {
+            id: 1,
+            name: "Previous Session 1",
+            date: new Date().toISOString(),
+            attendee: 10,
+            absentee: 2,
+          },
+          {
+            id: 2,
+            name: "Previous Session 2",
+            date: new Date().toISOString(),
+            attendee: 8,
+            absentee: 4,
+          },
+        ],
+      },
+    ];
+  }
 }
-
-export default addDashboardMock;

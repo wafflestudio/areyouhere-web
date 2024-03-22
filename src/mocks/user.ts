@@ -1,51 +1,82 @@
 import { HttpStatusCode } from "axios";
-import AxiosMockAdapter from "axios-mock-adapter";
 
-let logined = true;
+import { SignInRequest, SignUpRequest } from "../api/user.ts";
 
-function addUserMock(mock: AxiosMockAdapter) {
-  mock.onPost("/api/manager").reply(() => {
-    console.log("post /api/manager");
-    logined = true;
+import {
+  GetMapping,
+  PostMapping,
+  RequestConfig,
+  RequestMapping,
+} from "./base.ts";
+
+@RequestMapping("/api/auth")
+export class AuthMock {
+  private static currentUser = -1;
+  private static users = [
+    {
+      email: "test@example.com",
+      name: "test user",
+      password: "testtest",
+    },
+  ];
+
+  @PostMapping("/signup")
+  static signUp(config: RequestConfig) {
+    const data = JSON.parse(config.data) as SignUpRequest;
+    this.users.push({
+      email: data.email,
+      name: data.nickname,
+      password: data.password,
+    });
     return [HttpStatusCode.Ok];
-  });
+  }
 
-  mock.onPost("/api/manager/login").reply((config) => {
-    const data = JSON.parse(config.data);
-    if (data.email === "test@example.com") {
-      logined = true;
-      return [HttpStatusCode.Ok];
-    } else {
-      return [HttpStatusCode.BadRequest];
+  @PostMapping("/login")
+  static login(config: RequestConfig) {
+    const data = JSON.parse(config.data) as SignInRequest;
+    for (let i = 0; i < this.users.length; i++) {
+      const user = this.users[i];
+      if (user.email === data.email) {
+        if (user.password === data.password) {
+          this.currentUser = i;
+          return [HttpStatusCode.Ok];
+        } else {
+          return [HttpStatusCode.BadRequest];
+        }
+      }
     }
-  });
+    return [HttpStatusCode.BadRequest];
+  }
 
-  mock.onGet("/api/manager/logout").reply(() => {
-    logined = false;
+  @GetMapping("/logout")
+  static logout() {
+    this.currentUser = -1;
     return [HttpStatusCode.Ok];
-  });
+  }
 
-  mock.onGet("/api/manager").reply(() => {
-    if (logined) {
+  @GetMapping("/me")
+  static me() {
+    if (this.currentUser !== -1) {
       return [
         HttpStatusCode.Ok,
         {
-          name: "test user",
+          email: this.users[this.currentUser].email,
+          name: this.users[this.currentUser].name,
         },
       ];
     } else {
       return [HttpStatusCode.Unauthorized];
     }
-  });
+  }
 
-  mock.onGet(/\/api\/manager\/.+/).reply((config) => {
-    const email = config.url?.split("/").pop();
-    if (email === "test@example.com") {
-      return [HttpStatusCode.Conflict];
-    } else {
-      return [HttpStatusCode.Ok];
+  @GetMapping("/email-availability")
+  static emailAvailability(config: RequestConfig) {
+    const email = config.params.email;
+    for (let i = 0; i < this.users.length; i++) {
+      if (this.users[i].email === email) {
+        return [HttpStatusCode.Conflict];
+      }
     }
-  });
+    return [HttpStatusCode.Ok];
+  }
 }
-
-export default addUserMock;

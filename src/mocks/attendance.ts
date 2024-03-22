@@ -1,22 +1,58 @@
 import { HttpStatusCode } from "axios";
-import AxiosMockAdapter from "axios-mock-adapter";
 
-import { AttendanceRequest } from "../api/attendance";
+import {
+  AttendanceRequest,
+  AttendanceResponse,
+  UpdateAttendeeRequest,
+} from "../api/attendance";
 
-function addAttendanceMock(mock: AxiosMockAdapter) {
-  mock.onPost("/api/attendance").reply((config) => {
+import {
+  GetMapping,
+  PostMapping,
+  PutMapping,
+  RequestConfig,
+  RequestMapping,
+} from "./base.ts";
+import { SessionMock } from "./session.ts";
+
+@RequestMapping("/api/attendance")
+export class AttendanceMock {
+  @PostMapping()
+  static attend(config: RequestConfig) {
     const data = JSON.parse(config.data) as AttendanceRequest;
     if (data.authCode === "1234") {
-      return [HttpStatusCode.Ok];
+      return [
+        HttpStatusCode.Ok,
+        {
+          attendanceName: "User 1",
+          sessionName: "Session 1",
+          courseName: "Course 1",
+          attendanceTime: new Date(),
+        } as AttendanceResponse,
+      ];
     } else {
       return [HttpStatusCode.NoContent];
     }
-  });
+  }
 
-  // /api/attendance/:courseId/:sessionId
-  mock.onGet(/\/api\/attendance\/\d+\/\d+/).reply((config) => {
+  @GetMapping()
+  static getAttendanceStatus() {
     return [HttpStatusCode.Ok, { attendances: 10, total: 20 }];
-  });
-}
+  }
 
-export default addAttendanceMock;
+  @PutMapping()
+  static updateAttendances(config: RequestConfig) {
+    const data = JSON.parse(config.data) as UpdateAttendeeRequest;
+
+    data.updateAttendances.forEach((update) => {
+      const sessionAttendee = Object.values(SessionMock.sessionAttendees)
+        .flat()
+        .find((a) => a.attendanceId === update.attendanceId);
+      if (sessionAttendee) {
+        sessionAttendee.attendanceStatus = update.attendanceStatus;
+      }
+    });
+
+    return [HttpStatusCode.Ok];
+  }
+}
