@@ -6,10 +6,12 @@ import styled from "styled-components";
 import { createCourse } from "../../api/course.ts";
 import { PrimaryButton } from "../../components/Button.tsx";
 import ChipBox from "../../components/class/ChipBox.tsx";
+import NamesakeModal from "../../components/class/NamesakeModal.tsx";
 import UnknownNameCheckbox from "../../components/class/UnknownNameCheckbox.tsx";
 import { MultiLineTextField } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
-import { AttendeeInfo } from "../../type.ts";
+import useModalState from "../../hooks/modal.tsx";
+import { AttendeeInfo, PickPartial } from "../../type.ts";
 
 function CreateClass() {
   const navigate = useNavigate();
@@ -119,62 +121,108 @@ function CreateClass() {
     setIsCheckedUnknownName(e.target.checked);
   };
 
+  const [namesakes, setNamesakes] = useState<
+    PickPartial<AttendeeInfo, "id">[][]
+  >([]);
+  const [namesakeModalState, openNamesakeModal, closeNamesakeModal] =
+    useModalState();
+
+  const submit = () => {
+    // 1. arrange by name
+    const nameMap = new Map<string, number>();
+    let namesakes: PickPartial<AttendeeInfo, "id">[][] = [];
+    for (let i = 0; i < attendeeList.length; i++) {
+      const name = attendeeList[i];
+      if (nameMap.has(name)) {
+        const idx = nameMap.get(name)!;
+        namesakes[idx].push({ name, note: "" });
+      } else {
+        nameMap.set(name, namesakes.length);
+        namesakes.push([{ name, note: "" }]);
+      }
+    }
+    // 2. remove one names
+    namesakes = namesakes.filter((namesake) => namesake.length > 1);
+    // 3. if namesakes exist, open modal
+    if (namesakes.length > 0) {
+      setNamesakes(namesakes);
+      openNamesakeModal();
+      return;
+    }
+    // 3-1. if namesakes do not exist, create class
+    createClass({
+      name: className,
+      description,
+      attendees: attendeeList.map(
+        (name) =>
+          ({
+            name,
+            note: "",
+          }) as Omit<AttendeeInfo, "id">
+      ),
+      onlyListNameAllowed: isCheckedUnknownName,
+    });
+  };
+
   return (
-    <Container>
-      <TitleBar label="Create a New Class" />
-      <CreatClassContainer>
-        <MultiLineTextField
-          textareaStyle={{ height: "4.5rem" }}
-          label="Name of your class"
-          value={className}
-          onChange={(e) => setClassName(e.target.value)}
-        />
-        <MultiLineTextField
-          textareaStyle={{ height: "12rem" }}
-          label="Description"
-          value={description}
-          placeholder="Add a description."
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <MultiLineTextField
-          textareaStyle={{ height: "7rem" }}
-          label="Attendee name"
-          value={attendeeInput}
-          placeholder="Add attendee names using the 'enter' key or paste from a spreadsheet."
-          onChange={(e) => setAttendeeInput(e.target.value)}
-          onKeyDown={handleEnterDown}
-          onPaste={handlePaste}
-          onCompositionStart={() => setIsComposing(true)}
-          onCompositionEnd={() => setIsComposing(false)}
-        />
-        <UnknownNameCheckbox
-          checkboxId="unknownNameAllow"
-          checked={isCheckedUnknownName}
-          onChange={handleUnknownNameCheckbox}
-        />
-        <ChipBox attendeeList={attendeeList} removeChip={removeChip} />
-        <PrimaryButton
-          style={{ width: "45rem" }}
-          onClick={() => {
-            createClass({
-              name: className,
-              description,
-              attendees: attendeeList.map(
-                (name) =>
-                  ({
-                    name,
-                    note: "",
-                  }) as Omit<AttendeeInfo, "id">
-              ),
-              onlyListNameAllowed: isCheckedUnknownName,
-            });
-          }}
-          disabled={className === ""}
-        >
-          Create a New Class
-        </PrimaryButton>
-      </CreatClassContainer>
-    </Container>
+    <>
+      <NamesakeModal
+        state={namesakeModalState}
+        namesakes={namesakes}
+        close={closeNamesakeModal}
+        onNamesakeChanged={setNamesakes}
+        onSubmitted={() => {
+          createClass({
+            name: className,
+            description,
+            attendees: namesakes.flat(),
+            onlyListNameAllowed: isCheckedUnknownName,
+          });
+        }}
+      />
+      <Container>
+        <TitleBar label="Create a New Class" />
+        <CreatClassContainer>
+          <MultiLineTextField
+            textareaStyle={{ height: "4.5rem" }}
+            label="Name of your class"
+            value={className}
+            onChange={(e) => setClassName(e.target.value)}
+          />
+          <MultiLineTextField
+            textareaStyle={{ height: "12rem" }}
+            label="Description"
+            value={description}
+            placeholder="Add a description."
+            onChange={(e) => setDescription(e.target.value)}
+          />
+          <MultiLineTextField
+            textareaStyle={{ height: "7rem" }}
+            label="Attendee name"
+            value={attendeeInput}
+            placeholder="Add attendee names using the 'enter' key or paste from a spreadsheet."
+            onChange={(e) => setAttendeeInput(e.target.value)}
+            onKeyDown={handleEnterDown}
+            onPaste={handlePaste}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={() => setIsComposing(false)}
+          />
+          <UnknownNameCheckbox
+            checkboxId="unknownNameAllow"
+            checked={isCheckedUnknownName}
+            onChange={handleUnknownNameCheckbox}
+          />
+          <ChipBox attendeeList={attendeeList} removeChip={removeChip} />
+          <PrimaryButton
+            style={{ width: "45rem" }}
+            onClick={submit}
+            disabled={className === ""}
+          >
+            Create a New Class
+          </PrimaryButton>
+        </CreatClassContainer>
+      </Container>
+    </>
   );
 }
 

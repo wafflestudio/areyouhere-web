@@ -7,7 +7,7 @@ interface TextAreaProps
   textareaStyle?: React.CSSProperties;
 }
 
-const StyledInput = styled.input<{ hasError?: boolean }>`
+export const StyledInput = styled.input<{ hasError?: boolean }>`
   padding: 1rem 1.5rem;
   ${({ theme }) => theme.typography.b3};
 
@@ -33,7 +33,7 @@ const StyledInput = styled.input<{ hasError?: boolean }>`
 `;
 
 interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+  label?: string | React.ReactNode;
   textFieldStyle?: React.CSSProperties;
   hasError?: boolean;
   supportingText?: React.ReactNode | string;
@@ -68,7 +68,9 @@ function TextField({
 }: TextFieldProps) {
   return (
     <InputContainer style={style}>
-      {label && <TextFieldLabel>{label}</TextFieldLabel>}
+      {typeof label === "string"
+        ? label && <TextFieldLabel>{label}</TextFieldLabel>
+        : label}
       <StyledInput {...props} style={textFieldStyle} hasError={hasError} />
       {supportingText != null && (
         <SupportingLabel hasError={hasError}>{supportingText}</SupportingLabel>
