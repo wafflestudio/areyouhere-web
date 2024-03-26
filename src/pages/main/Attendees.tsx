@@ -2,11 +2,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
-import { deleteAttendee, useAttendees } from "../../api/attendee.ts";
+import {
+  deleteAttendee,
+  GetAttendeesResult,
+  useAttendees,
+} from "../../api/attendee.ts";
 import AlertModal from "../../components/AlertModal.tsx";
 import AddAttendeesModal from "../../components/attendees/AddAttendeesModal.tsx";
 import AttendeesItem from "../../components/attendees/AttendeesItem.tsx";
-import { PrimaryButton, SecondaryButton } from "../../components/Button.tsx";
+import {
+  PrimaryButton,
+  SecondaryButton,
+  TertiaryButton,
+} from "../../components/Button.tsx";
 import Checkbox from "../../components/Checkbox.tsx";
 import {
   SessionTable,
@@ -17,6 +25,9 @@ import TitleBar from "../../components/TitleBar.tsx";
 import useModalState from "../../hooks/modal.tsx";
 import { useClassId } from "../../hooks/urlParse.tsx";
 import theme from "../../styles/Theme.tsx";
+import { AttendeeInfo } from "../../type.ts";
+
+import sessions from "./session/Sessions.tsx";
 
 interface CheckedState {
   [key: number]: boolean;
@@ -88,9 +99,29 @@ function Attendees() {
       attendeeIds: deleteAttendeeIds,
     });
 
+    // if editing, delete in tempAttendees
+    if (tempAttendees != null) {
+      setTempAttendees(
+        tempAttendees.filter((attendee) => !checkedState[attendee.attendee.id])
+      );
+    }
+
     setIsAllChecked(false);
     setCheckedState({});
   };
+
+  const handleSave = () => {
+    if (tempAttendees != null) {
+      // TODO: save tempAttendees
+      // TODO: call api
+    }
+  };
+
+  // 수정 관련
+  const [editing, setEditing] = useState(false);
+  const [tempAttendees, setTempAttendees] = useState<GetAttendeesResult | null>(
+    null
+  );
 
   return (
     <>
@@ -102,28 +133,53 @@ function Attendees() {
         </TitleBar>
         <HeaderContainer>
           <h5>{attendees?.length ?? 0} Attendees</h5>
-          <SecondaryButton
-            onClick={openDeleteModal}
-            disabled={checkedCount === 0}
-            colorScheme="red"
-          >
-            Delete
-          </SecondaryButton>
+          {editing ? (
+            <ActionContainer>
+              <SecondaryButton
+                onClick={openDeleteModal}
+                disabled={checkedCount === 0}
+                colorScheme="red"
+              >
+                Delete
+              </SecondaryButton>
+              <PrimaryButton
+                onClick={() => {
+                  setTempAttendees(null);
+                  setEditing(false);
+                }}
+              >
+                Save
+              </PrimaryButton>
+            </ActionContainer>
+          ) : (
+            <TertiaryButton
+              onClick={() => {
+                if (attendees != null) {
+                  setTempAttendees(attendees.slice());
+                  setEditing(true);
+                }
+              }}
+            >
+              Edit
+            </TertiaryButton>
+          )}
         </HeaderContainer>
         <ContentContainer>
           <SessionTable>
             <SessionTableHead>
               <tr>
-                <CheckboxCell>
-                  <Checkbox
-                    checkboxId="masterCheckbox"
-                    checked={isAllChecked}
-                    onChange={handleMasterCheckboxChange}
-                  />
-                </CheckboxCell>
+                {editing && (
+                  <CheckboxCell>
+                    <Checkbox
+                      checkboxId="masterCheckbox"
+                      checked={isAllChecked}
+                      onChange={handleMasterCheckboxChange}
+                    />
+                  </CheckboxCell>
+                )}
                 <SessionTableHeadItem
                   style={{
-                    width: "20rem",
+                    width: "15rem",
                     border: "none",
                   }}
                 >
@@ -131,7 +187,15 @@ function Attendees() {
                 </SessionTableHeadItem>
                 <SessionTableHeadItem
                   style={{
-                    width: "20rem",
+                    width: "23.5rem",
+                    border: "none",
+                  }}
+                >
+                  Notes
+                </SessionTableHeadItem>
+                <SessionTableHeadItem
+                  style={{
+                    width: "14rem",
                     border: "none",
                   }}
                 >
@@ -147,8 +211,9 @@ function Attendees() {
                 </SessionTableHeadItem>
               </tr>
             </SessionTableHead>
-            {attendees?.map((attendee) => (
+            {(editing ? tempAttendees : attendees)?.map((attendee, index) => (
               <AttendeesItem
+                editing={editing}
                 key={attendee.attendee.id}
                 attendee={attendee.attendee}
                 attendance={attendee.attendance}
@@ -157,6 +222,15 @@ function Attendees() {
                 onCheckboxChange={() =>
                   handleCheckboxChange(attendee.attendee.id)
                 }
+                onAttendeeChange={(newAttendee: AttendeeInfo) => {
+                  if (tempAttendees != null) {
+                    tempAttendees?.splice(index, 1, {
+                      ...tempAttendees[index],
+                      attendee: newAttendee,
+                    });
+                    setTempAttendees([...tempAttendees]);
+                  }
+                }}
               />
             ))}
           </SessionTable>
@@ -209,6 +283,12 @@ const HeaderContainer = styled.div`
   }
 `;
 
+const ActionContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 1.2rem;
+`;
+
 const ContentContainer = styled.div`
   width: 118.1rem;
   display: flex;
@@ -218,7 +298,8 @@ const ContentContainer = styled.div`
 `;
 
 const CheckboxCell = styled.th`
-  width: 4rem;
+  width: 2rem;
+  text-align: center;
   vertical-align: middle;
   padding: 1.5rem 2.5rem 1.5rem 3rem;
 `;

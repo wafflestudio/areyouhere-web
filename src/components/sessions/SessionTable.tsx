@@ -30,7 +30,7 @@ const SessionTableHeadItem = styled.th`
 const SessionTableItem = styled.td`
   ${({ theme }) => theme.typography.b3};
   color: ${({ theme }) => theme.colors.black};
-  padding: 1.3rem 2.5rem;
+  padding: 1.7rem 2.5rem;
   border: 1px solid ${({ theme }) => theme.colors.grey};
   vertical-align: middle;
 `;
