@@ -30,6 +30,7 @@ export class AuthCodeMock {
 
     session.authCode = AuthCodeMock.getRandomAuthCode();
     session.startDate = new Date();
+    DatabaseMock.update();
 
     return [HttpStatusCode.Ok, { authCode: session.authCode }];
   }
@@ -56,6 +57,7 @@ export class AuthCodeMock {
 
     delete session.authCode;
     session.endDate = new Date();
+    DatabaseMock.update();
 
     return [HttpStatusCode.Ok];
   }

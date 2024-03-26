@@ -164,6 +164,7 @@ export class SessionMock {
     } as SessionData;
 
     course.sessions.push(session);
+    DatabaseMock.update();
 
     return [HttpStatusCode.Ok];
   }
@@ -185,6 +186,7 @@ export class SessionMock {
     }
 
     course.sessions.splice(sessionIndex, 1);
+    DatabaseMock.update();
     return [HttpStatusCode.Ok];
   }
 }

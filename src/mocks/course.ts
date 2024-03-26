@@ -67,6 +67,7 @@ export class CourseMock {
       })),
       sessions: [],
     });
+    DatabaseMock.update();
     return [HttpStatusCode.Ok];
   }
 
@@ -79,6 +80,7 @@ export class CourseMock {
       course.name = data.name;
       course.description = data.description;
       course.allowOnlyRegistered = data.onlyListNameAllowed;
+      DatabaseMock.update();
       return [HttpStatusCode.Ok];
     } else {
       return [HttpStatusCode.NotFound];
@@ -91,6 +93,7 @@ export class CourseMock {
     const index = DatabaseMock.courses.findIndex((c) => c.id === id);
     if (index !== -1) {
       DatabaseMock.courses.splice(index, 1);
+      DatabaseMock.update();
       return [HttpStatusCode.Ok];
     } else {
       return [HttpStatusCode.NotFound];
