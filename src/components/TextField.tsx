@@ -7,7 +7,7 @@ interface TextAreaProps
   textareaStyle?: React.CSSProperties;
 }
 
-const StyledInput = styled.input<{ hasError?: boolean }>`
+export const StyledInput = styled.input<{ hasError?: boolean }>`
   padding: 1rem 1.5rem;
   ${({ theme }) => theme.typography.b3};
 
