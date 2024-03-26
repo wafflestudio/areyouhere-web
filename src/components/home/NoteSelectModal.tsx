@@ -16,9 +16,11 @@ import Modal from "../Modal.tsx";
 function NoteSelectModal({
   onCancel,
   state,
+  onError,
 }: {
   onCancel: () => void;
   state: ModalStateType;
+  onError?: (error: Error) => void;
 }) {
   const navigate = useNavigate();
   const attendanceResults = useMutationState({
@@ -61,6 +63,7 @@ function NoteSelectModal({
     },
     onError: (error) => {
       console.error(error);
+      onError?.(error);
     },
   });
 

@@ -12,6 +12,14 @@ import NoteSelectModal from "../components/home/NoteSelectModal.tsx";
 import TextField from "../components/TextField";
 import useModalState from "../hooks/modal.tsx";
 
+const ErrorMessages: Record<AttendanceErrorCode, string> = {
+  [AttendanceErrorCode.InvalidAuthCode]: `Could not find a session corresponding to passcode. Please check your credentials or contact the administrator for help.`,
+  [AttendanceErrorCode.InvalidName]: `Could not find a session corresponding to your name. Please check your credentials or contact the administrator for help.`,
+  [AttendanceErrorCode.AlreadyAttended]: `You have already attended the session.`,
+  [AttendanceErrorCode.DifferentName]: `You have already attended the session with a different name.`,
+  [AttendanceErrorCode.FailedToAttend]: `Failed to attend the session. Please try again later.`,
+};
+
 function Home() {
   const navigate = useNavigate();
 
@@ -41,31 +49,7 @@ function Home() {
     },
     onError: (error) => {
       console.error(error);
-      switch (error.message) {
-        case AttendanceErrorCode.InvalidAuthCode:
-          setErrorMessage(
-            `Could not find a session corresponding to passcode. Please check your credentials or contact the administrator for help.`
-          );
-          break;
-        case AttendanceErrorCode.InvalidName:
-          setErrorMessage(
-            `Could not find a session corresponding to your name. Please check your credentials or contact the administrator for help.`
-          );
-          break;
-        case AttendanceErrorCode.AlreadyAttended:
-          setErrorMessage(`You have already attended the session.`);
-          break;
-        case AttendanceErrorCode.DifferentName:
-          setErrorMessage(
-            `You have already attended the session with a different name.`
-          );
-          break;
-        case AttendanceErrorCode.FailedToAttend:
-          setErrorMessage(
-            `Failed to attend the session. Please try again later.`
-          );
-          break;
-      }
+      setErrorMessage(ErrorMessages[error.message as AttendanceErrorCode]);
     },
   });
 
@@ -77,6 +61,9 @@ function Home() {
       <NoteSelectModal
         onCancel={() => closeNoteSelectModal()}
         state={noteSelectModalState}
+        onError={(error) => {
+          setErrorMessage(ErrorMessages[error.message as AttendanceErrorCode]);
+        }}
       />
       <DesktopContainer>
         <TransferBanner from="attendees" />
