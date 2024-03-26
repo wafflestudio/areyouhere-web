@@ -40,12 +40,6 @@ function Settings() {
     }
   }, [classItem]);
 
-  const handleUnknownNameCheckbox = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setOnlyListNameAllowed(e.target.checked);
-  };
-
   return (
     <Container>
       <TitleBar label="Class Settings" />
@@ -62,11 +56,6 @@ function Settings() {
           value={description}
           placeholder="Add a description."
           onChange={(e) => setDescription(e.target.value)}
-        />
-        <UnknownNameCheckbox
-          checkboxId="unknownNameAllow"
-          checked={onlyListNameAllowed}
-          onChange={handleUnknownNameCheckbox}
         />
         <PrimaryButton
           style={{ width: "45rem" }}
@@ -98,7 +87,7 @@ const CreatClassContainer = styled.div`
   flex-direction: column;
   align-items: flex-end;
 
-  margin-left: 6rem;
+  margin-left: 5rem;
 
   & > * {
     margin-bottom: 3.4rem;

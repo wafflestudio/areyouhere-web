@@ -1,33 +1,33 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import {
   deleteAttendee,
   GetAttendeesResult,
   useAttendees,
-} from "../../api/attendee.ts";
-import AlertModal from "../../components/AlertModal.tsx";
-import AddAttendeesModal from "../../components/attendees/AddAttendeesModal.tsx";
-import AttendeesItem from "../../components/attendees/AttendeesItem.tsx";
+} from "../../../api/attendee.ts";
+import AlertModal from "../../../components/AlertModal.tsx";
+import AddAttendeesModal from "../../../components/attendees/AddAttendeesModal.tsx";
+import AttendeesItem from "../../../components/attendees/AttendeesItem.tsx";
 import {
   PrimaryButton,
   SecondaryButton,
   TertiaryButton,
-} from "../../components/Button.tsx";
-import Checkbox from "../../components/Checkbox.tsx";
+} from "../../../components/Button.tsx";
+import Checkbox from "../../../components/Checkbox.tsx";
 import {
   SessionTable,
   SessionTableHead,
   SessionTableHeadItem,
-} from "../../components/sessions/SessionTable.tsx";
-import TitleBar from "../../components/TitleBar.tsx";
-import useModalState from "../../hooks/modal.tsx";
-import { useClassId } from "../../hooks/urlParse.tsx";
-import theme from "../../styles/Theme.tsx";
-import { AttendeeInfo } from "../../type.ts";
-
-import sessions from "./session/Sessions.tsx";
+} from "../../../components/sessions/SessionTable.tsx";
+import TitleBar from "../../../components/TitleBar.tsx";
+import useModalState from "../../../hooks/modal.tsx";
+import { useClassId } from "../../../hooks/urlParse.tsx";
+import theme from "../../../styles/Theme.tsx";
+import { AttendeeInfo } from "../../../type.ts";
+import sessions from "../session/Sessions.tsx";
 
 interface CheckedState {
   [key: number]: boolean;
@@ -84,7 +84,11 @@ function Attendees() {
   }, [checkedState, attendees]);
 
   // 유저 추가 관련
-  const [addModalState, openAddModal, closeAddModal] = useModalState();
+  const navigate = useNavigate();
+
+  const handleAddAttendees = () => {
+    navigate(`/class/${classId}/attendees/add`);
+  };
 
   // 유저 삭제 관련
   const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
@@ -127,7 +131,7 @@ function Attendees() {
     <>
       <Container>
         <TitleBar label="Attendees">
-          <PrimaryButton onClick={openAddModal}>
+          <PrimaryButton onClick={handleAddAttendees}>
             Add New Attendees
           </PrimaryButton>
         </TitleBar>
@@ -237,7 +241,6 @@ function Attendees() {
         </ContentContainer>
       </Container>
       {/* 모달 */}
-      <AddAttendeesModal state={addModalState} onCancel={closeAddModal} />
       <AlertModal
         state={deleteModalState}
         type="delete"

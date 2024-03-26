@@ -150,7 +150,7 @@ function SessionDetail() {
                   </SessionTableItem>
                   <SessionTableItem>
                     {sessionAttendees?.[index]?.attendanceStatus === true
-                      ? dateFormat(attendee?.attendanceTime, "HH:mm:ss")
+                      ? dateFormat(attendee?.attendanceTime, "HH:MM:ss")
                       : "--:--:--"}
                   </SessionTableItem>
                 </tr>
