@@ -1,11 +1,11 @@
 import axios, { HttpStatusCode } from "axios";
 
-type CreateAuthCodeRequest = {
+export type CreateAuthCodeRequest = {
   courseId: number;
   sessionId: number;
 };
 
-type DeactivateAuthCodeRequest = {
+export type DeactivateAuthCodeRequest = {
   authCode: string;
   sessionId: number;
   courseId: number;

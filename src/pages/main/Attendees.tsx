@@ -54,7 +54,7 @@ function Attendees() {
     const newAttendeesCheckedState = attendees.reduce(
       (acc, attendee) => ({
         ...acc,
-        [attendee.id]: newCheckedState,
+        [attendee.attendee.id]: newCheckedState,
       }),
       {}
     );
@@ -68,7 +68,7 @@ function Attendees() {
     const allChecked =
       attendees != null &&
       attendees.length > 0 &&
-      attendees.every((attendee) => checkedState[attendee.id]);
+      attendees.every((attendee) => checkedState[attendee.attendee.id]);
     setIsAllChecked(allChecked);
   }, [checkedState, attendees]);
 
@@ -81,8 +81,8 @@ function Attendees() {
   const handleDelete = () => {
     if (attendees == null) return;
     const deleteAttendeeIds = attendees
-      .filter((attendee) => checkedState[attendee.id])
-      .map((attendee) => attendee.id);
+      .filter((attendee) => checkedState[attendee.attendee.id])
+      .map((attendee) => attendee.attendee.id);
 
     deleteAttendees({
       attendeeIds: deleteAttendeeIds,
@@ -149,10 +149,14 @@ function Attendees() {
             </SessionTableHead>
             {attendees?.map((attendee) => (
               <AttendeesItem
-                key={attendee.id}
-                attendee={attendee}
-                isChecked={checkedState[attendee.id]}
-                onCheckboxChange={() => handleCheckboxChange(attendee.id)}
+                key={attendee.attendee.id}
+                attendee={attendee.attendee}
+                attendance={attendee.attendance}
+                absence={attendee.absence}
+                isChecked={checkedState[attendee.attendee.id]}
+                onCheckboxChange={() =>
+                  handleCheckboxChange(attendee.attendee.id)
+                }
               />
             ))}
           </SessionTable>

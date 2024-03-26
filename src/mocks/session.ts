@@ -1,6 +1,13 @@
 import { HttpStatusCode } from "axios";
 
-import { CreateSessionRequest, Session, SessionAttendee } from "../api/session";
+import {
+  CreateSessionRequest,
+  GetSessionAbsenteesResponse,
+  GetSessionAttendeesResponse,
+  GetSessionsResponse,
+  SessionAttendee,
+  SessionWithoutId,
+} from "../api/session";
 
 import {
   DeleteMapping,
@@ -9,71 +16,54 @@ import {
   RequestConfig,
   RequestMapping,
 } from "./base.ts";
+import { DatabaseMock, SessionData } from "./database.ts";
 
 @RequestMapping("/api/session")
 export class SessionMock {
-  static sessions: Record<number, Session> = {
-    1: {
-      id: 1,
-      name: "Session 1",
-      date: new Date(),
-      attendee: 10,
-      absentee: 2,
-    },
-    2: {
-      id: 2,
-      name: "Session 2",
-      date: new Date(),
-      attendee: 8,
-      absentee: 4,
-    },
-  };
-
-  static sessionAttendees: Record<number, SessionAttendee[]> = {
-    1: [
-      {
-        attendanceId: 1,
-        attendeeName: "Attendee 1",
-        attendanceStatus: true,
-        attendanceTime: new Date(),
-      },
-      {
-        attendanceId: 2,
-        attendeeName: "Attendee 2",
-        attendanceStatus: false,
-        attendanceTime: new Date(),
-      },
-    ],
-    2: [
-      {
-        attendanceId: 3,
-        attendeeName: "Attendee 3",
-        attendanceStatus: true,
-        attendanceTime: new Date(),
-      },
-      {
-        attendanceId: 4,
-        attendeeName: "Attendee 4",
-        attendanceStatus: false,
-        attendanceTime: new Date(),
-      },
-    ],
-  };
-
   @GetMapping()
-  static getSessions() {
+  static getSessions(config: RequestConfig) {
+    const courseId = parseInt(config.params.courseId, 10);
+    if (!courseId) {
+      return [HttpStatusCode.BadRequest];
+    }
+
+    const course = DatabaseMock.courses.find((c) => c.id === courseId);
+    if (!course) {
+      return [HttpStatusCode.NotFound];
+    }
+
     return [
       HttpStatusCode.Ok,
-      { allSessionAttendanceInfo: Object.values(this.sessions) },
+      {
+        allSessionAttendanceInfo: course.sessions.map((s) => ({
+          id: s.id,
+          name: s.name,
+          absentee: s.attendances.filter((a) => !a.attendanceStatus).length,
+          attendee: s.attendances.filter((a) => a.attendanceStatus).length,
+          date: s.startDate,
+        })),
+      } as GetSessionsResponse,
     ];
   }
 
   @GetMapping("/:sessionId")
   static getSession(config: RequestConfig) {
     const sessionId = parseInt(config.pathParams.sessionId, 10);
-    const session = this.sessions[sessionId];
-    if (session) {
-      return [HttpStatusCode.Ok, session];
+    const session = DatabaseMock.courses
+      .flatMap((c) => c.sessions)
+      .find((s) => s.id === sessionId);
+    if (session != null) {
+      return [
+        HttpStatusCode.Ok,
+        {
+          date: session.startDate,
+          attendee: session.attendances.filter((a) => a.attendanceStatus)
+            .length,
+          name: session.name,
+          absentee: session.attendances.filter((a) => !a.attendanceStatus)
+            .length,
+        } as SessionWithoutId,
+      ];
     } else {
       return [HttpStatusCode.NoContent];
     }
@@ -82,9 +72,34 @@ export class SessionMock {
   @GetMapping("/:sessionId/attendee")
   static getAttendees(config: RequestConfig) {
     const sessionId = parseInt(config.pathParams.sessionId, 10);
-    const sessionAttendees = this.sessionAttendees[sessionId];
-    if (sessionAttendees) {
-      return [HttpStatusCode.Ok, { sessionAttendees: sessionAttendees }];
+
+    const course = DatabaseMock.courses.find((c) =>
+      c.sessions.some((s) => s.id === sessionId)
+    );
+    if (!course) {
+      return [HttpStatusCode.NotFound];
+    }
+
+    const session = course.sessions.find((s) => s.id === sessionId);
+    if (!session) {
+      return [HttpStatusCode.NotFound];
+    }
+
+    const sessionAttendees = session.attendances.map(
+      (a) =>
+        ({
+          attendanceId: a.id,
+          attendee: course.attendees.find((att) => att.id === a.attendeeId),
+          attendanceStatus: a.attendanceStatus,
+          attendanceTime: a.date,
+        }) as SessionAttendee
+    );
+
+    if (sessionAttendees.length > 0) {
+      return [
+        HttpStatusCode.Ok,
+        { sessionAttendees: sessionAttendees } as GetSessionAttendeesResponse,
+      ];
     } else {
       return [HttpStatusCode.NoContent];
     }
@@ -93,14 +108,35 @@ export class SessionMock {
   @GetMapping("/:sessionId/absentee")
   static getAbsentees(config: RequestConfig) {
     const sessionId = parseInt(config.pathParams.sessionId, 10);
-    if (this.sessionAttendees[sessionId]) {
+
+    const course = DatabaseMock.courses.find((c) =>
+      c.sessions.some((s) => s.id === sessionId)
+    );
+    if (!course) {
+      return [HttpStatusCode.NotFound];
+    }
+
+    const session = course.sessions.find((s) => s.id === sessionId);
+    if (!session) {
+      return [HttpStatusCode.NotFound];
+    }
+
+    const sessionAbsentees = session.attendances
+      .map(
+        (a) =>
+          ({
+            attendanceId: a.id,
+            attendee: course.attendees.find((att) => att.id === a.attendeeId),
+            attendanceStatus: a.attendanceStatus,
+            attendanceTime: a.date,
+          }) as SessionAttendee
+      )
+      .filter((a) => !a.attendanceStatus);
+
+    if (sessionAbsentees.length > 0) {
       return [
         HttpStatusCode.Ok,
-        {
-          sessionAttendees: this.sessionAttendees[sessionId].filter(
-            (a) => !a.attendanceStatus
-          ),
-        },
+        { sessionAttendees: sessionAbsentees } as GetSessionAbsenteesResponse,
       ];
     } else {
       return [HttpStatusCode.NoContent];
@@ -110,28 +146,45 @@ export class SessionMock {
   @PostMapping()
   static createSession(config: RequestConfig) {
     const data = JSON.parse(config.data) as CreateSessionRequest;
-    const newId =
-      Math.max(...Object.values(this.sessions).map((s) => s.id)) + 1;
-    this.sessions[newId] = {
-      id: newId,
+    const course = DatabaseMock.courses.find((c) => c.id === data.courseId);
+    if (!course) {
+      return [HttpStatusCode.NotFound];
+    }
+
+    const session = {
+      id: DatabaseMock.nextSessionId++,
       name: data.sessionName,
-      date: new Date(),
-      attendee: Math.floor(Math.random() * 10),
-      absentee: Math.floor(Math.random() * 10),
-    };
-    this.sessionAttendees[newId] = [];
+      startDate: new Date(),
+      attendances: course.attendees.map((a) => ({
+        id: DatabaseMock.nextAttendanceId++,
+        attendeeId: a.id,
+        attendanceStatus: false,
+        date: new Date(),
+      })),
+    } as SessionData;
+
+    course.sessions.push(session);
+
     return [HttpStatusCode.Ok];
   }
 
   @DeleteMapping()
   static deleteSession(config: RequestConfig) {
-    const index = config.params.sessionId;
-    if (this.sessions[index]) {
-      delete this.sessionAttendees[index];
-      delete this.sessions[index];
-      return [HttpStatusCode.Ok];
-    } else {
+    const sessionId = config.params.sessionId;
+
+    const course = DatabaseMock.courses.find((c) =>
+      c.sessions.some((s) => s.id === sessionId)
+    );
+    if (!course) {
       return [HttpStatusCode.NoContent];
     }
+
+    const sessionIndex = course.sessions.findIndex((s) => s.id === sessionId);
+    if (sessionIndex === -1) {
+      return [HttpStatusCode.NoContent];
+    }
+
+    course.sessions.splice(sessionIndex, 1);
+    return [HttpStatusCode.Ok];
   }
 }

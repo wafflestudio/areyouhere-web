@@ -2,43 +2,62 @@ import { HttpStatusCode } from "axios";
 
 import { CurrentSessionInfo } from "../api/dashboard.ts";
 
-import { GetMapping, RequestMapping } from "./base.ts";
+import { GetMapping, RequestConfig, RequestMapping } from "./base.ts";
+import { DatabaseMock } from "./database.ts";
 
 @RequestMapping("/api/course/:courseId/dashboard")
 export class DashboardMock {
-  static currentSessionInfo: Partial<CurrentSessionInfo> = {
-    id: 1,
-    sessionName: "Session Name",
-    sessionTime: undefined,
-    authCode: undefined,
-  };
-
   @GetMapping()
-  static getCurrentSessionInfo() {
-    return [HttpStatusCode.Ok, DashboardMock.currentSessionInfo];
-  }
+  static getCurrentSessionInfo(config: RequestConfig) {
+    const courseId = parseInt(config.pathParams.courseId, 10);
+    const course = DatabaseMock.courses.find((c) => c.id === courseId);
+    if (!course) {
+      return [HttpStatusCode.NotFound];
+    }
 
-  @GetMapping("/session")
-  static getPreviousSessions() {
+    const currentSession = course.sessions.find(
+      (s) => s.startDate != null && s.endDate == null
+    );
+
+    if (!currentSession) {
+      return [HttpStatusCode.NoContent];
+    }
+
     return [
       HttpStatusCode.Ok,
       {
-        sessionAttendanceInfos: [
-          {
-            id: 1,
-            name: "Previous Session 1",
-            date: new Date().toISOString(),
-            attendee: 10,
-            absentee: 2,
-          },
-          {
-            id: 2,
-            name: "Previous Session 2",
-            date: new Date().toISOString(),
-            attendee: 8,
-            absentee: 4,
-          },
-        ],
+        sessionTime: currentSession.startDate,
+        authCode: currentSession.authCode,
+        sessionName: currentSession.name,
+        id: currentSession.id,
+      } as CurrentSessionInfo,
+    ];
+  }
+
+  @GetMapping("/session")
+  static getPreviousSessions(config: RequestConfig) {
+    const courseId = parseInt(config.pathParams.courseId, 10);
+    const course = DatabaseMock.courses.find((c) => c.id === courseId);
+
+    if (!course) {
+      return [HttpStatusCode.NotFound];
+    }
+
+    const previousSessions = course.sessions
+      .filter((s) => s.startDate != null && s.endDate != null)
+      .slice(0, 5)
+      .map((s) => ({
+        id: s.id,
+        name: s.name,
+        date: s.startDate,
+        attendee: s.attendances.filter((a) => a.attendanceStatus).length,
+        absentee: s.attendances.filter((a) => !a.attendanceStatus).length,
+      }));
+
+    return [
+      HttpStatusCode.Ok,
+      {
+        sessionAttendanceInfos: previousSessions,
       },
     ];
   }

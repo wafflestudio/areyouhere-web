@@ -1,17 +1,34 @@
 import { useQuery } from "@tanstack/react-query";
 import axios, { HttpStatusCode } from "axios";
 
+import { AttendeeInfo } from "../type.ts";
+
 export type AttendanceRequest = {
   attendeeName: string;
   authCode: string;
+  attendeeId?: number;
 };
 
-export type AttendanceResponse = {
+export type AttendanceOneChoiceResponse = {
   attendanceName: string;
   sessionName: string;
   courseName: string;
   attendanceTime: Date;
 };
+
+export type AttendanceMultipleChoicesResponse = {
+  attendeeNotes: Omit<AttendeeInfo, "name">[];
+};
+
+export type AttendanceResult =
+  | {
+      type: "oneChoice";
+      response: AttendanceOneChoiceResponse;
+    }
+  | {
+      type: "multipleChoices";
+      response: AttendanceMultipleChoicesResponse;
+    };
 
 export enum AttendanceErrorCode {
   InvalidAuthCode = "InvalidAuthCode",
@@ -31,21 +48,28 @@ export type UpdateAttendee = {
   attendanceStatus: boolean;
 };
 
-export type UpdateAttendeeRequest = {
+export type UpdateAttendanceStatusRequest = {
   updateAttendances: UpdateAttendee[];
 };
 
-export const attend = async (
+export const postAttend = async (
   request: AttendanceRequest
-): Promise<AttendanceResponse> => {
+): Promise<AttendanceResult> => {
   const res = await axios.post("/api/attendance", request, {
     validateStatus: () => true,
   });
   if (res.status === HttpStatusCode.Ok) {
-    const data = res.data as AttendanceResponse;
+    const data = res.data as AttendanceOneChoiceResponse;
     data.attendanceTime = new Date(data.attendanceTime);
-
-    return data;
+    return {
+      type: "oneChoice",
+      response: data,
+    };
+  } else if (res.status === HttpStatusCode.MultipleChoices) {
+    return {
+      type: "multipleChoices",
+      response: res.data as AttendanceMultipleChoicesResponse,
+    };
   } else if (res.status === HttpStatusCode.NotFound) {
     throw new Error(AttendanceErrorCode.InvalidAuthCode);
   } else if (res.status === HttpStatusCode.BadRequest) {
@@ -75,10 +99,8 @@ export const getAttendanceStatus = async (
   return res.data;
 };
 
-// /api/attendance/update
-// {updateAttendances: [{attendanceId : "Long", attendanceStatus : "boolean"}, ... {...}, ..., {...}]}
-export const updateAttendances = async (
-  request: UpdateAttendeeRequest
+export const updateAttendanceStatus = async (
+  request: UpdateAttendanceStatusRequest
 ): Promise<void> => {
   await axios.put("/api/attendance", request);
 };

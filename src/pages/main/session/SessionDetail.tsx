@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
-import { updateAttendances, UpdateAttendee } from "../../../api/attendance";
+import {
+  updateAttendanceStatus,
+  UpdateAttendee,
+} from "../../../api/attendance";
 import {
   SessionAttendee,
   useSession,
@@ -34,7 +37,7 @@ function SessionDetail() {
 
   const queryClient = useQueryClient();
   const { mutate: updateAttendees } = useMutation({
-    mutationFn: updateAttendances,
+    mutationFn: updateAttendanceStatus,
     mutationKey: ["updateAttendances"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["session", sessionId] });
@@ -103,7 +106,7 @@ function SessionDetail() {
               .map(({ attendee, index }) => (
                 <tr>
                   <SessionTableItem style={{ width: "24rem" }}>
-                    {attendee.attendeeName}
+                    {attendee.attendee.name}
                   </SessionTableItem>
                   <SessionTableItem>
                     <AttendanceChipContainer>

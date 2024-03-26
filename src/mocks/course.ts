@@ -14,39 +14,16 @@ import {
   RequestConfig,
   RequestMapping,
 } from "./base.ts";
+import { DatabaseMock } from "./database.ts";
 
 @RequestMapping("/api/course")
 export class CourseMock {
-  static courses: Course[] = [
-    {
-      id: 1,
-      name: "Course 1",
-      description: "Description for Course 1",
-      allowOnlyRegistered: true,
-      attendees: ["User 1", "User 2"],
-    },
-    {
-      id: 2,
-      name: "Course 2",
-      description: "Description for Course 2",
-      allowOnlyRegistered: false,
-      attendees: ["User 3", "User 4"],
-    },
-    {
-      id: 3,
-      name: "Course 3",
-      description: "Description for Course 3",
-      allowOnlyRegistered: true,
-      attendees: ["User 5", "User 6", "User 7"],
-    },
-  ];
-
   @GetMapping()
   static getCourses() {
     return [
       HttpStatusCode.Ok,
       {
-        courses: CourseMock.courses.map((c) => ({
+        courses: DatabaseMock.courses.map((c) => ({
           id: c.id,
           name: c.name,
           description: c.description,
@@ -60,9 +37,17 @@ export class CourseMock {
   @GetMapping("/:id")
   static getCourse(config: RequestConfig) {
     const id = parseInt(config.pathParams.id, 10);
-    const course = CourseMock.courses.find((c) => c.id === id);
+    const course = DatabaseMock.courses.find((c) => c.id === id);
     if (course) {
-      return [HttpStatusCode.Ok, course];
+      return [
+        HttpStatusCode.Ok,
+        {
+          id: course.id,
+          name: course.name,
+          description: course.description,
+          allowOnlyRegistered: course.allowOnlyRegistered,
+        } as Course,
+      ];
     } else {
       return [HttpStatusCode.NotFound];
     }
@@ -71,13 +56,16 @@ export class CourseMock {
   @PostMapping()
   static createCourse(config: RequestConfig) {
     const data = JSON.parse(config.data) as CourseCreationRequest;
-    const newId = Math.max(...CourseMock.courses.map((c) => c.id)) + 1;
-    CourseMock.courses.push({
-      id: newId,
+    DatabaseMock.courses.push({
+      id: DatabaseMock.nextCourseId++,
       name: data.name,
       description: data.description,
       allowOnlyRegistered: data.onlyListNameAllowed,
-      attendees: data.attendees,
+      attendees: data.attendees.map((a, i) => ({
+        ...a,
+        id: i + 1,
+      })),
+      sessions: [],
     });
     return [HttpStatusCode.Ok];
   }
@@ -86,7 +74,7 @@ export class CourseMock {
   static updateCourse(config: RequestConfig) {
     const id = parseInt(config.pathParams.id, 10);
     const data = JSON.parse(config.data) as CourseUpdateRequest;
-    const course = CourseMock.courses.find((c) => c.id === id);
+    const course = DatabaseMock.courses.find((c) => c.id === id);
     if (course) {
       course.name = data.name;
       course.description = data.description;
@@ -100,9 +88,9 @@ export class CourseMock {
   @DeleteMapping("/:id")
   static deleteCourse(config: RequestConfig) {
     const id = parseInt(config.pathParams.id, 10);
-    const index = CourseMock.courses.findIndex((c) => c.id === id);
+    const index = DatabaseMock.courses.findIndex((c) => c.id === id);
     if (index !== -1) {
-      CourseMock.courses.splice(index, 1);
+      DatabaseMock.courses.splice(index, 1);
       return [HttpStatusCode.Ok];
     } else {
       return [HttpStatusCode.NotFound];

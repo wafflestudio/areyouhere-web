@@ -8,37 +8,32 @@ import {
   RequestConfig,
   RequestMapping,
 } from "./base.ts";
+import { DatabaseMock } from "./database.ts";
 
 @RequestMapping("/api/auth")
 export class AuthMock {
-  private static currentUser = -1;
-  private static users = [
-    {
-      email: "test@example.com",
-      name: "test user",
-      password: "testtest",
-    },
-  ];
-
   @PostMapping("/signup")
   static signUp(config: RequestConfig) {
     const data = JSON.parse(config.data) as SignUpRequest;
-    this.users.push({
+    DatabaseMock.users.push({
+      id: DatabaseMock.nextUserId++,
       email: data.email,
       name: data.nickname,
       password: data.password,
     });
+    DatabaseMock.update();
     return [HttpStatusCode.Ok];
   }
 
   @PostMapping("/login")
   static login(config: RequestConfig) {
     const data = JSON.parse(config.data) as SignInRequest;
-    for (let i = 0; i < this.users.length; i++) {
-      const user = this.users[i];
+    for (let i = 0; i < DatabaseMock.users.length; i++) {
+      const user = DatabaseMock.users[i];
       if (user.email === data.email) {
         if (user.password === data.password) {
-          this.currentUser = i;
+          DatabaseMock.currentUser = i;
+          DatabaseMock.update();
           return [HttpStatusCode.Ok];
         } else {
           return [HttpStatusCode.BadRequest];
@@ -50,18 +45,19 @@ export class AuthMock {
 
   @GetMapping("/logout")
   static logout() {
-    this.currentUser = -1;
+    DatabaseMock.currentUser = -1;
+    DatabaseMock.update();
     return [HttpStatusCode.Ok];
   }
 
   @GetMapping("/me")
   static me() {
-    if (this.currentUser !== -1) {
+    if (DatabaseMock.currentUser !== -1) {
       return [
         HttpStatusCode.Ok,
         {
-          email: this.users[this.currentUser].email,
-          name: this.users[this.currentUser].name,
+          email: DatabaseMock.users[DatabaseMock.currentUser].email,
+          name: DatabaseMock.users[DatabaseMock.currentUser].name,
         },
       ];
     } else {
@@ -72,8 +68,8 @@ export class AuthMock {
   @GetMapping("/email-availability")
   static emailAvailability(config: RequestConfig) {
     const email = config.params.email;
-    for (let i = 0; i < this.users.length; i++) {
-      if (this.users[i].email === email) {
+    for (let i = 0; i < DatabaseMock.users.length; i++) {
+      if (DatabaseMock.users[i].email === email) {
         return [HttpStatusCode.Conflict];
       }
     }

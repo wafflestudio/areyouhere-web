@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
+import { AttendeeInfo } from "../type.ts";
+
 export type CourseCreationRequest = {
   name: string;
   description: string;
-  attendees: string[];
+  attendees: Omit<AttendeeInfo, "id">[];
   onlyListNameAllowed: boolean;
 };
 
@@ -19,7 +21,6 @@ export type Course = {
   id: number;
   name: string;
   description: string;
-  attendees: string[];
   allowOnlyRegistered: boolean;
 };
 

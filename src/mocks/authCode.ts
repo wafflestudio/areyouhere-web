@@ -1,7 +1,12 @@
 import { HttpStatusCode } from "axios";
 
-import { PostMapping, RequestMapping } from "./base.ts";
-import { DashboardMock } from "./dashboard.ts";
+import {
+  CreateAuthCodeRequest,
+  DeactivateAuthCodeRequest,
+} from "../api/authCode.ts";
+
+import { PostMapping, RequestConfig, RequestMapping } from "./base.ts";
+import { DatabaseMock } from "./database.ts";
 
 @RequestMapping("/api/auth-code")
 export class AuthCodeMock {
@@ -10,20 +15,48 @@ export class AuthCodeMock {
   }
 
   @PostMapping()
-  static createAuthCode() {
-    DashboardMock.currentSessionInfo.authCode =
-      AuthCodeMock.getRandomAuthCode();
-    DashboardMock.currentSessionInfo.sessionTime = new Date();
-    return [
-      HttpStatusCode.Ok,
-      { authCode: DashboardMock.currentSessionInfo.authCode },
-    ];
+  static createAuthCode(config: RequestConfig) {
+    const data = JSON.parse(config.data) as CreateAuthCodeRequest;
+
+    const course = DatabaseMock.courses.find((c) => c.id === data.courseId);
+    if (!course) {
+      return [HttpStatusCode.NotFound];
+    }
+
+    const session = course.sessions.find((s) => s.id === data.sessionId);
+    if (!session) {
+      return [HttpStatusCode.NotFound];
+    }
+
+    session.authCode = AuthCodeMock.getRandomAuthCode();
+    session.startDate = new Date();
+
+    return [HttpStatusCode.Ok, { authCode: session.authCode }];
   }
 
   @PostMapping("/deactivate")
-  static deactivateAuthCode() {
-    DashboardMock.currentSessionInfo.authCode = undefined;
-    DashboardMock.currentSessionInfo.sessionTime = undefined;
+  static deactivateAuthCode(config: RequestConfig) {
+    const data = JSON.parse(config.data) as DeactivateAuthCodeRequest;
+
+    const course = DatabaseMock.courses.find((c) => c.id === data.courseId);
+    if (!course) {
+      console.log("course not found");
+      return [HttpStatusCode.NotFound];
+    }
+
+    const session = course.sessions.find((s) => s.id === data.sessionId);
+    if (!session) {
+      console.log("session not found");
+      return [HttpStatusCode.NotFound];
+    }
+
+    if (session.authCode !== data.authCode) {
+      return [HttpStatusCode.NotFound];
+    }
+
+    delete session.authCode;
+    session.endDate = new Date();
+
     return [HttpStatusCode.Ok];
   }
 }

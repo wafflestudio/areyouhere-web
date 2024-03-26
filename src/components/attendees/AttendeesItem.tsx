@@ -1,11 +1,13 @@
 import styled from "styled-components";
 
-import { Attendee } from "../../type.ts";
+import { AttendeeInfo } from "../../type.ts";
 import Checkbox from "../Checkbox.tsx";
 import { SessionTableItem } from "../sessions/SessionTable.tsx";
 
 interface AttendeesItemProps {
-  attendee: Attendee;
+  attendee: AttendeeInfo;
+  attendance: number;
+  absence: number;
   isChecked: boolean;
   onCheckboxChange: () => void;
   onDelete?: () => void;
@@ -13,6 +15,8 @@ interface AttendeesItemProps {
 
 function AttendeesItem({
   attendee,
+  attendance,
+  absence,
   isChecked,
   onCheckboxChange,
 }: AttendeesItemProps) {
@@ -39,7 +43,7 @@ function AttendeesItem({
           color: isChecked ? "white" : "black",
         }}
       >
-        {attendee.attendance}
+        {attendance}
       </SessionTableItem>
       <SessionTableItem
         style={{
@@ -47,7 +51,7 @@ function AttendeesItem({
           color: isChecked ? "white" : "black",
         }}
       >
-        {attendee.absence}
+        {absence}
       </SessionTableItem>
     </CustomTr>
   );

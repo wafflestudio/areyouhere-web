@@ -3,20 +3,24 @@ import dateFormat from "dateformat";
 import { Navigate, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { AttendanceResponse } from "../api/attendance.ts";
+import { AttendanceResult } from "../api/attendance.ts";
 import { PrimaryButton, SecondaryButton } from "../components/Button";
 
 function Result() {
   const navigate = useNavigate();
-  const attendanceResults = useMutationState<AttendanceResponse>({
+  const attendanceResults = useMutationState<AttendanceResult>({
     filters: { mutationKey: ["attend"] },
-    select: (mutation) => mutation.state.data as AttendanceResponse,
+    select: (mutation) => mutation.state.data as AttendanceResult,
   });
 
   if (attendanceResults.length === 0) {
     return <Navigate to={"/"} />;
   } else {
     const result = attendanceResults[0];
+    if (result == null || result.type !== "oneChoice") {
+      return <></>;
+    }
+    const data = result.response;
     return (
       <>
         <DesktopContainer>
@@ -28,18 +32,18 @@ function Result() {
           <InfoCard>
             <InfoItem>
               <InfoLabel>Name</InfoLabel>
-              <InfoLabel>{result.attendanceName}</InfoLabel>
+              <InfoLabel>{data.attendanceName}</InfoLabel>
             </InfoItem>
             <InfoItem style={{ marginTop: "2.6rem" }}>
               <InfoLabel>Class / Session</InfoLabel>
               <InfoLabel>
-                {result.courseName} / {result.sessionName}
+                {data.courseName} / {data.sessionName}
               </InfoLabel>
             </InfoItem>
             <InfoItem style={{ marginTop: "2.6rem" }}>
               <InfoLabel>Sent Time</InfoLabel>
               <InfoLabel>
-                {dateFormat(result.attendanceTime, "HH:MM:ss")}
+                {dateFormat(data.attendanceTime, "HH:MM:ss")}
               </InfoLabel>
             </InfoItem>
             <PrimaryButton
@@ -59,19 +63,19 @@ function Result() {
           <MobileContentContainer>
             <MobileContentLabel>NAME</MobileContentLabel>
             <MobileContent style={{ marginTop: "0.7rem" }}>
-              {result.attendanceName}
+              {data.attendanceName}
             </MobileContent>
             <MobileContentLabel style={{ marginTop: "1.8rem" }}>
               CLASS / SESSION
             </MobileContentLabel>
             <MobileContent style={{ marginTop: "0.7rem" }}>
-              {result.courseName} / {result.sessionName}
+              {data.courseName} / {data.sessionName}
             </MobileContent>
             <MobileContentLabel style={{ marginTop: "1.8rem" }}>
               SENT TIME
             </MobileContentLabel>
             <MobileContent style={{ marginTop: "0.7rem" }}>
-              {dateFormat(result.attendanceTime, "HH:MM:ss")}
+              {dateFormat(data.attendanceTime, "HH:MM:ss")}
             </MobileContent>
           </MobileContentContainer>
           <SecondaryButton

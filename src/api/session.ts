@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import axios, { HttpStatusCode } from "axios";
 
+import { AttendeeInfo } from "../type.ts";
+
 export type Session = {
   id: number;
   name: string;
@@ -9,11 +11,23 @@ export type Session = {
   absentee: number;
 };
 
+export type GetSessionsResponse = {
+  allSessionAttendanceInfo: Session[];
+};
+
 export type SessionAttendee = {
   attendanceId: number;
-  attendeeName: string;
+  attendee: Omit<AttendeeInfo, "id">;
   attendanceStatus: boolean;
   attendanceTime: Date;
+};
+
+export type GetSessionAttendeesResponse = {
+  sessionAttendees: SessionAttendee[];
+};
+
+export type GetSessionAbsenteesResponse = {
+  sessionAttendees: SessionAttendee[];
 };
 
 export type CreateSessionRequest = {
@@ -28,9 +42,7 @@ export type DeleteSessionRequest = {
 export type SessionWithoutId = Omit<Session, "id">;
 
 export const getSessions = async (courseId: number): Promise<Session[]> => {
-  const res = await axios.get<{
-    allSessionAttendanceInfo: Session[];
-  }>(`/api/session`, {
+  const res = await axios.get<GetSessionsResponse>(`/api/session`, {
     params: { courseId },
     validateStatus: () => true,
   });
@@ -57,7 +69,7 @@ export const getSession = async (
 export const getSessionAttendees = async (
   sessionId: number
 ): Promise<SessionAttendee[]> => {
-  const res = await axios.get<{ sessionAttendees: SessionAttendee[] }>(
+  const res = await axios.get<GetSessionAttendeesResponse>(
     `/api/session/${sessionId}/attendee`,
     {
       validateStatus: () => true,
@@ -80,7 +92,7 @@ export const getSessionAttendees = async (
 export const getSessionAbsenteesOnly = async (
   sessionId: number
 ): Promise<SessionAttendee[]> => {
-  const res = await axios.get<{ sessionAttendees: SessionAttendee[] }>(
+  const res = await axios.get<GetSessionAbsenteesResponse>(
     `/api/session/${sessionId}/absentee`,
     {
       validateStatus: () => true,

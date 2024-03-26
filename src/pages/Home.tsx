@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { attend, AttendanceErrorCode } from "../api/attendance.ts";
+import { AttendanceErrorCode, postAttend } from "../api/attendance.ts";
 import sendIcon from "../assets/send.svg";
 import TransferBanner from "../components/admin/TransferBanner.tsx";
 import Alert from "../components/Alert.tsx";
@@ -28,7 +28,7 @@ function Home() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { mutate: performAttendance } = useMutation({
-    mutationFn: attend,
+    mutationFn: postAttend,
     mutationKey: ["attend"],
     onSuccess: () => {
       navigate("/result");

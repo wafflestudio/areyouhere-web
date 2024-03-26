@@ -9,6 +9,7 @@ import ChipBox from "../../components/class/ChipBox.tsx";
 import UnknownNameCheckbox from "../../components/class/UnknownNameCheckbox.tsx";
 import { MultiLineTextField } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
+import { AttendeeInfo } from "../../type.ts";
 
 function CreateClass() {
   const navigate = useNavigate();
@@ -158,7 +159,13 @@ function CreateClass() {
             createClass({
               name: className,
               description,
-              attendees: attendeeList,
+              attendees: attendeeList.map(
+                (name) =>
+                  ({
+                    name,
+                    note: "",
+                  }) as Omit<AttendeeInfo, "id">
+              ),
               onlyListNameAllowed: isCheckedUnknownName,
             });
           }}
