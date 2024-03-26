@@ -33,7 +33,7 @@ export const StyledInput = styled.input<{ hasError?: boolean }>`
 `;
 
 interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+  label?: string | React.ReactNode;
   textFieldStyle?: React.CSSProperties;
   hasError?: boolean;
   supportingText?: React.ReactNode | string;
@@ -68,7 +68,9 @@ function TextField({
 }: TextFieldProps) {
   return (
     <InputContainer style={style}>
-      {label && <TextFieldLabel>{label}</TextFieldLabel>}
+      {typeof label === "string"
+        ? label && <TextFieldLabel>{label}</TextFieldLabel>
+        : label}
       <StyledInput {...props} style={textFieldStyle} hasError={hasError} />
       {supportingText != null && (
         <SupportingLabel hasError={hasError}>{supportingText}</SupportingLabel>
@@ -85,7 +87,11 @@ function MultiLineTextField({
 }: TextAreaProps) {
   return (
     <TextAreaContainer style={style}>
-      {label && <TextFieldLabel>{label}</TextFieldLabel>}
+      {label && (
+        <div>
+          <TextFieldLabel>{label}</TextFieldLabel>
+        </div>
+      )}
       <StyledTextArea {...props} style={textareaStyle} />
     </TextAreaContainer>
   );
