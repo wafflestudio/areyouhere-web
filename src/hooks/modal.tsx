@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { MODAL_ANIMATION_DURATION } from "../components/Modal.tsx";
 import { ModalStateHookType, ModalStateType } from "../type";
 
 function useModalState(): ModalStateHookType {
@@ -10,7 +11,7 @@ function useModalState(): ModalStateHookType {
   };
   const close = () => {
     setState("closing");
-    setTimeout(() => setState("closed"), 300);
+    setTimeout(() => setState("closed"), MODAL_ANIMATION_DURATION);
   };
 
   return [state, open, close];

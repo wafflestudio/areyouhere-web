@@ -16,7 +16,7 @@ function Result() {
   if (attendanceResults.length === 0) {
     return <Navigate to={"/"} />;
   } else {
-    const result = attendanceResults[0];
+    const result = attendanceResults[attendanceResults.length - 1];
     if (result == null || result.type !== "oneChoice") {
       return <></>;
     }
@@ -47,12 +47,12 @@ function Result() {
               </InfoLabel>
             </InfoItem>
             <PrimaryButton
-              style={{ width: "13rem", marginTop: "4rem" }}
+              style={{ marginTop: "4rem" }}
               onClick={() => {
                 navigate("/");
               }}
             >
-              Confirm
+              Back to Main Page
             </PrimaryButton>
           </InfoCard>
         </DesktopContainer>

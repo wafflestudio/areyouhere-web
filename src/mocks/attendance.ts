@@ -50,7 +50,7 @@ export class AttendanceMock {
       if (attendees.length > 1) {
         // If there are multiple attendees with the same name, return the list of attendees
         return [
-          HttpStatusCode.Conflict,
+          HttpStatusCode.MultipleChoices,
           {
             attendeeNotes: attendees.map((a) => ({
               id: a.id,

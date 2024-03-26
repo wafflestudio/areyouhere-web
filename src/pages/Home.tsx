@@ -8,7 +8,9 @@ import sendIcon from "../assets/send.svg";
 import TransferBanner from "../components/admin/TransferBanner.tsx";
 import Alert from "../components/Alert.tsx";
 import { PrimaryButton } from "../components/Button.tsx";
+import NoteSelectModal from "../components/home/NoteSelectModal.tsx";
 import TextField from "../components/TextField";
+import useModalState from "../hooks/modal.tsx";
 
 function Home() {
   const navigate = useNavigate();
@@ -30,8 +32,12 @@ function Home() {
   const { mutate: performAttendance } = useMutation({
     mutationFn: postAttend,
     mutationKey: ["attend"],
-    onSuccess: () => {
-      navigate("/result");
+    onSuccess: (data) => {
+      if (data.type == "oneChoice") {
+        navigate("/result");
+      } else {
+        openNoteSelectModal();
+      }
     },
     onError: (error) => {
       console.error(error);
@@ -63,8 +69,15 @@ function Home() {
     },
   });
 
+  const [noteSelectModalState, openNoteSelectModal, closeNoteSelectModal] =
+    useModalState();
+
   return (
     <>
+      <NoteSelectModal
+        onCancel={() => closeNoteSelectModal()}
+        state={noteSelectModalState}
+      />
       <DesktopContainer>
         <TransferBanner from="attendees" />
         <TimeDisplay>
@@ -223,7 +236,7 @@ const BannerChatBubble = styled.div`
   font-weight: 400;
   color: #000000;
   line-height: 3.6rem;
-  border-radius: 0rem 2rem 2rem 2rem;
+  border-radius: 0 2rem 2rem 2rem;
 `;
 
 const InputContainer = styled.form`
@@ -258,7 +271,7 @@ const MobileBannerLabel = styled.p`
 `;
 
 const MobileBannerChatBubble = styled.div`
-  border-radius: 0rem 2rem 2rem 2rem;
+  border-radius: 0 2rem 2rem 2rem;
   padding: 1.2rem 2.5rem;
 
   background-color: ${({ theme }) => theme.colors.lightGrey};
