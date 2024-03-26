@@ -106,6 +106,10 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
                       courseId: classId!,
                       sessionId: currentSessionInfo.id,
                     });
+                    window.open(
+                      `/class/${classId}/sessions/${currentSessionInfo.id}/code`,
+                      "_blank"
+                    );
                   }
                 }}
               >
@@ -293,6 +297,11 @@ const DetailsValue = styled.span`
   ${({ theme }) => theme.typography.b3};
   font-weight: 700;
   color: ${({ theme }) => theme.colors.darkGrey};
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 15rem;
 `;
 
 const NoSessionCard = styled.button`
