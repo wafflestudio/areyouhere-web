@@ -14,12 +14,7 @@ function CodePopup() {
   const [time, setTime] = useState(new Date());
 
   const classId = useClassId();
-  const { data: currentSessionInfo, isLoading } =
-    useCurrentSessionInfo(classId);
-
-  if (!isLoading && currentSessionInfo == null) {
-    window.close();
-  }
+  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
 
   const { data: attendanceStatus } = useAttendanceStatus(
     classId,
@@ -42,17 +37,8 @@ function CodePopup() {
     const interval = setInterval(() => {
       setTime(new Date());
     }, 100);
-    const channel = new BroadcastChannel("sessionRefresh");
-    channel.onmessage = () => {
-      queryClient.invalidateQueries({
-        queryKey: ["currentSessionInfo", classId],
-      });
-    };
-    return () => {
-      clearInterval(interval);
-      channel.close();
-    };
-  }, [classId, queryClient]);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <Container>

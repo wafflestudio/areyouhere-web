@@ -41,9 +41,6 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
       queryClient.invalidateQueries({
         queryKey: ["previousSessions", classId],
       });
-      const channel = new BroadcastChannel("sessionRefresh");
-      channel.postMessage("refresh");
-      channel.close();
     },
   });
 
