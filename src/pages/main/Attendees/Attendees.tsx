@@ -9,7 +9,6 @@ import {
   useAttendees,
 } from "../../../api/attendee.ts";
 import AlertModal from "../../../components/AlertModal.tsx";
-import AddAttendeesModal from "../../../components/attendees/AddAttendeesModal.tsx";
 import AttendeesItem from "../../../components/attendees/AttendeesItem.tsx";
 import {
   PrimaryButton,
@@ -18,16 +17,16 @@ import {
 } from "../../../components/Button.tsx";
 import Checkbox from "../../../components/Checkbox.tsx";
 import {
-  SessionTable,
-  SessionTableHead,
-  SessionTableHeadItem,
-} from "../../../components/sessions/SessionTable.tsx";
+  CheckboxHeadItem,
+  Table,
+  TableHead,
+  TableHeadItem,
+} from "../../../components/table/Table.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
 import useModalState from "../../../hooks/modal.tsx";
 import { useClassId } from "../../../hooks/urlParse.tsx";
 import theme from "../../../styles/Theme.tsx";
 import { AttendeeInfo } from "../../../type.ts";
-import sessions from "../session/Sessions.tsx";
 
 interface CheckedState {
   [key: number]: boolean;
@@ -169,52 +168,52 @@ function Attendees() {
           )}
         </HeaderContainer>
         <ContentContainer>
-          <SessionTable>
-            <SessionTableHead>
+          <Table>
+            <TableHead>
               <tr>
                 {editing && (
-                  <CheckboxCell>
+                  <CheckboxHeadItem>
                     <Checkbox
                       checkboxId="masterCheckbox"
                       checked={isAllChecked}
                       onChange={handleMasterCheckboxChange}
                     />
-                  </CheckboxCell>
+                  </CheckboxHeadItem>
                 )}
-                <SessionTableHeadItem
+                <TableHeadItem
                   style={{
                     width: "15rem",
                     border: "none",
                   }}
                 >
                   Name
-                </SessionTableHeadItem>
-                <SessionTableHeadItem
+                </TableHeadItem>
+                <TableHeadItem
                   style={{
                     width: "23.5rem",
                     border: "none",
                   }}
                 >
                   Notes
-                </SessionTableHeadItem>
-                <SessionTableHeadItem
+                </TableHeadItem>
+                <TableHeadItem
                   style={{
                     width: "14rem",
                     border: "none",
                   }}
                 >
                   Attendance
-                </SessionTableHeadItem>
-                <SessionTableHeadItem
+                </TableHeadItem>
+                <TableHeadItem
                   style={{
                     width: "auto",
                     border: "none",
                   }}
                 >
                   Absence
-                </SessionTableHeadItem>
+                </TableHeadItem>
               </tr>
-            </SessionTableHead>
+            </TableHead>
             {(editing ? tempAttendees : attendees)?.map((attendee, index) => (
               <AttendeesItem
                 editing={editing}
@@ -235,9 +234,14 @@ function Attendees() {
                     setTempAttendees([...tempAttendees]);
                   }
                 }}
+                to={
+                  editing
+                    ? undefined
+                    : `/class/${classId}/attendee/${attendee.attendee.id}`
+                }
               />
             ))}
-          </SessionTable>
+          </Table>
         </ContentContainer>
       </Container>
       {/* 모달 */}

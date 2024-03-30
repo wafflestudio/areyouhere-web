@@ -17,6 +17,21 @@ export type GetAttendeesResult = {
   absence: number;
 }[];
 
+export type GetAttendeeResult = {
+  attendee: {
+    name: string;
+    note?: string;
+    attendance: number;
+    absence: number;
+  };
+  attendanceInfo: {
+    attendanceId: number;
+    sessionName: string;
+    attendanceStatus: boolean;
+    attendanceTime: Date;
+  }[];
+};
+
 export type CreateAttendeeRequest = {
   courseId: number;
   newAttendees: Omit<AttendeeInfo, "id">[];
@@ -48,6 +63,29 @@ export const getAttendees = async (
   }
 };
 
+export const getAttendee = async (
+  attendeeId: number
+): Promise<GetAttendeeResult> => {
+  const res = await axios.get<GetAttendeeResult>(`/api/attendee/detail`, {
+    params: { attendeeId },
+    validateStatus: () => true,
+  });
+
+  if (res.status === HttpStatusCode.Ok) {
+    return {
+      attendee: res.data.attendee,
+      attendanceInfo: res.data.attendanceInfo?.map((info) => ({
+        attendanceId: info.attendanceId,
+        sessionName: info.sessionName,
+        attendanceStatus: info.attendanceStatus,
+        attendanceTime: new Date(info.attendanceTime),
+      })),
+    };
+  } else {
+    throw new Error("Failed to get attendee");
+  }
+};
+
 export const createAttendee = async (
   request: CreateAttendeeRequest
 ): Promise<void> => {
@@ -70,5 +108,12 @@ export const useAttendees = (courseId: number) => {
   return useQuery<GetAttendeesResult>({
     queryKey: ["attendees", courseId],
     queryFn: () => getAttendees(courseId),
+  });
+};
+
+export const useAttendee = (attendeeId: number) => {
+  return useQuery<GetAttendeeResult>({
+    queryKey: ["attendee", attendeeId],
+    queryFn: () => getAttendee(attendeeId),
   });
 };

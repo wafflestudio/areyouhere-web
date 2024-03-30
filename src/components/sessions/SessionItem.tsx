@@ -1,5 +1,5 @@
 import dateFormat from "dateformat";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -25,8 +25,8 @@ function SessionItem({
   to,
   date,
   sessionName,
-  attendance: attendees,
-  absence: absentees,
+  attendance,
+  absence,
   onDelete,
   ...props
 }: SessionItemProps) {
@@ -42,10 +42,10 @@ function SessionItem({
           {sessionName}
         </SessionCardLabel>
         <SessionCardLabel style={{ width: "18rem" }}>
-          {attendees}
+          {attendance}
         </SessionCardLabel>
         <SessionCardLabel style={{ width: "18rem" }}>
-          {absentees}
+          {absence}
         </SessionCardLabel>
       </SessionCardLink>
       <DropdownContainer
