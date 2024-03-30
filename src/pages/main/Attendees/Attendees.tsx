@@ -6,6 +6,7 @@ import styled from "styled-components";
 import {
   deleteAttendee,
   GetAttendeesResult,
+  updateAttendee,
   useAttendees,
 } from "../../../api/attendee.ts";
 import AlertModal from "../../../components/AlertModal.tsx";
@@ -33,12 +34,26 @@ function Attendees() {
   const classId = useClassId();
   const { data: attendees } = useAttendees(classId);
 
+  // 쿼리 관련
   const queryClient = useQueryClient();
   const { mutate: deleteAttendees } = useMutation({
     mutationFn: deleteAttendee,
     mutationKey: ["deleteAttendee"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
+    },
+  });
+  const { mutate: updateAttendees } = useMutation({
+    mutationFn: updateAttendee,
+    mutationKey: ["updateAttendee"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
+      // cleanup
+      setTempAttendees(null);
+      setEditing(false);
+    },
+    onError: () => {
+      // TODO: show error message
     },
   });
 
@@ -81,13 +96,30 @@ function Attendees() {
       );
     }
 
+    // reset checked state
     setCheckedState({});
   };
 
   const handleSave = () => {
-    if (tempAttendees != null) {
-      // TODO: save tempAttendees
-      // TODO: call api
+    if (attendees != null && tempAttendees != null) {
+      // compare between tempAttendees and attendees
+      const originalAttendees = attendees.map((attendee) => attendee.attendee);
+      const originalAttendeesMap = new Map(
+        originalAttendees.map((a) => [a.id, a])
+      );
+      const newAttendees = tempAttendees.map((attendee) => attendee.attendee);
+      const changedAttendees = newAttendees.filter(
+        (attendee) =>
+          originalAttendeesMap.get(attendee.id)?.name !== attendee.name ||
+          originalAttendeesMap.get(attendee.id)?.note !== attendee.note
+      );
+      console.log(changedAttendees);
+
+      // send changed attendees to server
+      updateAttendees({
+        courseId: classId,
+        newAttendees: changedAttendees,
+      });
     }
   };
 
@@ -116,14 +148,7 @@ function Attendees() {
               >
                 Delete
               </SecondaryButton>
-              <PrimaryButton
-                onClick={() => {
-                  setTempAttendees(null);
-                  setEditing(false);
-                }}
-              >
-                Save
-              </PrimaryButton>
+              <PrimaryButton onClick={handleSave}>Save</PrimaryButton>
             </ActionContainer>
           ) : (
             <TertiaryButton

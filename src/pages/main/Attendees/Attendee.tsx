@@ -1,8 +1,14 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
 import React, { useState } from "react";
 import styled from "styled-components";
 
-import { AttendanceInfo, useAttendee } from "../../../api/attendee.ts";
+import { updateAttendanceStatus } from "../../../api/attendance.ts";
+import {
+  AttendanceInfo,
+  updateAttendee,
+  useAttendee,
+} from "../../../api/attendee.ts";
 import { PrimaryButton, TertiaryButton } from "../../../components/Button.tsx";
 import InfoBar from "../../../components/InfoBar.tsx";
 import AttendanceChip from "../../../components/sessions/AttendanceChip.tsx";
@@ -15,15 +21,37 @@ import {
   TableRow,
 } from "../../../components/table/Table.tsx";
 import TableControl from "../../../components/table/TableControl.tsx";
+import { StyledInput } from "../../../components/TextField.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
-import { useAttendeeId } from "../../../hooks/urlParse.tsx";
+import { useAttendeeId, useClassId } from "../../../hooks/urlParse.tsx";
+import { AttendeeInfo } from "../../../type.ts";
 
 function Attendee() {
+  const courseId = useClassId();
   const attendeeId = useAttendeeId();
   const [option, setOption] = useState<string>("latest");
 
+  const queryClient = useQueryClient();
   const { data: attendeeData } = useAttendee(attendeeId);
+  const { mutate: updateAttendees } = useMutation({
+    mutationFn: updateAttendee,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attendee", attendeeId] });
+      setTempAttendee(null);
+      setIsEditing(false);
+    },
+  });
+  const { mutate: updateAttendances } = useMutation({
+    mutationFn: updateAttendanceStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attendee", attendeeId] });
+      setTempAttendances({});
+      setIsEditing(false);
+    },
+  });
 
+  // 수정 관련
+  const [tempAttendee, setTempAttendee] = useState<AttendeeInfo | null>(null);
   const [tempAttendances, setTempAttendances] = useState<
     Record<number, AttendanceInfo>
   >({});
@@ -35,8 +63,15 @@ function Attendee() {
         {isEditing ? (
           <PrimaryButton
             onClick={() => {
-              setIsEditing(false);
-              // TODO: updateAttendees(tempAttendees)
+              if (tempAttendee != null) {
+                updateAttendees({
+                  newAttendees: [tempAttendee],
+                  courseId: courseId,
+                });
+                updateAttendances({
+                  updateAttendances: Object.values(tempAttendances),
+                });
+              }
             }}
           >
             Save
@@ -44,16 +79,19 @@ function Attendee() {
         ) : (
           <TertiaryButton
             onClick={() => {
-              setTempAttendances(
-                attendeeData?.attendanceInfo?.reduce(
-                  (acc, attendance) => ({
-                    ...acc,
-                    [attendance.attendanceId]: attendance,
-                  }),
-                  {}
-                ) ?? {}
-              );
-              setIsEditing(true);
+              if (attendeeData != null) {
+                setTempAttendances(
+                  attendeeData.attendanceInfo.reduce(
+                    (acc, attendance) => ({
+                      ...acc,
+                      [attendance.attendanceId]: attendance,
+                    }),
+                    {}
+                  ) ?? {}
+                );
+                setTempAttendee(attendeeData.attendee);
+                setIsEditing(true);
+              }
             }}
           >
             Edit
@@ -63,13 +101,40 @@ function Attendee() {
       <ContentContainer>
         <InfoBar
           values={[
-            { label: "Name", value: attendeeData?.attendee?.name },
+            {
+              label: "Name",
+              value: isEditing ? (
+                <StyledInput
+                  value={tempAttendee!.name}
+                  onChange={(e) =>
+                    setTempAttendee({
+                      ...tempAttendee!,
+                      name: e.target.value,
+                    })
+                  }
+                />
+              ) : (
+                attendeeData?.attendee?.name
+              ),
+            },
             {
               label: "Note",
-              value: attendeeData?.attendee?.note,
+              value: isEditing ? (
+                <StyledInput
+                  value={tempAttendee!.note}
+                  onChange={(e) =>
+                    setTempAttendee({
+                      ...tempAttendee!,
+                      note: e.target.value,
+                    })
+                  }
+                />
+              ) : (
+                attendeeData?.attendee?.note
+              ),
             },
-            { label: "Attendance", value: attendeeData?.attendee?.attendance },
-            { label: "Absence", value: attendeeData?.attendee?.absence },
+            { label: "Attendance", value: attendeeData?.attendance },
+            { label: "Absence", value: attendeeData?.absence },
           ]}
         />
         <TableControl

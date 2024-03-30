@@ -44,10 +44,25 @@ function AttendeesItem({
         style={{
           border: "none",
           color: isChecked ? "white" : "black",
+          paddingTop: 0,
+          paddingBottom: 0,
+          paddingRight: 0,
         }}
         to={to}
       >
-        {attendee.name}
+        {editing ? (
+          <StyledInput
+            style={{ width: "100%" }}
+            value={attendee.name}
+            onChange={(e) => {
+              if (onAttendeeChange) {
+                onAttendeeChange({ ...attendee, name: e.target.value });
+              }
+            }}
+          />
+        ) : (
+          <>{attendee.name}</>
+        )}
       </TableItem>
       <TableItem
         style={{

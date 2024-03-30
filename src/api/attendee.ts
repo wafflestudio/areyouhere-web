@@ -25,12 +25,9 @@ export type AttendanceInfo = {
 };
 
 export type GetAttendeeResult = {
-  attendee: {
-    name: string;
-    note?: string;
-    attendance: number;
-    absence: number;
-  };
+  attendee: AttendeeInfo;
+  attendance: number;
+  absence: number;
   attendanceInfo: AttendanceInfo[];
 };
 
@@ -46,6 +43,11 @@ export type GetAttendeeDuplicateResponse = {
 
 export type DeleteAttendeeRequest = {
   attendeeIds: number[];
+};
+
+export type UpdateAttendeeRequest = {
+  courseId: number;
+  newAttendees: AttendeeInfo[];
 };
 
 export const getAttendees = async (
@@ -75,7 +77,7 @@ export const getAttendee = async (
 
   if (res.status === HttpStatusCode.Ok) {
     return {
-      attendee: res.data.attendee,
+      ...res.data,
       attendanceInfo: res.data.attendanceInfo?.map((info) => ({
         attendanceId: info.attendanceId,
         sessionName: info.sessionName,
@@ -104,6 +106,12 @@ export const deleteAttendee = async (
   request: DeleteAttendeeRequest
 ): Promise<void> => {
   return axios.post("/api/attendee/delete", request);
+};
+
+export const updateAttendee = async (
+  request: UpdateAttendeeRequest
+): Promise<void> => {
+  return axios.put("/api/attendee", request);
 };
 
 export const useAttendees = (courseId: number) => {
