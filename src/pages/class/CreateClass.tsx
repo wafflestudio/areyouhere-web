@@ -52,6 +52,7 @@ function CreateClass() {
     }
     // 2. remove one names
     namesakes = namesakes.filter((namesake) => namesake.length > 1);
+
     // 3. if namesakes exist, open modal
     if (namesakes.length > 0) {
       setNamesakes(namesakes);
