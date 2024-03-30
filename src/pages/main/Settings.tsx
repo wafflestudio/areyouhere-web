@@ -43,7 +43,7 @@ function Settings() {
   return (
     <Container>
       <TitleBar label="Class Settings" />
-      <CreatClassContainer>
+      <SettingContainer>
         <MultiLineTextField
           textareaStyle={{ height: "4.5rem" }}
           label="Name of your class"
@@ -71,7 +71,7 @@ function Settings() {
         >
           Save Changes
         </PrimaryButton>
-      </CreatClassContainer>
+      </SettingContainer>
     </Container>
   );
 }
@@ -82,12 +82,12 @@ const Container = styled.div`
   align-items: flex-start;
 `;
 
-const CreatClassContainer = styled.div`
+const SettingContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
 
-  margin-left: 5rem;
+  margin-left: 6rem;
 
   & > * {
     margin-bottom: 3.4rem;

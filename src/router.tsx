@@ -7,7 +7,7 @@ import SignUp from "./pages/admin/SignUp";
 import ClassList from "./pages/class/ClassList.tsx";
 import CreateClass from "./pages/class/CreateClass.tsx";
 import Home from "./pages/Home";
-import AddAttendees from "./pages/main/Attendees/AddAttendess.tsx";
+import AddAttendees from "./pages/main/Attendees/AddAttendees.tsx";
 import Attendees from "./pages/main/Attendees/Attendees.tsx";
 import CodePopup from "./pages/main/dashboard/CodePopup.tsx";
 import Dashboard from "./pages/main/dashboard/Dashboard.tsx";
