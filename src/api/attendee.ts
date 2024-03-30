@@ -47,7 +47,7 @@ export type DeleteAttendeeRequest = {
 
 export type UpdateAttendeeRequest = {
   courseId: number;
-  newAttendees: AttendeeInfo[];
+  updatedAttendees: AttendeeInfo[];
 };
 
 export const getAttendees = async (

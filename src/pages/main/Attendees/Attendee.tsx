@@ -65,7 +65,7 @@ function Attendee() {
             onClick={() => {
               if (tempAttendee != null) {
                 updateAttendees({
-                  newAttendees: [tempAttendee],
+                  updatedAttendees: [tempAttendee],
                   courseId: courseId,
                 });
                 updateAttendances({

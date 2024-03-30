@@ -118,7 +118,7 @@ function Attendees() {
       // send changed attendees to server
       updateAttendees({
         courseId: classId,
-        newAttendees: changedAttendees,
+        updatedAttendees: changedAttendees,
       });
     }
   };
