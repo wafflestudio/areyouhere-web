@@ -1,8 +1,10 @@
-import styled, { css } from "styled-components";
-
 import { AttendeeInfo } from "../../type.ts";
 import Checkbox from "../Checkbox.tsx";
-import { CheckboxItem, TableItem } from "../table/Table.tsx";
+import {
+  CheckboxItem,
+  SelectableTableRow,
+  TableItem,
+} from "../table/Table.tsx";
 import { StyledInput } from "../TextField.tsx";
 
 interface AttendeesItemProps {
@@ -28,7 +30,7 @@ function AttendeesItem({
   to,
 }: AttendeesItemProps) {
   return (
-    <CustomTr isChecked={isChecked}>
+    <SelectableTableRow selected={isChecked}>
       {editing && (
         <CheckboxItem>
           <Checkbox
@@ -87,26 +89,8 @@ function AttendeesItem({
       >
         {absence}
       </TableItem>
-    </CustomTr>
+    </SelectableTableRow>
   );
 }
-
-interface CustomTrProps {
-  isChecked: boolean;
-}
-
-const CustomTr = styled.tr<CustomTrProps>`
-  border: 1px solid ${({ theme }) => theme.colors.grey};
-  background-color: ${({ isChecked, theme }) =>
-    isChecked ? theme.colors.primary["400"] : "white"};
-
-  ${({ isChecked }) =>
-    !isChecked &&
-    css`
-      &:hover {
-        background-color: ${({ theme }) => theme.colors.primary["50"]};
-      }
-    `}
-`;
 
 export default AttendeesItem;

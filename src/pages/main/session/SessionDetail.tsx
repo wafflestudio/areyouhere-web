@@ -13,6 +13,7 @@ import {
   useSession,
   useSessionAttendees,
 } from "../../../api/session";
+import { PrimaryButton, TertiaryButton } from "../../../components/Button.tsx";
 import InfoBar from "../../../components/InfoBar.tsx";
 import AttendanceChip from "../../../components/sessions/AttendanceChip";
 import {
@@ -49,7 +50,35 @@ function SessionDetail() {
 
   return (
     <Container>
-      <TitleBar label="Session Details" />
+      <TitleBar label="Session Details">
+        {isEditing ? (
+          <PrimaryButton
+            onClick={() => {
+              const updateData: UpdateAttendee[] = tempAttendees.map(
+                (attendee) => ({
+                  attendanceId: attendee.attendanceId,
+                  attendanceStatus: attendee.attendanceStatus,
+                })
+              );
+              updateAttendees({
+                updateAttendances: updateData,
+              });
+              setIsEditing(false);
+            }}
+          >
+            Save
+          </PrimaryButton>
+        ) : (
+          <TertiaryButton
+            onClick={() => {
+              setTempAttendees(sessionAttendees ?? []);
+              setIsEditing(true);
+            }}
+          >
+            Edit
+          </TertiaryButton>
+        )}
+      </TitleBar>
       <ContentContainer>
         <InfoBar
           values={[
@@ -64,24 +93,6 @@ function SessionDetail() {
             { label: "View All", value: "all" },
             { label: "Absentees Only", value: "absentees" },
           ]}
-          onActionButtonClick={() => {
-            if (!isEditing) {
-              // TODO: copy current attendance status
-              setTempAttendees(sessionAttendees ?? []);
-            } else {
-              // TODO: send changed attendance status
-              const updateData: UpdateAttendee[] = tempAttendees.map(
-                (attendee) => ({
-                  attendanceId: attendee.attendanceId,
-                  attendanceStatus: attendee.attendanceStatus,
-                })
-              );
-              updateAttendees({
-                updateAttendances: updateData,
-              });
-            }
-            setIsEditing(!isEditing);
-          }}
           onOptionChange={(filter) => setFilter(filter)}
           isEditing={isEditing}
           value={filter}

@@ -17,6 +17,13 @@ export type GetAttendeesResult = {
   absence: number;
 }[];
 
+export type AttendanceInfo = {
+  attendanceId: number;
+  sessionName: string;
+  attendanceStatus: boolean;
+  attendanceTime: Date;
+};
+
 export type GetAttendeeResult = {
   attendee: {
     name: string;
@@ -24,12 +31,7 @@ export type GetAttendeeResult = {
     attendance: number;
     absence: number;
   };
-  attendanceInfo: {
-    attendanceId: number;
-    sessionName: string;
-    attendanceStatus: boolean;
-    attendanceTime: Date;
-  }[];
+  attendanceInfo: AttendanceInfo[];
 };
 
 export type CreateAttendeeRequest = {

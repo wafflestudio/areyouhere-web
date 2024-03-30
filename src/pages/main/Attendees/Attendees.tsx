@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -23,14 +23,11 @@ import {
   TableHeadItem,
 } from "../../../components/table/Table.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
+import { useCheckbox } from "../../../hooks/checkbox.tsx";
 import useModalState from "../../../hooks/modal.tsx";
 import { useClassId } from "../../../hooks/urlParse.tsx";
 import theme from "../../../styles/Theme.tsx";
 import { AttendeeInfo } from "../../../type.ts";
-
-interface CheckedState {
-  [key: number]: boolean;
-}
 
 function Attendees() {
   const classId = useClassId();
@@ -45,42 +42,17 @@ function Attendees() {
     },
   });
 
-  // 체크 박스 관리
-  const [checkedState, setCheckedState] = useState<CheckedState>({});
-  const [isAllChecked, setIsAllChecked] = useState(false);
-
-  const handleCheckboxChange = (id: number) => {
-    setCheckedState((prevState) => ({
-      ...prevState,
-      [id]: !prevState[id],
-    }));
-  };
-
-  const handleMasterCheckboxChange = () => {
-    if (attendees == null) return;
-    const newCheckedState = !isAllChecked;
-    setIsAllChecked(newCheckedState);
-
-    const newAttendeesCheckedState = attendees.reduce(
-      (acc, attendee) => ({
-        ...acc,
-        [attendee.attendee.id]: newCheckedState,
-      }),
-      {}
-    );
-
-    setCheckedState(newAttendeesCheckedState);
-  };
-
-  const checkedCount = Object.values(checkedState).filter(Boolean).length;
-
-  useEffect(() => {
-    const allChecked =
-      attendees != null &&
-      attendees.length > 0 &&
-      attendees.every((attendee) => checkedState[attendee.attendee.id]);
-    setIsAllChecked(allChecked);
-  }, [checkedState, attendees]);
+  const {
+    checkedState,
+    setCheckedState,
+    isAllChecked,
+    handleCheckboxChange,
+    handleMasterCheckboxChange,
+    checkedCount,
+  } = useCheckbox({
+    items: attendees ?? [],
+    keyFn: (item) => item.attendee.id,
+  });
 
   // 유저 추가 관련
   const navigate = useNavigate();
@@ -109,7 +81,6 @@ function Attendees() {
       );
     }
 
-    setIsAllChecked(false);
     setCheckedState({});
   };
 

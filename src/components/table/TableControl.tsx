@@ -1,8 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 
-import { PrimaryButton, TertiaryButton } from "../Button.tsx";
-
 interface TableControlProps extends React.HTMLAttributes<HTMLDivElement> {
   options: { label: string; value: string }[];
   value: string;
@@ -11,7 +9,8 @@ interface TableControlProps extends React.HTMLAttributes<HTMLDivElement> {
   isEditing?: boolean;
 
   onOptionChange: (filter: string) => void;
-  onActionButtonClick?: () => void;
+
+  trailing?: React.ReactNode;
 }
 
 function TableControl({
@@ -20,7 +19,7 @@ function TableControl({
   editable = true,
   isEditing = false,
   onOptionChange,
-  onActionButtonClick,
+  trailing,
   ...props
 }: TableControlProps) {
   return (
@@ -36,22 +35,7 @@ function TableControl({
           </OptionButton>
         ))}
       </OptionButtonContainer>
-      {editable &&
-        (isEditing ? (
-          <PrimaryButton
-            style={{ width: "9.5rem" }}
-            onClick={onActionButtonClick}
-          >
-            Save
-          </PrimaryButton>
-        ) : (
-          <TertiaryButton
-            style={{ width: "9.5rem" }}
-            onClick={onActionButtonClick}
-          >
-            Edit
-          </TertiaryButton>
-        ))}
+      <TrailingContainer>{trailing}</TrailingContainer>
     </Container>
   );
 }
@@ -81,8 +65,14 @@ const OptionButton = styled.button<{ active?: boolean }>`
 
 const OptionButtonContainer = styled.div`
   display: flex;
+  flex: 1;
   flex-direction: row;
   gap: 0.7rem;
+`;
+
+const TrailingContainer = styled.div`
+  display: flex;
+  gap: 1rem;
 `;
 
 export default TableControl;
