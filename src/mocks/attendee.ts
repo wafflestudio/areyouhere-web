@@ -3,6 +3,7 @@ import { HttpStatusCode } from "axios";
 import {
   CreateAttendeeRequest,
   DeleteAttendeeRequest,
+  GetAttendeeDuplicateRequest,
   GetAttendeeDuplicateResponse,
   GetAttendeeResult,
   GetAttendeesResponse,
@@ -141,12 +142,12 @@ export class AttendeeMock {
     }
 
     // check duplicate
-    const updateIds = new Set(data.newAttendees.map((a) => a.id));
+    const updateIds = new Set(data.updatedAttendees.map((a) => a.id));
     const notChangedAttendees = course.attendees.filter(
       (a) => !updateIds.has(a.id)
     );
     const nameNoteCounts: Record<string, number> = {};
-    [...notChangedAttendees, ...data.newAttendees].forEach((attendee) => {
+    [...notChangedAttendees, ...data.updatedAttendees].forEach((attendee) => {
       const key = `${attendee.name}\t${attendee.note}`;
       const count = nameNoteCounts[key] || 0;
       nameNoteCounts[key] = count + 1;
@@ -159,7 +160,9 @@ export class AttendeeMock {
 
     // update by id
     course.attendees = course.attendees.map((attendee) => {
-      const newAttendee = data.newAttendees.find((a) => a.id === attendee.id);
+      const newAttendee = data.updatedAttendees.find(
+        (a) => a.id === attendee.id
+      );
       return newAttendee || attendee;
     });
     DatabaseMock.update();
@@ -168,30 +171,35 @@ export class AttendeeMock {
 
   @PostMapping("/duplicate")
   static getDuplicatedAttendees(config: RequestConfig) {
-    const data = JSON.parse(config.data) as CreateAttendeeRequest;
+    const data = JSON.parse(config.data) as GetAttendeeDuplicateRequest;
+    console.log(data);
     const course = DatabaseMock.courses.find((c) => c.id === data.courseId);
     if (!course) {
       return [HttpStatusCode.NotFound];
     }
 
-    const nameCounts: Record<string, number> = {};
-    data.newAttendees.forEach((attendee) => {
-      const count = nameCounts[attendee.name] || 0;
-      nameCounts[attendee.name] = count + 1;
-    });
-    course.attendees.forEach((attendee) => {
-      const count = nameCounts[attendee.name] || 0;
-      nameCounts[attendee.name] = count + 1;
+    const keyFn = (attendee: { name?: string; note?: string }) =>
+      `${attendee.name ?? ""}@${attendee.note ?? ""}`;
+
+    const nameCounts: Record<string, { name: string; count: number }> = {};
+    [
+      ...data.newAttendees.map((e) => ({ name: e })),
+      ...course.attendees,
+    ].forEach((attendee) => {
+      console.log(attendee);
+      const key = keyFn(attendee);
+      const data = nameCounts[key] || { name: attendee.name, count: 0 };
+      nameCounts[key] = { name: attendee.name, count: data.count + 1 };
     });
 
     const duplicatedNames = Object.entries(nameCounts)
-      .filter(([_, count]) => count > 1)
-      .map(([name, _]) => name);
+      .filter(([_, data]) => data.count > 1)
+      .map(([_, data]) => data.name);
 
     const duplicatedAttendees: PickPartial<AttendeeInfo, "id">[] = [];
     data.newAttendees.forEach((attendee) => {
-      if (duplicatedNames.includes(attendee.name)) {
-        duplicatedAttendees.push({ name: attendee.name });
+      if (duplicatedNames.includes(attendee)) {
+        duplicatedAttendees.push({ name: attendee });
       }
     });
     course.attendees.forEach((attendee) => {
@@ -199,6 +207,7 @@ export class AttendeeMock {
         duplicatedAttendees.push({
           id: attendee.id,
           name: attendee.name,
+          note: attendee.note,
         });
       }
     });
