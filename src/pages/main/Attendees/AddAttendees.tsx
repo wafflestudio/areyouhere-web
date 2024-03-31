@@ -41,8 +41,7 @@ function AddAttendees() {
     // 1. arrange by name
     const nameMap = new Map<string, number>();
     let namesakes: PickPartial<AttendeeInfo, "id">[][] = [];
-    for (let i = 0; i < attendeeList.length; i++) {
-      const name = attendeeList[i];
+    attendeeList.forEach((name) => {
       if (nameMap.has(name)) {
         const idx = nameMap.get(name)!;
         namesakes[idx].push({ name, note: "" });
@@ -50,7 +49,7 @@ function AddAttendees() {
         nameMap.set(name, namesakes.length);
         namesakes.push([{ name, note: "" }]);
       }
-    }
+    });
 
     // 2. get namesakes from existing attendees
     const duplicatedAttendees = await getDuplicatedAttendee({
@@ -64,12 +63,14 @@ function AddAttendees() {
       const id = attendee.id;
       const name = attendee.name;
       const note = attendee.note;
-      if (nameMap.has(name)) {
-        const idx = nameMap.get(name)!;
-        namesakes[idx].push({ id, name, note });
-      } else {
-        nameMap.set(name, namesakes.length);
-        namesakes.push([{ id, name, note }]);
+      if (id) {
+        if (nameMap.has(name)) {
+          const idx = nameMap.get(name)!;
+          namesakes[idx].push({ id, name, note });
+        } else {
+          nameMap.set(name, namesakes.length);
+          namesakes.push([{ id, name, note }]);
+        }
       }
     });
 
