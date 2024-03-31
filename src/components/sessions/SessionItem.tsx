@@ -1,118 +1,95 @@
 import dateFormat from "dateformat";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
+import React from "react";
 
-import dotsVerticalGrey from "../../assets/class/dotsVerticalGrey.svg";
-import trashRed from "../../assets/class/trashRed.svg";
+import { Session } from "../../api/session.ts";
+import Checkbox from "../Checkbox.tsx";
 import {
-  DropdownButton,
-  DropdownContainer,
-  DropdownMenu,
-  DropdownMenuButton,
-} from "../Dropdown";
+  CheckboxItem,
+  SelectableTableRow,
+  TableItem,
+} from "../table/Table.tsx";
+import { StyledInput } from "../TextField.tsx";
 
 interface SessionItemProps extends React.HTMLAttributes<HTMLDivElement> {
-  to: string;
-  date: Date;
-  sessionName: string;
-  attendance: number;
-  absence: number;
+  editing: boolean;
+  isChecked: boolean;
+  onCheckboxChange: () => void;
+  to?: string;
+  session: Session;
+  onSessionChange?: (session: Session) => void;
   onDelete?: () => void;
 }
 
 function SessionItem({
+  editing,
+  isChecked,
+  onCheckboxChange,
   to,
-  date,
-  sessionName,
-  attendance: attendees,
-  absence: absentees,
+  session,
+  onSessionChange,
   onDelete,
   ...props
 }: SessionItemProps) {
-  const [isMoreMenuOpened, setIsMoreMenuOpened] = useState(false);
-
   return (
-    <SessionCard {...props}>
-      <SessionCardLink to={to}>
-        <SessionCardLabel style={{ width: "20rem" }}>
-          {dateFormat(date, "yyyy-mm-dd")}
-        </SessionCardLabel>
-        <SessionCardLabel style={{ width: "45rem" }}>
-          {sessionName}
-        </SessionCardLabel>
-        <SessionCardLabel style={{ width: "18rem" }}>
-          {attendees}
-        </SessionCardLabel>
-        <SessionCardLabel style={{ width: "18rem" }}>
-          {absentees}
-        </SessionCardLabel>
-      </SessionCardLink>
-      <DropdownContainer
-        onBlur={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget as Node)) {
-            console.log("2");
-            setIsMoreMenuOpened(false);
-          }
+    <SelectableTableRow selected={isChecked}>
+      {editing && (
+        <CheckboxItem>
+          <Checkbox
+            checkboxId={`checkbox-${session.id}`}
+            checked={isChecked}
+            onChange={onCheckboxChange}
+          />
+        </CheckboxItem>
+      )}
+      <TableItem
+        style={{
+          border: "none",
+          color: isChecked ? "white" : "black",
         }}
+        to={to}
       >
-        <DropdownMenu isOpened={isMoreMenuOpened}>
-          <DropdownDeleteButton
-            type="button"
-            onClick={() => {
-              setIsMoreMenuOpened(false);
-              if (onDelete) onDelete();
+        {dateFormat(session.date, "yyyy-mm-dd")}
+      </TableItem>
+      <TableItem
+        style={{
+          border: "none",
+          color: isChecked ? "white" : "black",
+          paddingTop: 0,
+          paddingBottom: 0,
+        }}
+        to={to}
+      >
+        {editing ? (
+          <StyledInput
+            value={session.name}
+            onChange={(e) => {
+              onSessionChange?.({ ...session, name: e.target.value });
             }}
-          >
-            <img src={trashRed} alt="Delete" width={20} height={20} />
-            Delete
-          </DropdownDeleteButton>
-        </DropdownMenu>
-        <DropdownButton
-          type="button"
-          onClick={() => {
-            setIsMoreMenuOpened(!isMoreMenuOpened);
-          }}
-        >
-          <img src={dotsVerticalGrey} alt="More" width={24} height={24} />
-        </DropdownButton>
-      </DropdownContainer>
-    </SessionCard>
+          />
+        ) : (
+          <>{session.name}</>
+        )}
+      </TableItem>
+      <TableItem
+        style={{
+          border: "none",
+          color: isChecked ? "white" : "black",
+        }}
+        to={to}
+      >
+        {session.attendee}
+      </TableItem>
+      <TableItem
+        style={{
+          border: "none",
+          color: isChecked ? "white" : "black",
+        }}
+        to={to}
+      >
+        {session.absentee}
+      </TableItem>
+    </SelectableTableRow>
   );
 }
-
-const SessionCard = styled.div`
-  position: relative;
-  background-color: ${({ theme }) => theme.colors.white};
-
-  border: 1px solid ${({ theme }) => theme.colors.grey};
-  border-radius: 2rem;
-
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding-right: 1.8rem;
-`;
-
-const SessionCardLink = styled(Link)`
-  padding: 2rem 3rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  text-decoration: none;
-`;
-
-const SessionCardLabel = styled.span`
-  ${({ theme }) => theme.typography.b1};
-  color: ${({ theme }) => theme.colors.black};
-`;
-
-const DropdownDeleteButton = styled(DropdownMenuButton)`
-  color: ${({ theme }) => theme.colors.red["500"]};
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.red["50"]};
-  }
-`;
 
 export default SessionItem;

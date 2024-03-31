@@ -1,39 +1,28 @@
-import dateFormat from "dateformat";
+import React, { ReactElement } from "react";
 import styled from "styled-components";
 
-interface SessionInfoBarProps extends React.HTMLAttributes<HTMLDivElement> {
-  date?: Date;
-  sessionName?: string;
-  attendance?: number;
-  absence?: number;
+export interface InfoBarProps extends React.HTMLAttributes<HTMLDivElement> {
+  values: { label: string; value?: ReactElement | string | number }[];
 }
 
-function SessionInfoBar({
-  date,
-  sessionName,
-  attendance,
-  absence,
-  ...props
-}: SessionInfoBarProps) {
+function InfoBar({ values, ...props }: InfoBarProps) {
   return (
     <Container {...props}>
       <SessionInfoItem style={{ width: "18rem" }}>
-        <SessionInfoLabel>Date</SessionInfoLabel>
-        <SessionInfoContent>
-          {dateFormat(date, "yyyy-mm-dd")}
-        </SessionInfoContent>
+        <SessionInfoLabel>{values[0].label}</SessionInfoLabel>
+        <SessionInfoContent>{values[0].value}</SessionInfoContent>
       </SessionInfoItem>
       <SessionInfoItem style={{ flex: "1" }}>
-        <SessionInfoLabel>Session Name</SessionInfoLabel>
-        <SessionInfoContent>{sessionName}</SessionInfoContent>
+        <SessionInfoLabel>{values[1].label}</SessionInfoLabel>
+        <SessionInfoContent>{values[1].value}</SessionInfoContent>
       </SessionInfoItem>
       <SessionInfoItem style={{ width: "20rem" }}>
-        <SessionInfoLabel>Attendance</SessionInfoLabel>
-        <SessionInfoContent>{attendance}</SessionInfoContent>
+        <SessionInfoLabel>{values[2].label}</SessionInfoLabel>
+        <SessionInfoContent>{values[2].value}</SessionInfoContent>
       </SessionInfoItem>
       <SessionInfoItem style={{ width: "20rem" }}>
-        <SessionInfoLabel>Absence</SessionInfoLabel>
-        <SessionInfoContent>{absence}</SessionInfoContent>
+        <SessionInfoLabel>{values[3].label}</SessionInfoLabel>
+        <SessionInfoContent>{values[3].value}</SessionInfoContent>
       </SessionInfoItem>
     </Container>
   );
@@ -67,4 +56,4 @@ const SessionInfoContent = styled.span`
   color: ${({ theme }) => theme.colors.black};
 `;
 
-export default SessionInfoBar;
+export default InfoBar;

@@ -12,4 +12,10 @@ function useSessionId() {
   return parseInt(data[4], 10);
 }
 
-export { useClassId, useSessionId };
+function useAttendeeId() {
+  const location = useLocation();
+  const data = location.pathname.split("/");
+  return parseInt(data[4], 10);
+}
+
+export { useClassId, useSessionId, useAttendeeId };
