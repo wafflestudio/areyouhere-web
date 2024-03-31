@@ -158,7 +158,7 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
           </InfoCard>
         </>
       ) : (
-        <InfoCard style={{ width: "100rem" }}>
+        <InfoCard style={{ width: "100rem", padding: "0" }}>
           <NoSessionCard onClick={onCreateNewSession}>
             <NoSessionTitle>No Sessions have been opened yet.</NoSessionTitle>
             <NoSessionDescription>
@@ -212,10 +212,9 @@ const ExpandButton = styled.button`
   top: 1.5rem;
   right: 1.3rem;
 
-  background: none;
   border: none;
   border-radius: 1rem;
-  background-color: ${({ theme }) => theme.colors.lightGrey};
+  background: ${({ theme }) => theme.colors.lightGrey} none;
 
   width: 2.6rem;
   height: 2.6rem;

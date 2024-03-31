@@ -1,15 +1,17 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { updateCourse, useCourses } from "../../api/course.ts";
 import { PrimaryButton } from "../../components/Button.tsx";
-import UnknownNameCheckbox from "../../components/class/UnknownNameCheckbox.tsx";
 import { MultiLineTextField } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 import { useClassId } from "../../hooks/urlParse.tsx";
 
 function Settings() {
+  const navigate = useNavigate();
+
   const [className, setClassName] = useState("");
   const [description, setDescription] = useState("");
 
@@ -67,6 +69,7 @@ function Settings() {
               description,
               onlyListNameAllowed,
             });
+            navigate(`/class/${classId}`);
           }}
         >
           Save Changes

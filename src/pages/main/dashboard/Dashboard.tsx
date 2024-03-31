@@ -90,7 +90,16 @@ function Dashboard() {
                     <TableItem style={{ width: "17.5rem" }}>
                       {dateFormat(session.date, "yyyy-mm-dd")}
                     </TableItem>
-                    <TableItem>{session.name}</TableItem>
+                    <TableItem
+                      style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        maxWidth: "42.3rem",
+                      }}
+                    >
+                      {session.name}
+                    </TableItem>
                     <TableItem style={{ width: "17.5rem" }}>
                       {session.attendee}
                     </TableItem>

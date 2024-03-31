@@ -39,23 +39,28 @@ function CreateClass() {
   const submit = () => {
     // 1. arrange by name
     const nameMap = new Map<string, number>();
-    let namesakes: PickPartial<AttendeeInfo, "id">[][] = [];
-    for (let i = 0; i < attendeeList.length; i++) {
-      const name = attendeeList[i];
+    const namesakeArray: PickPartial<AttendeeInfo, "id">[][] = [];
+    attendeeList.forEach((name, index) => {
       if (nameMap.has(name)) {
         const idx = nameMap.get(name)!;
-        namesakes[idx].push({ name, note: "" });
+        namesakeArray[idx].push({ name, note: "", index: index });
       } else {
-        nameMap.set(name, namesakes.length);
-        namesakes.push([{ name, note: "" }]);
+        nameMap.set(name, namesakeArray.length);
+        namesakeArray.push([{ name, note: "", index: index }]);
       }
-    }
-    // 2. remove one names
-    namesakes = namesakes.filter((namesake) => namesake.length > 1);
+    });
+
+    // 2. filter namesakes
+    const filteredNamesakes: PickPartial<AttendeeInfo, "id">[][] =
+      namesakeArray.filter((namesake) => namesake.length > 1);
+
+    console.log(namesakeArray);
+    console.log(filteredNamesakes);
 
     // 3. if namesakes exist, open modal
-    if (namesakes.length > 0) {
-      setNamesakes(namesakes);
+    if (filteredNamesakes.length > 0) {
+      setNamesakes(filteredNamesakes);
+      console.log(namesakes);
       openNamesakeModal();
       return;
     }
@@ -78,16 +83,18 @@ function CreateClass() {
     <>
       <NamesakeModal
         state={namesakeModalState}
-        namesakes={namesakes}
         close={closeNamesakeModal}
-        onNamesakeChanged={setNamesakes}
-        onSubmitted={() => {
+        initialNamesakes={namesakes}
+        attendeeList={attendeeList}
+        onSubmit={(attendees: PickPartial<AttendeeInfo, "id">[]) => {
           createClass({
             name: className,
             description,
-            attendees: namesakes.flat(),
+            attendees: attendees,
             onlyListNameAllowed: false,
           });
+          closeNamesakeModal();
+          navigate(-1);
         }}
       />
       <Container>

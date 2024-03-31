@@ -146,6 +146,13 @@ const TitleLabel = styled.p`
 const Title = styled.h3`
   ${({ theme }) => theme.typography.h2};
   color: ${({ theme }) => theme.colors.black};
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60rem;
+
+  margin: 2rem 0;
 `;
 
 const PasscodeBubble = styled.div`

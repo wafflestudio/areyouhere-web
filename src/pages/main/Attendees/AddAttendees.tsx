@@ -26,6 +26,10 @@ function AddAttendees() {
   const [namesakeModalState, openNamesakeModal, closeNamesakeModal] =
     useModalState();
 
+  const [newAttendees, setNewAttendees] = useState<
+    PickPartial<AttendeeInfo, "id">[]
+  >([]);
+
   // 유저 추가 api
   const classId = useClassId();
   const queryClient = useQueryClient();
@@ -40,7 +44,7 @@ function AddAttendees() {
   const submit = async () => {
     // 1. arrange by name
     const nameMap = new Map<string, number>();
-    let namesakes: PickPartial<AttendeeInfo, "id">[][] = [];
+    const namesakes: PickPartial<AttendeeInfo, "id">[][] = [];
     attendeeList.forEach((name) => {
       if (nameMap.has(name)) {
         const idx = nameMap.get(name)!;
@@ -74,14 +78,21 @@ function AddAttendees() {
       }
     });
 
-    // 3. remove one names
-    namesakes = namesakes.filter((namesake) => namesake.length > 1);
+    // 3. separate namesakes and unique attendees
+    const namesakeAttendees = [] as PickPartial<AttendeeInfo, "id">[][];
+    const newAttendees = [] as PickPartial<AttendeeInfo, "id">[];
 
-    console.log(namesakes);
+    namesakes.forEach((namesake) => {
+      if (namesake.length > 1) {
+        namesakeAttendees.push(namesake);
+      }
+      newAttendees.push({ name: namesake[0].name, note: "" });
+    });
+    setNewAttendees(newAttendees);
 
     // 4. if namesakes exist, open modal
-    if (namesakes.length > 0) {
-      setNamesakes(namesakes);
+    if (namesakeAttendees.length > 0) {
+      setNamesakes(namesakeAttendees);
       openNamesakeModal();
       return;
     }
@@ -100,13 +111,13 @@ function AddAttendees() {
     <>
       <NamesakeModal
         state={namesakeModalState}
-        namesakes={namesakes}
+        initialNamesakes={namesakes}
         close={closeNamesakeModal}
         onNamesakeChanged={setNamesakes}
-        onSubmitted={() => {
+        onSubmit={() => {
           createAttendees({
             courseId: classId!,
-            newAttendees: namesakes.flat(),
+            newAttendees: newAttendees.flat(),
           });
           closeNamesakeModal();
           navigate(-1);

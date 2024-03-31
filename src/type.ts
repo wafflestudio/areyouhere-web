@@ -14,6 +14,7 @@ export interface AttendeeInfo {
   id: number;
   name: string;
   note?: string;
+  index?: number;
 }
 
 export type PickPartial<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>> &
