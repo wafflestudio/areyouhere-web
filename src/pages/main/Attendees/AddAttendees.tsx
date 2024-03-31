@@ -52,14 +52,12 @@ function AddAttendees() {
     });
 
     // 2. get namesakes from existing attendees
-    const duplicatedAttendees = await getDuplicatedAttendee({
+    const { duplicatedAttendees } = await getDuplicatedAttendee({
       courseId: classId,
       newAttendees: attendeeList,
     });
 
-    const duplicatedAttendeeList = duplicatedAttendees.data.duplicatedAttendees;
-
-    duplicatedAttendeeList.forEach((attendee) => {
+    duplicatedAttendees.forEach((attendee) => {
       const id = attendee.id;
       const name = attendee.name;
       const note = attendee.note;

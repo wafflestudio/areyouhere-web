@@ -43,9 +43,7 @@ export type GetAttendeeDuplicateRequest = {
 
 export type GetAttendeeDuplicateResponse = {
   // if the attendee is new attendee, id will be null
-  data: {
-    duplicatedAttendees: PickPartial<AttendeeInfo, "id">[];
-  };
+  duplicatedAttendees: PickPartial<AttendeeInfo, "id">[];
 };
 
 export type DeleteAttendeeRequest = {
@@ -106,7 +104,7 @@ export const createAttendee = async (
 export const getDuplicatedAttendee = async (
   request: GetAttendeeDuplicateRequest
 ): Promise<GetAttendeeDuplicateResponse> => {
-  return axios.post("/api/attendee/duplicate", request);
+  return (await axios.post("/api/attendee/duplicate", request)).data;
 };
 
 export const deleteAttendee = async (
