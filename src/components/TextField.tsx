@@ -87,11 +87,7 @@ function MultiLineTextField({
 }: TextAreaProps) {
   return (
     <TextAreaContainer style={style}>
-      {label && (
-        <div>
-          <TextFieldLabel>{label}</TextFieldLabel>
-        </div>
-      )}
+      {label && <TextFieldLabel>{label}</TextFieldLabel>}
       <StyledTextArea {...props} style={textareaStyle} />
     </TextAreaContainer>
   );

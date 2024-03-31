@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 
 import { AttendeeInfo, ModalStateType, PickPartial } from "../../type.ts";
@@ -7,20 +7,22 @@ import Modal from "../Modal.tsx";
 import { StyledInput } from "../TextField.tsx";
 
 interface NamesakeModalProps {
-  close: () => void;
   state: ModalStateType;
-  namesakes: PickPartial<AttendeeInfo, "id">[][];
-  onNamesakeChanged?: (namesakes: PickPartial<AttendeeInfo, "id">[][]) => void;
-  onSubmitted?: () => void;
+  close: () => void;
+  initialNamesakes: PickPartial<AttendeeInfo, "id">[][];
+  attendeeList: string[];
+  onSubmit: (attendees: PickPartial<AttendeeInfo, "id">[]) => void;
 }
 
 function NamesakeModal({
   close,
   state,
-  namesakes,
-  onNamesakeChanged,
-  onSubmitted,
+  initialNamesakes,
+  attendeeList,
+  onSubmit,
 }: NamesakeModalProps) {
+  const [namesakes, setNamesakes] = useState(initialNamesakes);
+
   const isResolved = useMemo(() => {
     return namesakes.every((namesakeGroup) => {
       const notes = namesakeGroup.map((namesake) => namesake.note);
@@ -28,6 +30,11 @@ function NamesakeModal({
       return noteSet.size === notes.length;
     });
   }, [namesakes]);
+
+  useEffect(() => {
+    setNamesakes(initialNamesakes);
+  }, [initialNamesakes]);
+
   return (
     <Modal onBackgroundClick={close} state={state}>
       <Container>
@@ -44,7 +51,7 @@ function NamesakeModal({
             <>
               <NamesakeGroup key={groupIdx}>
                 {namesakeGroup.map((namesake, index) => (
-                  <NamesakeInputContainer>
+                  <NamesakeInputContainer key={index}>
                     <NamesakeLabelContainer>
                       <NamesakeInputLabel>{namesake.name}</NamesakeInputLabel>
                       {namesake.id != null && (
@@ -56,16 +63,23 @@ function NamesakeModal({
                     <NamesakeInput
                       value={namesake.note}
                       onChange={(e) => {
-                        const newNamesakes = [...namesakes];
-                        newNamesakes[groupIdx][index].note = e.target.value;
-                        onNamesakeChanged?.(newNamesakes);
+                        const updatedNamesakes = namesakes.map((group, gIdx) =>
+                          groupIdx === gIdx
+                            ? group.map((namesake, nIdx) =>
+                                index === nIdx
+                                  ? { ...namesake, note: e.target.value }
+                                  : namesake
+                              )
+                            : group
+                        );
+                        setNamesakes(updatedNamesakes);
                       }}
                       placeholder={"eg. email, student ID or A/B"}
                     />
                   </NamesakeInputContainer>
                 ))}
               </NamesakeGroup>
-              {groupIdx !== namesakes.length - 1 && <Divider />}
+              {groupIdx !== initialNamesakes.length - 1 && <Divider />}
             </>
           ))}
         </NamesakeGroupContainer>
@@ -74,7 +88,22 @@ function NamesakeModal({
             disabled={!isResolved}
             style={{ width: "100%" }}
             onClick={() => {
-              onSubmitted?.();
+              const updatedNewAttendees = attendeeList.map((attendee, idx) => {
+                const namesake = namesakes
+                  .flat()
+                  .find((ns) => ns.index === idx);
+                if (namesake && namesake.note) {
+                  return { name: attendee, note: namesake.note };
+                }
+                return { name: attendee, note: "" };
+              });
+
+              const finalAttendees = [
+                ...updatedNewAttendees,
+                ...namesakes.flat().filter((ns) => ns.id),
+              ];
+
+              onSubmit(finalAttendees);
             }}
           >
             Confirm
@@ -89,9 +118,11 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 
   padding: 4rem;
+
+  max-height: 80vh;
+  overflow-y: auto;
 
   h4 {
     ${({ theme }) => theme.typography.h4};
@@ -143,6 +174,9 @@ const NamesakeLabelContainer = styled.div`
 const NamesakeInputLabel = styled.span`
   ${({ theme }) => theme.typography.b3};
   color: ${({ theme }) => theme.colors.black};
+
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const NamesakeAlreadyExistChip = styled.div`

@@ -1,15 +1,17 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { updateCourse, useCourses } from "../../api/course.ts";
 import { PrimaryButton } from "../../components/Button.tsx";
-import UnknownNameCheckbox from "../../components/class/UnknownNameCheckbox.tsx";
 import { MultiLineTextField } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 import { useClassId } from "../../hooks/urlParse.tsx";
 
 function Settings() {
+  const navigate = useNavigate();
+
   const [className, setClassName] = useState("");
   const [description, setDescription] = useState("");
 
@@ -43,7 +45,7 @@ function Settings() {
   return (
     <Container>
       <TitleBar label="Class Settings" />
-      <CreatClassContainer>
+      <SettingContainer>
         <MultiLineTextField
           textareaStyle={{ height: "4.5rem" }}
           label="Name of your class"
@@ -67,11 +69,12 @@ function Settings() {
               description,
               onlyListNameAllowed,
             });
+            navigate(`/class/${classId}`);
           }}
         >
           Save Changes
         </PrimaryButton>
-      </CreatClassContainer>
+      </SettingContainer>
     </Container>
   );
 }
@@ -82,12 +85,12 @@ const Container = styled.div`
   align-items: flex-start;
 `;
 
-const CreatClassContainer = styled.div`
+const SettingContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
 
-  margin-left: 5rem;
+  margin-left: 6rem;
 
   & > * {
     margin-bottom: 3.4rem;

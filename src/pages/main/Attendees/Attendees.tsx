@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import {
   deleteAttendee,
   GetAttendeesResult,
+  updateAttendee,
   useAttendees,
 } from "../../../api/attendee.ts";
 import AlertModal from "../../../components/AlertModal.tsx";
-import AddAttendeesModal from "../../../components/attendees/AddAttendeesModal.tsx";
 import AttendeesItem from "../../../components/attendees/AttendeesItem.tsx";
 import {
   PrimaryButton,
@@ -18,25 +18,23 @@ import {
 } from "../../../components/Button.tsx";
 import Checkbox from "../../../components/Checkbox.tsx";
 import {
-  SessionTable,
-  SessionTableHead,
-  SessionTableHeadItem,
-} from "../../../components/sessions/SessionTable.tsx";
+  CheckboxHeadItem,
+  Table,
+  TableHead,
+  TableHeadItem,
+} from "../../../components/table/Table.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
+import { useCheckbox } from "../../../hooks/checkbox.tsx";
 import useModalState from "../../../hooks/modal.tsx";
 import { useClassId } from "../../../hooks/urlParse.tsx";
 import theme from "../../../styles/Theme.tsx";
 import { AttendeeInfo } from "../../../type.ts";
-import sessions from "../session/Sessions.tsx";
-
-interface CheckedState {
-  [key: number]: boolean;
-}
 
 function Attendees() {
   const classId = useClassId();
   const { data: attendees } = useAttendees(classId);
 
+  // 쿼리 관련
   const queryClient = useQueryClient();
   const { mutate: deleteAttendees } = useMutation({
     mutationFn: deleteAttendee,
@@ -45,43 +43,31 @@ function Attendees() {
       queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
     },
   });
+  const { mutate: updateAttendees } = useMutation({
+    mutationFn: updateAttendee,
+    mutationKey: ["updateAttendee"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
+      // cleanup
+      setTempAttendees(null);
+      setEditing(false);
+    },
+    onError: () => {
+      // TODO: show error message
+    },
+  });
 
-  // 체크 박스 관리
-  const [checkedState, setCheckedState] = useState<CheckedState>({});
-  const [isAllChecked, setIsAllChecked] = useState(false);
-
-  const handleCheckboxChange = (id: number) => {
-    setCheckedState((prevState) => ({
-      ...prevState,
-      [id]: !prevState[id],
-    }));
-  };
-
-  const handleMasterCheckboxChange = () => {
-    if (attendees == null) return;
-    const newCheckedState = !isAllChecked;
-    setIsAllChecked(newCheckedState);
-
-    const newAttendeesCheckedState = attendees.reduce(
-      (acc, attendee) => ({
-        ...acc,
-        [attendee.attendee.id]: newCheckedState,
-      }),
-      {}
-    );
-
-    setCheckedState(newAttendeesCheckedState);
-  };
-
-  const checkedCount = Object.values(checkedState).filter(Boolean).length;
-
-  useEffect(() => {
-    const allChecked =
-      attendees != null &&
-      attendees.length > 0 &&
-      attendees.every((attendee) => checkedState[attendee.attendee.id]);
-    setIsAllChecked(allChecked);
-  }, [checkedState, attendees]);
+  const {
+    checkedState,
+    setCheckedState,
+    isAllChecked,
+    handleCheckboxChange,
+    handleMasterCheckboxChange,
+    checkedCount,
+  } = useCheckbox({
+    items: attendees ?? [],
+    keyFn: (item) => item.attendee.id,
+  });
 
   // 유저 추가 관련
   const navigate = useNavigate();
@@ -110,14 +96,30 @@ function Attendees() {
       );
     }
 
-    setIsAllChecked(false);
+    // reset checked state
     setCheckedState({});
   };
 
   const handleSave = () => {
-    if (tempAttendees != null) {
-      // TODO: save tempAttendees
-      // TODO: call api
+    if (attendees != null && tempAttendees != null) {
+      // compare between tempAttendees and attendees
+      const originalAttendees = attendees.map((attendee) => attendee.attendee);
+      const originalAttendeesMap = new Map(
+        originalAttendees.map((a) => [a.id, a])
+      );
+      const newAttendees = tempAttendees.map((attendee) => attendee.attendee);
+      const changedAttendees = newAttendees.filter(
+        (attendee) =>
+          originalAttendeesMap.get(attendee.id)?.name !== attendee.name ||
+          originalAttendeesMap.get(attendee.id)?.note !== attendee.note
+      );
+      console.log(changedAttendees);
+
+      // send changed attendees to server
+      updateAttendees({
+        courseId: classId,
+        updatedAttendees: changedAttendees,
+      });
     }
   };
 
@@ -146,14 +148,7 @@ function Attendees() {
               >
                 Delete
               </SecondaryButton>
-              <PrimaryButton
-                onClick={() => {
-                  setTempAttendees(null);
-                  setEditing(false);
-                }}
-              >
-                Save
-              </PrimaryButton>
+              <PrimaryButton onClick={handleSave}>Save</PrimaryButton>
             </ActionContainer>
           ) : (
             <TertiaryButton
@@ -169,52 +164,52 @@ function Attendees() {
           )}
         </HeaderContainer>
         <ContentContainer>
-          <SessionTable>
-            <SessionTableHead>
+          <Table>
+            <TableHead>
               <tr>
                 {editing && (
-                  <CheckboxCell>
+                  <CheckboxHeadItem>
                     <Checkbox
                       checkboxId="masterCheckbox"
                       checked={isAllChecked}
                       onChange={handleMasterCheckboxChange}
                     />
-                  </CheckboxCell>
+                  </CheckboxHeadItem>
                 )}
-                <SessionTableHeadItem
+                <TableHeadItem
                   style={{
-                    width: "15rem",
+                    width: "20rem",
                     border: "none",
                   }}
                 >
                   Name
-                </SessionTableHeadItem>
-                <SessionTableHeadItem
+                </TableHeadItem>
+                <TableHeadItem
                   style={{
-                    width: "23.5rem",
+                    width: "20rem",
                     border: "none",
                   }}
                 >
                   Notes
-                </SessionTableHeadItem>
-                <SessionTableHeadItem
+                </TableHeadItem>
+                <TableHeadItem
                   style={{
                     width: "14rem",
                     border: "none",
                   }}
                 >
                   Attendance
-                </SessionTableHeadItem>
-                <SessionTableHeadItem
+                </TableHeadItem>
+                <TableHeadItem
                   style={{
                     width: "auto",
                     border: "none",
                   }}
                 >
                   Absence
-                </SessionTableHeadItem>
+                </TableHeadItem>
               </tr>
-            </SessionTableHead>
+            </TableHead>
             {(editing ? tempAttendees : attendees)?.map((attendee, index) => (
               <AttendeesItem
                 editing={editing}
@@ -235,9 +230,14 @@ function Attendees() {
                     setTempAttendees([...tempAttendees]);
                   }
                 }}
+                to={
+                  editing
+                    ? undefined
+                    : `/class/${classId}/attendee/${attendee.attendee.id}`
+                }
               />
             ))}
-          </SessionTable>
+          </Table>
         </ContentContainer>
       </Container>
       {/* 모달 */}
@@ -269,6 +269,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding-bottom: 5rem;
 `;
 
 const HeaderContainer = styled.div`
@@ -279,7 +280,7 @@ const HeaderContainer = styled.div`
   justify-content: space-between;
   margin-left: 6.2rem;
   margin-right: auto;
-  margin-bottom: 2.4rem;
+  margin-bottom: 1.6rem;
 
   h5 {
     ${theme.typography.h5};

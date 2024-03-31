@@ -4,13 +4,16 @@ import {
   CreateAttendeeRequest,
   DeleteAttendeeRequest,
   GetAttendeeDuplicateResponse,
+  GetAttendeeResult,
   GetAttendeesResponse,
+  UpdateAttendeeRequest,
 } from "../api/attendee";
 import { AttendeeInfo, PickPartial } from "../type.ts";
 
 import {
   GetMapping,
   PostMapping,
+  PutMapping,
   RequestConfig,
   RequestMapping,
 } from "./base.ts";
@@ -52,6 +55,48 @@ export class AttendeeMock {
     return [HttpStatusCode.Ok, { classAttendees } as GetAttendeesResponse];
   }
 
+  @GetMapping("/detail")
+  static getAttendee(config: RequestConfig) {
+    const attendeeId = parseInt(config.params.attendeeId, 10);
+    if (isNaN(attendeeId)) {
+      return [HttpStatusCode.BadRequest];
+    }
+
+    const course = DatabaseMock.courses.find((c) =>
+      c.attendees.some((a) => a.id === attendeeId)
+    );
+    if (!course) {
+      return [HttpStatusCode.NotFound];
+    }
+
+    const attendee = course.attendees.find((a) => a.id === attendeeId);
+    if (!attendee) {
+      return [HttpStatusCode.NotFound];
+    }
+
+    const attendanceInfo = course.sessions.map((session) => {
+      const sessionAttendance = session.attendances.find(
+        (a) => a.attendeeId === attendeeId
+      );
+      return {
+        attendanceId: sessionAttendance?.id || -1,
+        sessionName: session.name,
+        attendanceStatus: sessionAttendance?.attendanceStatus || false,
+        attendanceTime: sessionAttendance?.date || new Date(),
+      };
+    });
+
+    return [
+      HttpStatusCode.Ok,
+      {
+        attendee: attendee,
+        attendance: attendanceInfo.filter((a) => a.attendanceStatus).length,
+        absence: attendanceInfo.filter((a) => !a.attendanceStatus).length,
+        attendanceInfo,
+      } as GetAttendeeResult,
+    ];
+  }
+
   @PostMapping()
   static createAttendee(config: RequestConfig) {
     const data = JSON.parse(config.data) as CreateAttendeeRequest;
@@ -82,6 +127,40 @@ export class AttendeeMock {
           (a) => !data.attendeeIds.includes(a.attendeeId)
         );
       });
+    });
+    DatabaseMock.update();
+    return [HttpStatusCode.Ok];
+  }
+
+  @PutMapping()
+  static updateAttendee(config: RequestConfig) {
+    const data = JSON.parse(config.data) as UpdateAttendeeRequest;
+    const course = DatabaseMock.courses.find((c) => c.id === data.courseId);
+    if (!course) {
+      return [HttpStatusCode.NotFound];
+    }
+
+    // check duplicate
+    const updateIds = new Set(data.newAttendees.map((a) => a.id));
+    const notChangedAttendees = course.attendees.filter(
+      (a) => !updateIds.has(a.id)
+    );
+    const nameNoteCounts: Record<string, number> = {};
+    [...notChangedAttendees, ...data.newAttendees].forEach((attendee) => {
+      const key = `${attendee.name}\t${attendee.note}`;
+      const count = nameNoteCounts[key] || 0;
+      nameNoteCounts[key] = count + 1;
+    });
+
+    console.log(nameNoteCounts);
+    if (Object.values(nameNoteCounts).some((count) => count > 1)) {
+      return [HttpStatusCode.BadRequest];
+    }
+
+    // update by id
+    course.attendees = course.attendees.map((attendee) => {
+      const newAttendee = data.newAttendees.find((a) => a.id === attendee.id);
+      return newAttendee || attendee;
     });
     DatabaseMock.update();
     return [HttpStatusCode.Ok];

@@ -1,8 +1,10 @@
-import styled, { css } from "styled-components";
-
 import { AttendeeInfo } from "../../type.ts";
 import Checkbox from "../Checkbox.tsx";
-import { SessionTableItem } from "../sessions/SessionTable.tsx";
+import {
+  CheckboxItem,
+  SelectableTableRow,
+  TableItem,
+} from "../table/Table.tsx";
 import { StyledInput } from "../TextField.tsx";
 
 interface AttendeesItemProps {
@@ -14,6 +16,7 @@ interface AttendeesItemProps {
   onCheckboxChange: () => void;
   onAttendeeChange?: (attendee: AttendeeInfo) => void;
   onDelete?: () => void;
+  to?: string;
 }
 
 function AttendeesItem({
@@ -24,33 +27,61 @@ function AttendeesItem({
   isChecked,
   onCheckboxChange,
   onAttendeeChange,
+  to,
 }: AttendeesItemProps) {
   return (
-    <CustomTr isChecked={isChecked}>
+    <SelectableTableRow selected={isChecked}>
       {editing && (
-        <CheckboxCell>
+        <CheckboxItem>
           <Checkbox
             checkboxId={`checkbox-${attendee.id}`}
             checked={isChecked}
             onChange={onCheckboxChange}
           />
-        </CheckboxCell>
+        </CheckboxItem>
       )}
-      <SessionTableItem
+      <TableItem
         style={{
           border: "none",
           color: isChecked ? "white" : "black",
+          paddingTop: 0,
+          paddingBottom: 0,
+          paddingRight: 0,
         }}
+        to={to}
       >
-        {attendee.name}
-      </SessionTableItem>
-      <SessionTableItem
+        {editing ? (
+          <StyledInput
+            style={{
+              width: "100%",
+            }}
+            value={attendee.name}
+            onChange={(e) => {
+              if (onAttendeeChange) {
+                onAttendeeChange({ ...attendee, name: e.target.value });
+              }
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {attendee.name}
+          </div>
+        )}
+      </TableItem>
+      <TableItem
         style={{
           border: "none",
           color: isChecked ? "white" : "black",
           paddingTop: 0,
           paddingBottom: 0,
         }}
+        to={to}
       >
         {editing ? (
           <StyledInput
@@ -62,51 +93,37 @@ function AttendeesItem({
             }}
           />
         ) : (
-          <>{attendee.note}</>
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {attendee.note}
+          </div>
         )}
-      </SessionTableItem>
-      <SessionTableItem
+      </TableItem>
+      <TableItem
         style={{
           border: "none",
           color: isChecked ? "white" : "black",
         }}
+        to={to}
       >
         {attendance}
-      </SessionTableItem>
-      <SessionTableItem
+      </TableItem>
+      <TableItem
         style={{
           border: "none",
           color: isChecked ? "white" : "black",
         }}
+        to={to}
       >
         {absence}
-      </SessionTableItem>
-    </CustomTr>
+      </TableItem>
+    </SelectableTableRow>
   );
 }
-
-interface CustomTrProps {
-  isChecked: boolean;
-}
-
-const CustomTr = styled.tr<CustomTrProps>`
-  border: 1px solid ${({ theme }) => theme.colors.grey};
-  background-color: ${({ isChecked, theme }) =>
-    isChecked ? theme.colors.primary["400"] : "white"};
-
-  ${({ isChecked }) =>
-    !isChecked &&
-    css`
-      &:hover {
-        background-color: ${({ theme }) => theme.colors.primary["50"]};
-      }
-    `}
-`;
-
-const CheckboxCell = styled.td`
-  text-align: center;
-  vertical-align: middle;
-  padding: 1.5rem 2.5rem 1.5rem 3rem;
-`;
 
 export default AttendeesItem;
