@@ -178,7 +178,7 @@ function Attendees() {
                 )}
                 <TableHeadItem
                   style={{
-                    width: "15rem",
+                    width: "20rem",
                     border: "none",
                   }}
                 >
@@ -186,7 +186,7 @@ function Attendees() {
                 </TableHeadItem>
                 <TableHeadItem
                   style={{
-                    width: "23.5rem",
+                    width: "20rem",
                     border: "none",
                   }}
                 >
@@ -269,6 +269,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding-bottom: 5rem;
 `;
 
 const HeaderContainer = styled.div`
@@ -279,7 +280,7 @@ const HeaderContainer = styled.div`
   justify-content: space-between;
   margin-left: 6.2rem;
   margin-right: auto;
-  margin-bottom: 2.4rem;
+  margin-bottom: 1.6rem;
 
   h5 {
     ${theme.typography.h5};

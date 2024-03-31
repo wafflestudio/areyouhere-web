@@ -8,13 +8,31 @@ export interface InfoBarProps extends React.HTMLAttributes<HTMLDivElement> {
 function InfoBar({ values, ...props }: InfoBarProps) {
   return (
     <Container {...props}>
-      <SessionInfoItem style={{ width: "18rem" }}>
+      <SessionInfoItem style={{ width: "25rem" }}>
         <SessionInfoLabel>{values[0].label}</SessionInfoLabel>
-        <SessionInfoContent>{values[0].value}</SessionInfoContent>
+        <SessionInfoContent
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "25rem",
+          }}
+        >
+          {values[0].value}
+        </SessionInfoContent>
       </SessionInfoItem>
       <SessionInfoItem style={{ flex: "1" }}>
         <SessionInfoLabel>{values[1].label}</SessionInfoLabel>
-        <SessionInfoContent>{values[1].value}</SessionInfoContent>
+        <SessionInfoContent
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "35.7rem",
+          }}
+        >
+          {values[1].value}
+        </SessionInfoContent>
       </SessionInfoItem>
       <SessionInfoItem style={{ width: "20rem" }}>
         <SessionInfoLabel>{values[2].label}</SessionInfoLabel>

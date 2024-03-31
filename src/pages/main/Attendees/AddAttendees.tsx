@@ -26,10 +26,6 @@ function AddAttendees() {
   const [namesakeModalState, openNamesakeModal, closeNamesakeModal] =
     useModalState();
 
-  const [newAttendees, setNewAttendees] = useState<
-    PickPartial<AttendeeInfo, "id">[]
-  >([]);
-
   // 유저 추가 api
   const classId = useClassId();
   const queryClient = useQueryClient();
@@ -44,14 +40,14 @@ function AddAttendees() {
   const submit = async () => {
     // 1. arrange by name
     const nameMap = new Map<string, number>();
-    const namesakes: PickPartial<AttendeeInfo, "id">[][] = [];
-    attendeeList.forEach((name) => {
+    const namesakeArray: PickPartial<AttendeeInfo, "id">[][] = [];
+    attendeeList.forEach((name, index) => {
       if (nameMap.has(name)) {
         const idx = nameMap.get(name)!;
-        namesakes[idx].push({ name, note: "" });
+        namesakeArray[idx].push({ name, note: "", index: index });
       } else {
-        nameMap.set(name, namesakes.length);
-        namesakes.push([{ name, note: "" }]);
+        nameMap.set(name, namesakeArray.length);
+        namesakeArray.push([{ name, note: "", index: index }]);
       }
     });
 
@@ -70,29 +66,21 @@ function AddAttendees() {
       if (id) {
         if (nameMap.has(name)) {
           const idx = nameMap.get(name)!;
-          namesakes[idx].push({ id, name, note });
+          namesakeArray[idx].push({ id, name, note });
         } else {
-          nameMap.set(name, namesakes.length);
-          namesakes.push([{ id, name, note }]);
+          nameMap.set(name, namesakeArray.length);
+          namesakeArray.push([{ id, name, note }]);
         }
       }
     });
 
-    // 3. separate namesakes and unique attendees
-    const namesakeAttendees = [] as PickPartial<AttendeeInfo, "id">[][];
-    const newAttendees = [] as PickPartial<AttendeeInfo, "id">[];
+    // 2. filter namesakes
+    const filteredNamesakes: PickPartial<AttendeeInfo, "id">[][] =
+      namesakeArray.filter((namesake) => namesake.length > 1);
 
-    namesakes.forEach((namesake) => {
-      if (namesake.length > 1) {
-        namesakeAttendees.push(namesake);
-      }
-      newAttendees.push({ name: namesake[0].name, note: "" });
-    });
-    setNewAttendees(newAttendees);
-
-    // 4. if namesakes exist, open modal
-    if (namesakeAttendees.length > 0) {
-      setNamesakes(namesakeAttendees);
+    // 3. if namesakes exist, open modal
+    if (filteredNamesakes.length > 0) {
+      setNamesakes(filteredNamesakes);
       openNamesakeModal();
       return;
     }
@@ -111,13 +99,13 @@ function AddAttendees() {
     <>
       <NamesakeModal
         state={namesakeModalState}
-        initialNamesakes={namesakes}
         close={closeNamesakeModal}
-        onNamesakeChanged={setNamesakes}
-        onSubmit={() => {
+        initialNamesakes={namesakes}
+        attendeeList={attendeeList}
+        onSubmit={(attendees) => {
           createAttendees({
             courseId: classId!,
-            newAttendees: newAttendees.flat(),
+            newAttendees: attendees,
           });
           closeNamesakeModal();
           navigate(-1);

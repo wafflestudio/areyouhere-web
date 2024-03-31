@@ -144,7 +144,7 @@ const ContentContainer = styled.div`
   width: 100rem;
   margin-left: 6.3rem;
   margin-right: auto;
-  margin-bottom: 13.2rem;
+  margin-bottom: 5rem;
 `;
 
 const Subtitle = styled.p`

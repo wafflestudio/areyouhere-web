@@ -54,13 +54,9 @@ function CreateClass() {
     const filteredNamesakes: PickPartial<AttendeeInfo, "id">[][] =
       namesakeArray.filter((namesake) => namesake.length > 1);
 
-    console.log(namesakeArray);
-    console.log(filteredNamesakes);
-
     // 3. if namesakes exist, open modal
     if (filteredNamesakes.length > 0) {
       setNamesakes(filteredNamesakes);
-      console.log(namesakes);
       openNamesakeModal();
       return;
     }
@@ -86,7 +82,7 @@ function CreateClass() {
         close={closeNamesakeModal}
         initialNamesakes={namesakes}
         attendeeList={attendeeList}
-        onSubmit={(attendees: PickPartial<AttendeeInfo, "id">[]) => {
+        onSubmit={(attendees) => {
           createClass({
             name: className,
             description,

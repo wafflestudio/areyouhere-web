@@ -105,6 +105,7 @@ function Attendee() {
               label: "Name",
               value: isEditing ? (
                 <StyledInput
+                  style={{ width: "25rem" }}
                   value={tempAttendee!.name}
                   onChange={(e) =>
                     setTempAttendee({
@@ -121,6 +122,7 @@ function Attendee() {
               label: "Note",
               value: isEditing ? (
                 <StyledInput
+                  style={{ width: "35.7rem" }}
                   value={tempAttendee!.note}
                   onChange={(e) =>
                     setTempAttendee({
@@ -150,9 +152,7 @@ function Attendee() {
           <TableHead>
             <TableRow>
               <TableHeadItem noBorders>Date</TableHeadItem>
-              <TableHeadItem noBorders style={{ width: "24rem" }}>
-                Session Name
-              </TableHeadItem>
+              <TableHeadItem noBorders>Session Name</TableHeadItem>
               <TableHeadItem noBorders>Attendance Status</TableHeadItem>
               <TableHeadItem noBorders>Time of Attendance</TableHeadItem>
             </TableRow>
@@ -166,7 +166,17 @@ function Attendee() {
                 <TableItem noBorders>
                   {dateFormat(attendance.attendanceTime, "yyyy-mm-dd")}
                 </TableItem>
-                <TableItem noBorders>{attendance.sessionName}</TableItem>
+                <TableItem
+                  noBorders
+                  style={{
+                    width: "24rem",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {attendance.sessionName}
+                </TableItem>
                 <TableItem noBorders>
                   {isEditing ? (
                     <AttendanceChipContainer>
@@ -233,6 +243,7 @@ const ContentContainer = styled.div`
   flex-direction: column;
   margin-left: 6.2rem;
   margin-right: auto;
+  margin-bottom: 5rem;
 `;
 
 const AttendanceChipContainer = styled.div`

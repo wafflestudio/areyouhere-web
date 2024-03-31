@@ -120,7 +120,14 @@ function SessionDetail() {
               })
               .map(({ attendee, index }) => (
                 <tr>
-                  <TableItem style={{ width: "24rem" }}>
+                  <TableItem
+                    style={{
+                      width: "24rem",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
                     {attendee.attendee.name}
                   </TableItem>
                   <TableItem>
@@ -190,6 +197,7 @@ const ContentContainer = styled.div`
   flex-direction: column;
   margin-left: 6.2rem;
   margin-right: auto;
+  margin-bottom: 5rem;
 `;
 
 const AttendanceChipContainer = styled.div`

@@ -52,7 +52,9 @@ function AttendeesItem({
       >
         {editing ? (
           <StyledInput
-            style={{ width: "100%" }}
+            style={{
+              width: "100%",
+            }}
             value={attendee.name}
             onChange={(e) => {
               if (onAttendeeChange) {
@@ -61,7 +63,15 @@ function AttendeesItem({
             }}
           />
         ) : (
-          <>{attendee.name}</>
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {attendee.name}
+          </div>
         )}
       </TableItem>
       <TableItem
@@ -83,7 +93,15 @@ function AttendeesItem({
             }}
           />
         ) : (
-          <>{attendee.note}</>
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {attendee.note}
+          </div>
         )}
       </TableItem>
       <TableItem

@@ -61,13 +61,23 @@ function SessionItem({
       >
         {editing ? (
           <StyledInput
+            style={{ width: "50rem" }}
             value={session.name}
             onChange={(e) => {
               onSessionChange?.({ ...session, name: e.target.value });
             }}
           />
         ) : (
-          <>{session.name}</>
+          <div
+            style={{
+              maxWidth: "65rem",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {session.name}
+          </div>
         )}
       </TableItem>
       <TableItem

@@ -92,13 +92,18 @@ function NamesakeModal({
                 const namesake = namesakes
                   .flat()
                   .find((ns) => ns.index === idx);
-                if (namesake && namesake.note !== undefined) {
+                if (namesake && namesake.note) {
                   return { name: attendee, note: namesake.note };
                 }
                 return { name: attendee, note: "" };
               });
 
-              onSubmit(updatedNewAttendees);
+              const finalAttendees = [
+                ...updatedNewAttendees,
+                ...namesakes.flat().filter((ns) => ns.id),
+              ];
+
+              onSubmit(finalAttendees);
             }}
           >
             Confirm
@@ -113,9 +118,11 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 
   padding: 4rem;
+
+  max-height: 80vh;
+  overflow-y: auto;
 
   h4 {
     ${({ theme }) => theme.typography.h4};
@@ -167,6 +174,9 @@ const NamesakeLabelContainer = styled.div`
 const NamesakeInputLabel = styled.span`
   ${({ theme }) => theme.typography.b3};
   color: ${({ theme }) => theme.colors.black};
+
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const NamesakeAlreadyExistChip = styled.div`
