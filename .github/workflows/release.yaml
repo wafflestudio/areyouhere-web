@@ -25,15 +25,21 @@ jobs:
     - name: Build React App
       run: npm run build
 
-    - name: Configure SSH
-      uses: webfactory/ssh-agent@v0.9.0
+    - name: Deploy via SCP
+      uses: appleboy/scp-action@v0.1.7
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        host: ${{ env.SERVER_HOST }}
+        username: ${{ env.SERVER_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ env.SERVER_SSH_PORT }}
+        source: './dist/*'
+        target: ${{ env.DEPLOY_TARGET }}
 
-    - name: Deploy via SSH
-      run: |
-        scp -r ./dist/* ubuntu@areyouhere.today:~/project/areyouhere-web
-
-    - name: Restart Nginx
-      run: |
-        ssh ubuntu@areyouhere.today 'sudo systemctl restart nginx'
+    - name: Restart nginx
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}
+        script: sudo systemctl restart nginx
