@@ -1,72 +1,129 @@
-import styled from "styled-components";
-
-import { Attendee } from "../../type.ts";
+import { AttendeeInfo } from "../../type.ts";
 import Checkbox from "../Checkbox.tsx";
-import { SessionTableItem } from "../sessions/SessionTable.tsx";
+import {
+  CheckboxItem,
+  SelectableTableRow,
+  TableItem,
+} from "../table/Table.tsx";
+import { StyledInput } from "../TextField.tsx";
 
 interface AttendeesItemProps {
-  attendee: Attendee;
+  editing: boolean;
+  attendee: AttendeeInfo;
+  attendance: number;
+  absence: number;
   isChecked: boolean;
   onCheckboxChange: () => void;
+  onAttendeeChange?: (attendee: AttendeeInfo) => void;
   onDelete?: () => void;
+  to?: string;
 }
 
 function AttendeesItem({
+  editing,
   attendee,
+  attendance,
+  absence,
   isChecked,
   onCheckboxChange,
+  onAttendeeChange,
+  to,
 }: AttendeesItemProps) {
   return (
-    <CustomTr isChecked={isChecked}>
-      <CheckboxCell>
-        <Checkbox
-          checkboxId={`checkbox-${attendee.id}`}
-          checked={isChecked}
-          onChange={onCheckboxChange}
-        />
-      </CheckboxCell>
-      <SessionTableItem
+    <SelectableTableRow selected={isChecked}>
+      {editing && (
+        <CheckboxItem>
+          <Checkbox
+            checkboxId={`checkbox-${attendee.id}`}
+            checked={isChecked}
+            onChange={onCheckboxChange}
+          />
+        </CheckboxItem>
+      )}
+      <TableItem
+        style={{
+          border: "none",
+          color: isChecked ? "white" : "black",
+          paddingTop: 0,
+          paddingBottom: 0,
+          paddingRight: 0,
+        }}
+        to={to}
+      >
+        {editing ? (
+          <StyledInput
+            style={{
+              width: "100%",
+            }}
+            value={attendee.name}
+            onChange={(e) => {
+              if (onAttendeeChange) {
+                onAttendeeChange({ ...attendee, name: e.target.value });
+              }
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {attendee.name}
+          </div>
+        )}
+      </TableItem>
+      <TableItem
+        style={{
+          border: "none",
+          color: isChecked ? "white" : "black",
+          paddingTop: 0,
+          paddingBottom: 0,
+        }}
+        to={to}
+      >
+        {editing ? (
+          <StyledInput
+            value={attendee.note}
+            onChange={(e) => {
+              if (onAttendeeChange) {
+                onAttendeeChange({ ...attendee, note: e.target.value });
+              }
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {attendee.note}
+          </div>
+        )}
+      </TableItem>
+      <TableItem
         style={{
           border: "none",
           color: isChecked ? "white" : "black",
         }}
+        to={to}
       >
-        {attendee.name}
-      </SessionTableItem>
-      <SessionTableItem
+        {attendance}
+      </TableItem>
+      <TableItem
         style={{
           border: "none",
           color: isChecked ? "white" : "black",
         }}
+        to={to}
       >
-        {attendee.attendance}
-      </SessionTableItem>
-      <SessionTableItem
-        style={{
-          border: "none",
-          color: isChecked ? "white" : "black",
-        }}
-      >
-        {attendee.absence}
-      </SessionTableItem>
-    </CustomTr>
+        {absence}
+      </TableItem>
+    </SelectableTableRow>
   );
 }
-
-interface CustomTrProps {
-  isChecked: boolean;
-}
-
-const CustomTr = styled.tr<CustomTrProps>`
-  border: 1px solid ${({ theme }) => theme.colors.grey};
-  background-color: ${({ isChecked, theme }) =>
-    isChecked ? theme.colors.primary["400"] : "white"};
-`;
-
-const CheckboxCell = styled.td`
-  width: 4rem;
-  vertical-align: middle;
-  padding: 1.5rem 2.5rem 1.5rem 3rem;
-`;
 
 export default AttendeesItem;

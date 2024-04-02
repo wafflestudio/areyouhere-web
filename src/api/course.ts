@@ -1,14 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
+import { AttendeeInfo } from "../type.ts";
+
 export type CourseCreationRequest = {
   name: string;
   description: string;
-  attendees: string[];
+  attendees: Omit<AttendeeInfo, "id">[];
   onlyListNameAllowed: boolean;
 };
 
 export type CourseUpdateRequest = {
+  id: number;
   name: string;
   description: string;
   onlyListNameAllowed: boolean;
@@ -18,12 +21,27 @@ export type Course = {
   id: number;
   name: string;
   description: string;
-  attendees: string[];
   allowOnlyRegistered: boolean;
 };
 
-export const getCourses = async (): Promise<Course[]> => {
-  return (await axios.get<Course[]>("/api/course")).data;
+export type CoursePreview = {
+  id: number;
+  name: string;
+  description: string;
+  attendees: number;
+  allowOnlyRegistered: boolean;
+};
+
+export type CourseListResponse = {
+  courses: CoursePreview[];
+};
+
+export const getCourses = async (): Promise<CoursePreview[]> => {
+  return (await axios.get<CourseListResponse>("/api/course")).data.courses;
+};
+
+export const getCourse = async (id: number): Promise<Course> => {
+  return (await axios.get<Course>(`/api/course/${id}`)).data;
 };
 
 export const createCourse = async (
@@ -33,10 +51,10 @@ export const createCourse = async (
 };
 
 export const updateCourse = async (
-  id: number,
   request: CourseUpdateRequest
 ): Promise<void> => {
-  return axios.put(`/api/course/${id}`, request);
+  const { id, ...rest } = request;
+  return axios.put(`/api/course/${id}`, rest);
 };
 
 export const deleteCourse = async (id: number): Promise<void> => {
@@ -44,8 +62,15 @@ export const deleteCourse = async (id: number): Promise<void> => {
 };
 
 export const useCourses = () => {
-  return useQuery<Course[]>({
+  return useQuery<CoursePreview[]>({
     queryKey: ["courses"],
     queryFn: getCourses,
+  });
+};
+
+export const useCourse = (id: number) => {
+  return useQuery<Course>({
+    queryKey: ["course", id],
+    queryFn: () => getCourse(id),
   });
 };

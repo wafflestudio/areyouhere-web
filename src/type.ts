@@ -1,3 +1,5 @@
+import React from "react";
+
 export type ModalStateType = "open" | "closed" | "closing";
 
 export type ModalStateHookType = [ModalStateType, () => void, () => void];
@@ -8,9 +10,12 @@ export type ModalProps = {
   onBackgroundClick: () => void;
 };
 
-export interface Attendee {
+export interface AttendeeInfo {
   id: number;
   name: string;
-  attendance: number;
-  absence: number;
+  note?: string;
+  index?: number;
 }
+
+export type PickPartial<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>> &
+  Partial<Pick<T, K>>;

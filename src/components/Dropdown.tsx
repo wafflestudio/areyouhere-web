@@ -1,7 +1,5 @@
 import styled from "styled-components";
 
-import dotsVerticalGrey from "../assets/class/dotsVerticalGrey.svg";
-
 const DropdownContainer = styled.div`
   position: relative;
 `;
@@ -12,7 +10,6 @@ const DropdownButton = styled.button`
   height: 2.4rem;
   background: none;
   border: none;
-  background-image: url(${dotsVerticalGrey});
 
   cursor: pointer;
 `;

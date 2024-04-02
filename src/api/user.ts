@@ -19,11 +19,11 @@ export type User = {
 
 export const EMAIL_REGEX =
   "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
-export const PASSWORD_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$";
+export const PASSWORD_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[\\W_]).{8,20}$";
 export const NICKNAME_REGEX = "^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣]{2,16}$";
 
 export const getUser = async (): Promise<User | null> => {
-  const res = await axios.get<User>("/api/manager", {
+  const res = await axios.get<User>("/api/auth/me", {
     validateStatus: () => true,
   });
   if (res.status === HttpStatusCode.Ok) {
@@ -34,13 +34,13 @@ export const getUser = async (): Promise<User | null> => {
 };
 
 export const signUp = async (request: SignUpRequest): Promise<void> => {
-  return await axios.post("/api/manager", request, {
+  return await axios.post("/api/auth/signup", request, {
     withCredentials: true,
   });
 };
 
 export const signIn = async (request: SignInRequest): Promise<void> => {
-  const res = await axios.post("/api/manager/login", request, {
+  const res = await axios.post("/api/auth/login", request, {
     validateStatus: () => true,
     withCredentials: true,
   });
@@ -53,7 +53,7 @@ export const signIn = async (request: SignInRequest): Promise<void> => {
 };
 
 export const logout = async (): Promise<void> => {
-  return axios.get("/api/manager/logout", {
+  return axios.get("/api/auth/logout", {
     withCredentials: true,
   });
 };
@@ -81,7 +81,8 @@ export const isEmailConflict = async (
 
   console.log("isEmailConflict", email);
 
-  const res = await axios.get(`/api/manager/${email}`, {
+  const res = await axios.get(`/api/auth/email-availability`, {
+    params: { email },
     validateStatus: () => true,
   });
 

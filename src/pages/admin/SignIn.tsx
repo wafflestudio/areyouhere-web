@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -40,9 +40,11 @@ function SignIn() {
     },
   });
 
-  if (user != null) {
-    navigate("/class");
-  }
+  useEffect(() => {
+    if (user != null) {
+      navigate("/class");
+    }
+  }, [navigate, user]);
 
   return (
     <Container>
@@ -117,6 +119,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  width: 100%;
 `;
 
 const LoginContainer = styled.div`

@@ -1,51 +1,78 @@
 import { HttpStatusCode } from "axios";
-import AxiosMockAdapter from "axios-mock-adapter";
 
-let logined = true;
+import { SignInRequest, SignUpRequest } from "../api/user.ts";
 
-function addUserMock(mock: AxiosMockAdapter) {
-  mock.onPost("/api/manager").reply(() => {
-    console.log("post /api/manager");
-    logined = true;
+import {
+  GetMapping,
+  PostMapping,
+  RequestConfig,
+  RequestMapping,
+} from "./base.ts";
+import { DatabaseMock } from "./database.ts";
+
+@RequestMapping("/api/auth")
+export class AuthMock {
+  @PostMapping("/signup")
+  static signUp(config: RequestConfig) {
+    const data = JSON.parse(config.data) as SignUpRequest;
+    DatabaseMock.users.push({
+      id: DatabaseMock.nextUserId++,
+      email: data.email,
+      name: data.nickname,
+      password: data.password,
+    });
+    DatabaseMock.update();
     return [HttpStatusCode.Ok];
-  });
+  }
 
-  mock.onPost("/api/manager/login").reply((config) => {
-    const data = JSON.parse(config.data);
-    if (data.email === "test@example.com") {
-      logined = true;
-      return [HttpStatusCode.Ok];
-    } else {
-      return [HttpStatusCode.BadRequest];
+  @PostMapping("/login")
+  static login(config: RequestConfig) {
+    const data = JSON.parse(config.data) as SignInRequest;
+    for (let i = 0; i < DatabaseMock.users.length; i++) {
+      const user = DatabaseMock.users[i];
+      if (user.email === data.email) {
+        if (user.password === data.password) {
+          DatabaseMock.currentUser = i;
+          DatabaseMock.update();
+          return [HttpStatusCode.Ok];
+        } else {
+          return [HttpStatusCode.BadRequest];
+        }
+      }
     }
-  });
+    return [HttpStatusCode.BadRequest];
+  }
 
-  mock.onGet("/api/manager/logout").reply(() => {
-    logined = false;
+  @GetMapping("/logout")
+  static logout() {
+    DatabaseMock.currentUser = -1;
+    DatabaseMock.update();
     return [HttpStatusCode.Ok];
-  });
+  }
 
-  mock.onGet("/api/manager").reply(() => {
-    if (logined) {
+  @GetMapping("/me")
+  static me() {
+    if (DatabaseMock.currentUser !== -1) {
       return [
         HttpStatusCode.Ok,
         {
-          name: "test user",
+          email: DatabaseMock.users[DatabaseMock.currentUser].email,
+          name: DatabaseMock.users[DatabaseMock.currentUser].name,
         },
       ];
     } else {
       return [HttpStatusCode.Unauthorized];
     }
-  });
+  }
 
-  mock.onGet(/\/api\/manager\/.+/).reply((config) => {
-    const email = config.url?.split("/").pop();
-    if (email === "test@example.com") {
-      return [HttpStatusCode.Conflict];
-    } else {
-      return [HttpStatusCode.Ok];
+  @GetMapping("/email-availability")
+  static emailAvailability(config: RequestConfig) {
+    const email = config.params.email;
+    for (let i = 0; i < DatabaseMock.users.length; i++) {
+      if (DatabaseMock.users[i].email === email) {
+        return [HttpStatusCode.Conflict];
+      }
     }
-  });
+    return [HttpStatusCode.Ok];
+  }
 }
-
-export default addUserMock;

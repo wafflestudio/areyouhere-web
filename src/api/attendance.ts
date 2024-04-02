@@ -1,10 +1,42 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { HttpStatusCode } from "axios";
+
+import { AttendeeInfo } from "../type.ts";
 
 export type AttendanceRequest = {
   attendeeName: string;
   authCode: string;
+  attendeeId?: number;
 };
+
+export type AttendanceOneChoiceResponse = {
+  attendanceName: string;
+  sessionName: string;
+  courseName: string;
+  attendanceTime: Date;
+};
+
+export type AttendanceMultipleChoicesResponse = {
+  attendeeNotes: Omit<AttendeeInfo, "name">[];
+};
+
+export type AttendanceResult =
+  | {
+      type: "oneChoice";
+      response: AttendanceOneChoiceResponse;
+    }
+  | {
+      type: "multipleChoices";
+      response: AttendanceMultipleChoicesResponse;
+    };
+
+export enum AttendanceErrorCode {
+  InvalidAuthCode = "InvalidAuthCode",
+  InvalidName = "InvalidName",
+  FailedToAttend = "FailedToAttend",
+  AlreadyAttended = "AlreadyAttended",
+  DifferentName = "DifferentName",
+}
 
 export type AttendanceStatus = {
   attendances: number;
@@ -12,14 +44,42 @@ export type AttendanceStatus = {
 };
 
 export type UpdateAttendee = {
-  attendeeId: number;
+  attendanceId: number;
   attendanceStatus: boolean;
 };
 
-export const attend = async (request: AttendanceRequest): Promise<void> => {
-  const res = await axios.post("/api/attendance", request);
-  if (res.status !== 200) {
-    throw new Error("Invalid passcode");
+export type UpdateAttendanceStatusRequest = {
+  updateAttendances: UpdateAttendee[];
+};
+
+export const postAttend = async (
+  request: AttendanceRequest
+): Promise<AttendanceResult> => {
+  const res = await axios.post("/api/attendance", request, {
+    validateStatus: () => true,
+  });
+  if (res.status === HttpStatusCode.Ok) {
+    const data = res.data as AttendanceOneChoiceResponse;
+    data.attendanceTime = new Date(data.attendanceTime);
+    return {
+      type: "oneChoice",
+      response: data,
+    };
+  } else if (res.status === HttpStatusCode.MultipleChoices) {
+    return {
+      type: "multipleChoices",
+      response: res.data as AttendanceMultipleChoicesResponse,
+    };
+  } else if (res.status === HttpStatusCode.NotFound) {
+    throw new Error(AttendanceErrorCode.InvalidAuthCode);
+  } else if (res.status === HttpStatusCode.BadRequest) {
+    throw new Error(AttendanceErrorCode.AlreadyAttended);
+  } else if (res.status === HttpStatusCode.Forbidden) {
+    throw new Error(AttendanceErrorCode.DifferentName);
+  } else if (res.status === HttpStatusCode.NoContent) {
+    throw new Error(AttendanceErrorCode.InvalidName);
+  } else {
+    throw new Error(AttendanceErrorCode.FailedToAttend);
   }
 };
 
@@ -30,16 +90,19 @@ export const getAttendanceStatus = async (
   if (sessionId == null) {
     return { attendances: 0, total: 0 };
   }
-  const res = await axios.get(`/api/attendance/${courseId}/${sessionId}`);
+  const res = await axios.get(`/api/attendance`, {
+    params: {
+      courseId,
+      sessionId,
+    },
+  });
   return res.data;
 };
 
-// /api/attendance/update
-// {updateAttendances: [{attendanceId : "Long", attendanceStatus : "boolean"}, ... {...}, ..., {...}]}
-export const updateAttendances = async (
-  updateAttendances: UpdateAttendee[]
+export const updateAttendanceStatus = async (
+  request: UpdateAttendanceStatusRequest
 ): Promise<void> => {
-  await axios.post("/api/attendance/update", { updateAttendances });
+  await axios.put("/api/attendance", request);
 };
 
 export const useAttendanceStatus = (courseId: number, sessionId?: number) => {

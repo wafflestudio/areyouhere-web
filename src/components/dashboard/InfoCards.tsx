@@ -1,26 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
-import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 import { useAttendanceStatus } from "../../api/attendance";
 import { createAuthCode, deactivateAuthCode } from "../../api/authCode";
 import { useCurrentSessionInfo } from "../../api/dashboard";
 import expandDarkGrey from "../../assets/dashboard/expandDarkGrey.svg";
-import { useClassId } from "../../hooks/urlParse";
+import { useClassId, useSessionId } from "../../hooks/urlParse";
 import { SecondaryButton } from "../Button";
 
 interface InfoCardsProps extends React.HTMLAttributes<HTMLDivElement> {
-  hasSession?: boolean;
   onCreateNewSession?: () => void;
 }
 
-function InfoCards({
-  hasSession,
-  onCreateNewSession,
-  ...props
-}: InfoCardsProps) {
-  const location = useLocation();
+function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
   const classId = useClassId();
 
   const queryClient = useQueryClient();
@@ -45,6 +38,12 @@ function InfoCards({
       queryClient.invalidateQueries({
         queryKey: ["currentSessionInfo", classId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["previousSessions", classId],
+      });
+      const channel = new BroadcastChannel("sessionRefresh");
+      channel.postMessage("refresh");
+      channel.close();
     },
   });
 
@@ -55,7 +54,7 @@ function InfoCards({
 
   return (
     <InfoCardContainer {...props}>
-      {hasSession ? (
+      {currentSessionInfo?.id != null ? (
         <>
           <InfoCard style={{ width: activated ? "28rem" : "24rem" }}>
             <InfoCardTitle>Passcode</InfoCardTitle>
@@ -63,7 +62,10 @@ function InfoCards({
               <>
                 <ExpandButton
                   onClick={() => {
-                    window.open("/class/1/sessions/1/code", "_blank");
+                    window.open(
+                      `/class/${classId}/sessions/${currentSessionInfo.id}/code`,
+                      "_blank"
+                    );
                   }}
                 >
                   <img
@@ -85,6 +87,8 @@ function InfoCards({
                       if (currentSessionInfo?.authCode != null) {
                         deactivateSession({
                           authCode: currentSessionInfo.authCode,
+                          sessionId: currentSessionInfo.id,
+                          courseId: classId!,
                         });
                       }
                     }}
@@ -102,6 +106,10 @@ function InfoCards({
                       courseId: classId!,
                       sessionId: currentSessionInfo.id,
                     });
+                    window.open(
+                      `/class/${classId}/sessions/${currentSessionInfo.id}/code`,
+                      "_blank"
+                    );
                   }
                 }}
               >
@@ -118,30 +126,39 @@ function InfoCards({
               <AttendanceTotal>/</AttendanceTotal>
               <AttendanceTotal>{attendanceStatus?.total ?? 0}</AttendanceTotal>
             </AttendanceContainer>
-            <Absentees>5 absentees</Absentees>
+            <Absentees>
+              {(attendanceStatus?.total ?? 0) -
+                (attendanceStatus?.attendances ?? 0)}{" "}
+              absentees
+            </Absentees>
           </InfoCard>
           <InfoCard>
             <InfoCardTitle>Details</InfoCardTitle>
             <DetailsBar style={{ marginTop: "2.1rem" }}>
               <DetailsLabel>Name</DetailsLabel>
-              <DetailsValue>{currentSessionInfo?.name}</DetailsValue>
+              <DetailsValue>{currentSessionInfo?.sessionName}</DetailsValue>
             </DetailsBar>
             <DetailsBar style={{ marginTop: "1.6rem" }}>
               <DetailsLabel>Date</DetailsLabel>
               <DetailsValue>
-                {dateFormat(currentSessionInfo?.startTime, "yyyy-mm-dd (ddd)")}
+                {dateFormat(
+                  currentSessionInfo?.sessionTime,
+                  "yyyy-mm-dd (ddd)"
+                )}
               </DetailsValue>
             </DetailsBar>
             <DetailsBar style={{ marginTop: "1.6rem" }}>
               <DetailsLabel>Start Time</DetailsLabel>
               <DetailsValue>
-                {dateFormat(currentSessionInfo?.startTime, "TT HH:MM")}
+                {activated
+                  ? dateFormat(currentSessionInfo?.sessionTime, "TT hh:mm")
+                  : "-"}
               </DetailsValue>
             </DetailsBar>
           </InfoCard>
         </>
       ) : (
-        <InfoCard style={{ width: "100rem" }}>
+        <InfoCard style={{ width: "100rem", padding: "0" }}>
           <NoSessionCard onClick={onCreateNewSession}>
             <NoSessionTitle>No Sessions have been opened yet.</NoSessionTitle>
             <NoSessionDescription>
@@ -195,10 +212,9 @@ const ExpandButton = styled.button`
   top: 1.5rem;
   right: 1.3rem;
 
-  background: none;
   border: none;
   border-radius: 1rem;
-  background-color: ${({ theme }) => theme.colors.lightGrey};
+  background: ${({ theme }) => theme.colors.lightGrey} none;
 
   width: 2.6rem;
   height: 2.6rem;
@@ -280,6 +296,11 @@ const DetailsValue = styled.span`
   ${({ theme }) => theme.typography.b3};
   font-weight: 700;
   color: ${({ theme }) => theme.colors.darkGrey};
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 15rem;
 `;
 
 const NoSessionCard = styled.button`

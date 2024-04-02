@@ -4,26 +4,30 @@ import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
-import { updateAttendances, UpdateAttendee } from "../../../api/attendance";
+import {
+  updateAttendanceStatus,
+  UpdateAttendee,
+} from "../../../api/attendance";
 import {
   SessionAttendee,
   useSession,
   useSessionAttendees,
 } from "../../../api/session";
+import { PrimaryButton, TertiaryButton } from "../../../components/Button.tsx";
+import InfoBar from "../../../components/InfoBar.tsx";
 import AttendanceChip from "../../../components/sessions/AttendanceChip";
-import SessionControl from "../../../components/sessions/SessionControl";
-import SessionInfoBar from "../../../components/sessions/SessionInfoBar";
 import {
-  SessionTable,
-  SessionTableHead,
-  SessionTableHeadItem,
-  SessionTableBody,
-  SessionTableItem,
-} from "../../../components/sessions/SessionTable";
+  Table,
+  TableBody,
+  TableHead,
+  TableHeadItem,
+  TableItem,
+} from "../../../components/table/Table.tsx";
+import TableControl from "../../../components/table/TableControl.tsx";
 import TitleBar from "../../../components/TitleBar";
 
 function SessionDetail() {
-  const [filter, setFilter] = useState<"all" | "absentees">("all");
+  const [filter, setFilter] = useState<string>("all");
   const [isEditing, setIsEditing] = useState(false);
   const [tempAttendees, setTempAttendees] = useState<SessionAttendee[]>([]);
 
@@ -34,55 +38,74 @@ function SessionDetail() {
 
   const queryClient = useQueryClient();
   const { mutate: updateAttendees } = useMutation({
-    mutationFn: updateAttendances,
+    mutationFn: updateAttendanceStatus,
     mutationKey: ["updateAttendances"],
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["session"] });
+      queryClient.invalidateQueries({ queryKey: ["session", sessionId] });
+      queryClient.invalidateQueries({
+        queryKey: ["sessionAttendees", sessionId],
+      });
     },
   });
 
   return (
     <Container>
-      <TitleBar label="Session Details" />
-      <ContentContainer>
-        <SessionInfoBar
-          date={session?.date}
-          sessionName={session?.name}
-          attendance={session?.attendee}
-          absence={session?.absentee}
-        />
-        <SessionControl
-          onActionButtonClick={() => {
-            if (!isEditing) {
-              // TODO: copy current attendance status
-              setTempAttendees(sessionAttendees ?? []);
-            } else {
-              // TODO: send changed attendance status
+      <TitleBar label="Session Details">
+        {isEditing ? (
+          <PrimaryButton
+            onClick={() => {
               const updateData: UpdateAttendee[] = tempAttendees.map(
                 (attendee) => ({
-                  attendeeId: attendee.attendeeId,
+                  attendanceId: attendee.attendanceId,
                   attendanceStatus: attendee.attendanceStatus,
                 })
               );
-              updateAttendees(updateData);
-            }
-            setIsEditing(!isEditing);
-          }}
-          onFilterChange={(filter) => setFilter(filter)}
-          isEditing={isEditing}
-          filter={filter}
+              updateAttendees({
+                updateAttendances: updateData,
+              });
+              setIsEditing(false);
+            }}
+          >
+            Save
+          </PrimaryButton>
+        ) : (
+          <TertiaryButton
+            onClick={() => {
+              setTempAttendees(sessionAttendees ?? []);
+              setIsEditing(true);
+            }}
+          >
+            Edit
+          </TertiaryButton>
+        )}
+      </TitleBar>
+      <ContentContainer>
+        <InfoBar
+          values={[
+            { label: "Date", value: dateFormat(session?.date, "yyyy-mm-dd") },
+            { label: "Session Name", value: session?.name },
+            { label: "Attendance", value: session?.attendee },
+            { label: "Absence", value: session?.absentee },
+          ]}
         />
-        <SessionTable>
-          <SessionTableHead>
+        <TableControl
+          options={[
+            { label: "View All", value: "all" },
+            { label: "Absentees Only", value: "absentees" },
+          ]}
+          onOptionChange={(filter) => setFilter(filter)}
+          isEditing={isEditing}
+          value={filter}
+        />
+        <Table>
+          <TableHead>
             <tr>
-              <SessionTableHeadItem style={{ width: "24rem" }}>
-                Name
-              </SessionTableHeadItem>
-              <SessionTableHeadItem>Attendance Status</SessionTableHeadItem>
-              <SessionTableHeadItem>Time of Attendance</SessionTableHeadItem>
+              <TableHeadItem style={{ width: "24rem" }}>Name</TableHeadItem>
+              <TableHeadItem>Attendance Status</TableHeadItem>
+              <TableHeadItem>Time of Attendance</TableHeadItem>
             </tr>
-          </SessionTableHead>
-          <SessionTableBody>
+          </TableHead>
+          <TableBody>
             {(isEditing ? tempAttendees : sessionAttendees)
               ?.map((attendee, index) => ({
                 attendee,
@@ -97,10 +120,17 @@ function SessionDetail() {
               })
               .map(({ attendee, index }) => (
                 <tr>
-                  <SessionTableItem style={{ width: "24rem" }}>
-                    {attendee.attendeeName}
-                  </SessionTableItem>
-                  <SessionTableItem>
+                  <TableItem
+                    style={{
+                      width: "24rem",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {attendee.attendee.name}
+                  </TableItem>
+                  <TableItem>
                     <AttendanceChipContainer>
                       {(isEditing || attendee.attendanceStatus) && (
                         <AttendanceChip
@@ -139,16 +169,16 @@ function SessionDetail() {
                         />
                       )}
                     </AttendanceChipContainer>
-                  </SessionTableItem>
-                  <SessionTableItem>
+                  </TableItem>
+                  <TableItem>
                     {sessionAttendees?.[index]?.attendanceStatus === true
-                      ? dateFormat(attendee?.attendanceTime, "HH:mm:ss")
+                      ? dateFormat(attendee?.attendanceTime, "HH:MM:ss")
                       : "--:--:--"}
-                  </SessionTableItem>
+                  </TableItem>
                 </tr>
               ))}
-          </SessionTableBody>
-        </SessionTable>
+          </TableBody>
+        </Table>
       </ContentContainer>
     </Container>
   );
@@ -167,6 +197,7 @@ const ContentContainer = styled.div`
   flex-direction: column;
   margin-left: 6.2rem;
   margin-right: auto;
+  margin-bottom: 5rem;
 `;
 
 const AttendanceChipContainer = styled.div`

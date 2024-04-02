@@ -3,12 +3,22 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { attend } from "../api/attendance.ts";
+import { AttendanceErrorCode, postAttend } from "../api/attendance.ts";
 import sendIcon from "../assets/send.svg";
 import TransferBanner from "../components/admin/TransferBanner.tsx";
 import Alert from "../components/Alert.tsx";
 import { PrimaryButton } from "../components/Button.tsx";
+import NoteSelectModal from "../components/home/NoteSelectModal.tsx";
 import TextField from "../components/TextField";
+import useModalState from "../hooks/modal.tsx";
+
+const ErrorMessages: Record<AttendanceErrorCode, string> = {
+  [AttendanceErrorCode.InvalidAuthCode]: `Could not find a session corresponding to passcode. Please check your credentials or contact the administrator for help.`,
+  [AttendanceErrorCode.InvalidName]: `Could not find a session corresponding to your name. Please check your credentials or contact the administrator for help.`,
+  [AttendanceErrorCode.AlreadyAttended]: `You have already attended the session.`,
+  [AttendanceErrorCode.DifferentName]: `You have already attended the session with a different name.`,
+  [AttendanceErrorCode.FailedToAttend]: `Failed to attend the session. Please try again later.`,
+};
 
 function Home() {
   const navigate = useNavigate();
@@ -25,21 +35,36 @@ function Home() {
   const [name, setName] = useState("");
   const [passcode, setPasscode] = useState("");
 
-  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { mutate: performAttendance } = useMutation({
-    mutationFn: attend,
+    mutationFn: postAttend,
     mutationKey: ["attend"],
-    onSuccess: () => {
-      navigate("/result");
+    onSuccess: (data) => {
+      if (data.type == "oneChoice") {
+        navigate("/result");
+      } else {
+        openNoteSelectModal();
+      }
     },
-    onError: () => {
-      setHasError(true);
+    onError: (error) => {
+      console.error(error);
+      setErrorMessage(ErrorMessages[error.message as AttendanceErrorCode]);
     },
   });
 
+  const [noteSelectModalState, openNoteSelectModal, closeNoteSelectModal] =
+    useModalState();
+
   return (
     <>
+      <NoteSelectModal
+        onCancel={() => closeNoteSelectModal()}
+        state={noteSelectModalState}
+        onError={(error) => {
+          setErrorMessage(ErrorMessages[error.message as AttendanceErrorCode]);
+        }}
+      />
       <DesktopContainer>
         <TransferBanner from="attendees" />
         <TimeDisplay>
@@ -75,11 +100,9 @@ function Home() {
               onChange={(e) => setPasscode(e.target.value)}
               style={{ marginTop: "1.1rem" }}
             />
-            {hasError && (
+            {errorMessage && (
               <Alert type="warning" style={{ marginTop: "2rem" }}>
-                Could not find a session corresponding to your name and
-                passcode. Please check your credentials or contact the
-                administrator for help.
+                {errorMessage}
               </Alert>
             )}
             <PrimaryButton
@@ -121,11 +144,9 @@ function Home() {
             value={passcode}
             onChange={(e) => setPasscode(e.target.value)}
           />
-          {hasError && (
+          {errorMessage && (
             <Alert type="warning" style={{ marginTop: "1rem" }} size="small">
-              Could not find a session corresponding to your name and passcode.
-              Please check your credentials or contact the administrator for
-              help.
+              {errorMessage}
             </Alert>
           )}
           <PrimaryButton
@@ -202,7 +223,7 @@ const BannerChatBubble = styled.div`
   font-weight: 400;
   color: #000000;
   line-height: 3.6rem;
-  border-radius: 0rem 2rem 2rem 2rem;
+  border-radius: 0 2rem 2rem 2rem;
 `;
 
 const InputContainer = styled.form`
@@ -237,7 +258,7 @@ const MobileBannerLabel = styled.p`
 `;
 
 const MobileBannerChatBubble = styled.div`
-  border-radius: 0rem 2rem 2rem 2rem;
+  border-radius: 0 2rem 2rem 2rem;
   padding: 1.2rem 2.5rem;
 
   background-color: ${({ theme }) => theme.colors.lightGrey};

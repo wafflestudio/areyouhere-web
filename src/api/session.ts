@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import axios, { HttpStatusCode } from "axios";
 
+import { AttendeeInfo } from "../type.ts";
+
 export type Session = {
   id: number;
   name: string;
@@ -9,11 +11,23 @@ export type Session = {
   absentee: number;
 };
 
+export type GetSessionsResponse = {
+  allSessionAttendanceInfo: Session[];
+};
+
 export type SessionAttendee = {
-  attendeeId: number;
-  attendeeName: string;
+  attendanceId: number;
+  attendee: Omit<AttendeeInfo, "id">;
   attendanceStatus: boolean;
   attendanceTime: Date;
+};
+
+export type GetSessionAttendeesResponse = {
+  sessionAttendees: SessionAttendee[];
+};
+
+export type GetSessionAbsenteesResponse = {
+  sessionAttendees: SessionAttendee[];
 };
 
 export type CreateSessionRequest = {
@@ -28,16 +42,15 @@ export type DeleteSessionRequest = {
 export type SessionWithoutId = Omit<Session, "id">;
 
 export const getSessions = async (courseId: number): Promise<Session[]> => {
-  const res = await axios.get<{
-    sessionAttendanceInfos: Session[];
-  }>(`/api/session/${courseId}`, {
+  const res = await axios.get<GetSessionsResponse>(`/api/session`, {
+    params: { courseId },
     validateStatus: () => true,
   });
 
   if (res.status === HttpStatusCode.NoContent) {
     return [];
   } else if (res.status === HttpStatusCode.Ok) {
-    const data = res.data.sessionAttendanceInfos;
+    const data = res.data.allSessionAttendanceInfo;
     data.forEach((info) => {
       info.date = new Date(info.date);
     });
@@ -47,15 +60,17 @@ export const getSessions = async (courseId: number): Promise<Session[]> => {
   }
 };
 
-export const getSession = async (id: number): Promise<SessionWithoutId> => {
-  return (await axios.get<SessionWithoutId>(`/api/session/detail/${id}`)).data;
+export const getSession = async (
+  sessionId: number
+): Promise<SessionWithoutId> => {
+  return (await axios.get<SessionWithoutId>(`/api/session/${sessionId}`)).data;
 };
 
 export const getSessionAttendees = async (
   sessionId: number
 ): Promise<SessionAttendee[]> => {
-  const res = await axios.get<{ sessionAttendees: SessionAttendee[] }>(
-    `/api/session/detail/attendee/${sessionId}`,
+  const res = await axios.get<GetSessionAttendeesResponse>(
+    `/api/session/${sessionId}/attendee`,
     {
       validateStatus: () => true,
     }
@@ -77,8 +92,8 @@ export const getSessionAttendees = async (
 export const getSessionAbsenteesOnly = async (
   sessionId: number
 ): Promise<SessionAttendee[]> => {
-  const res = await axios.get<{ sessionAttendees: SessionAttendee[] }>(
-    `/api/session/detail/absentee/${sessionId}`,
+  const res = await axios.get<GetSessionAbsenteesResponse>(
+    `/api/session/${sessionId}/absentee`,
     {
       validateStatus: () => true,
     }
@@ -102,7 +117,9 @@ export const createSession = async (request: CreateSessionRequest) => {
 };
 
 export const deleteSession = async (request: DeleteSessionRequest) => {
-  return axios.delete(`/api/session/${request.sessionId}`);
+  return axios.delete(`/api/session`, {
+    params: request,
+  });
 };
 
 export const useSessions = (courseId: number) => {

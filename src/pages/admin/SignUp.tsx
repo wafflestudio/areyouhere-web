@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -49,9 +49,11 @@ function SignUp() {
 
   const { data: isEmailConflict } = useEmailConflict(email, !emailError);
 
-  if (user != null) {
-    navigate("/class");
-  }
+  useEffect(() => {
+    if (user != null) {
+      navigate("/class");
+    }
+  }, [navigate, user]);
 
   return (
     <Container>

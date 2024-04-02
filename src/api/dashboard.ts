@@ -6,15 +6,15 @@ import { Session } from "./session";
 export type CurrentSessionInfo = {
   id: number;
   authCode?: string;
-  name: string;
-  startTime?: Date;
+  sessionName: string;
+  sessionTime?: Date;
 };
 
 export const getCurrentSessionInfo = async (
   courseId: number
 ): Promise<CurrentSessionInfo | null> => {
   const res = await axios.get<CurrentSessionInfo>(
-    `/api/course/dashboard/${courseId}`,
+    `/api/course/${courseId}/dashboard`,
     {
       validateStatus: () => true,
     }
@@ -23,8 +23,8 @@ export const getCurrentSessionInfo = async (
   if (res.status === HttpStatusCode.NoContent) {
     return null;
   } else if (res.status === HttpStatusCode.Ok) {
-    if (res.data.startTime) {
-      res.data.startTime = new Date(res.data.startTime);
+    if (res.data.sessionTime) {
+      res.data.sessionTime = new Date(res.data.sessionTime);
     }
     return res.data;
   } else {
@@ -37,7 +37,7 @@ export const getPreviousSessions = async (
 ): Promise<Session[]> => {
   const res = await axios.get<{
     sessionAttendanceInfos: Session[];
-  }>(`/api/course/dashboard/session/${courseId}`, {
+  }>(`/api/course/${courseId}/dashboard/session`, {
     validateStatus: () => true,
   });
 

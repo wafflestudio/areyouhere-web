@@ -37,6 +37,7 @@ const AlertText = styled.p<{ size: "normal" | "small" }>`
   ${({ theme, size }) =>
     size === "normal" ? theme.typography.b1 : theme.typography.b4};
   color: ${({ theme }) => theme.colors.red["500"]};
+  line-height: 2.4rem;
 `;
 
 export default Alert;

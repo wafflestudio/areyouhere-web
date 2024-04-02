@@ -3,21 +3,19 @@ import dateFormat from "dateformat";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import {
-  useCurrentSessionInfo,
-  usePreviousSessions,
-} from "../../../api/dashboard.ts";
+import { useCourse } from "../../../api/course.ts";
+import { usePreviousSessions } from "../../../api/dashboard.ts";
 import { createSession } from "../../../api/session.ts";
 import { PrimaryButton } from "../../../components/Button.tsx";
 import CreateSessionModal from "../../../components/dashboard/CreateSessionModal.tsx";
 import InfoCards from "../../../components/dashboard/InfoCards.tsx";
 import {
-  SessionTable,
-  SessionTableHead,
-  SessionTableHeadItem,
-  SessionTableBody,
-  SessionTableItem,
-} from "../../../components/sessions/SessionTable.tsx";
+  Table,
+  TableBody,
+  TableHead,
+  TableHeadItem,
+  TableItem,
+} from "../../../components/table/Table.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
 import useModalState from "../../../hooks/modal.tsx";
 
@@ -33,7 +31,6 @@ function Dashboard() {
   const location = useLocation();
   const classId = parseInt(location.pathname.split("/")[2], 10);
 
-  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
   const { data: previousSessions } = usePreviousSessions(classId);
 
   const queryClient = useQueryClient();
@@ -41,44 +38,43 @@ function Dashboard() {
     mutationFn: createSession,
     mutationKey: ["createSession"],
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["previousSessions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["previousSessions", classId],
+      });
       queryClient.invalidateQueries({
         queryKey: ["currentSessionInfo", classId],
       });
     },
   });
 
+  const { data: classItem } = useCourse(classId);
+
   return (
     <>
       <Container>
-        <TitleBar label={currentSessionInfo?.name ?? ""}>
+        <TitleBar label={classItem?.name ?? ""}>
           <PrimaryButton onClick={() => openCreateSessionModal()}>
             Create New Session
           </PrimaryButton>
         </TitleBar>
         <ContentContainer>
           <Subtitle>Current Session</Subtitle>
-          <InfoCards
-            hasSession={(previousSessions?.length ?? 0) > 0}
-            onCreateNewSession={() => openCreateSessionModal()}
-          />
+          <InfoCards onCreateNewSession={() => openCreateSessionModal()} />
           <Subtitle style={{ marginTop: "5rem" }}>Previous Session</Subtitle>
           <ElevatedSessionTable>
-            <SessionTableHead>
+            <TableHead>
               <tr>
-                <SessionTableHeadItem style={{ width: "17.5rem" }}>
-                  Date
-                </SessionTableHeadItem>
-                <SessionTableHeadItem>Session Title</SessionTableHeadItem>
-                <SessionTableHeadItem style={{ width: "17.5rem" }}>
+                <TableHeadItem style={{ width: "17.5rem" }}>Date</TableHeadItem>
+                <TableHeadItem>Session Title</TableHeadItem>
+                <TableHeadItem style={{ width: "17.5rem" }}>
                   Attendance
-                </SessionTableHeadItem>
-                <SessionTableHeadItem style={{ width: "17.5rem" }}>
+                </TableHeadItem>
+                <TableHeadItem style={{ width: "17.5rem" }}>
                   Absence
-                </SessionTableHeadItem>
+                </TableHeadItem>
               </tr>
-            </SessionTableHead>
-            <SessionTableBody>
+            </TableHead>
+            <TableBody>
               {previousSessions == null || previousSessions.length == 0 ? (
                 <tr>
                   <EmptyTableBody colSpan={4} />
@@ -91,20 +87,29 @@ function Dashboard() {
                     }}
                     style={{ cursor: "pointer" }}
                   >
-                    <SessionTableItem style={{ width: "17.5rem" }}>
+                    <TableItem style={{ width: "17.5rem" }}>
                       {dateFormat(session.date, "yyyy-mm-dd")}
-                    </SessionTableItem>
-                    <SessionTableItem>{session.name}</SessionTableItem>
-                    <SessionTableItem style={{ width: "17.5rem" }}>
+                    </TableItem>
+                    <TableItem
+                      style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        maxWidth: "42.3rem",
+                      }}
+                    >
+                      {session.name}
+                    </TableItem>
+                    <TableItem style={{ width: "17.5rem" }}>
                       {session.attendee}
-                    </SessionTableItem>
-                    <SessionTableItem style={{ width: "17.5rem" }}>
+                    </TableItem>
+                    <TableItem style={{ width: "17.5rem" }}>
                       {session.absentee}
-                    </SessionTableItem>
+                    </TableItem>
                   </tr>
                 ))
               )}
-            </SessionTableBody>
+            </TableBody>
           </ElevatedSessionTable>
         </ContentContainer>
       </Container>
@@ -139,7 +144,7 @@ const ContentContainer = styled.div`
   width: 100rem;
   margin-left: 6.3rem;
   margin-right: auto;
-  margin-bottom: 13.2rem;
+  margin-bottom: 5rem;
 `;
 
 const Subtitle = styled.p`
@@ -148,7 +153,7 @@ const Subtitle = styled.p`
   margin-bottom: 2.4rem;
 `;
 
-const ElevatedSessionTable = styled(SessionTable)`
+const ElevatedSessionTable = styled(Table)`
   box-shadow: ${({ theme }) => theme.effects.blur};
 `;
 

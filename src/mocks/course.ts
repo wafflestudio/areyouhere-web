@@ -1,5 +1,4 @@
 import { HttpStatusCode } from "axios";
-import AxiosMockAdapter from "axios-mock-adapter";
 
 import {
   Course,
@@ -7,71 +6,97 @@ import {
   CourseUpdateRequest,
 } from "../api/course";
 
-const courses: Course[] = [
-  {
-    id: 1,
-    name: "Course 1",
-    description: "Description for Course 1",
-    allowOnlyRegistered: true,
-    attendees: ["User 1", "User 2"],
-  },
-  {
-    id: 2,
-    name: "Course 2",
-    description: "Description for Course 2",
-    allowOnlyRegistered: false,
-    attendees: ["User 3", "User 4"],
-  },
-  {
-    id: 3,
-    name: "Course 3",
-    description: "Description for Course 3",
-    allowOnlyRegistered: true,
-    attendees: ["User 5", "User 6", "User 7"],
-  },
-];
+import {
+  DeleteMapping,
+  GetMapping,
+  PostMapping,
+  PutMapping,
+  RequestConfig,
+  RequestMapping,
+} from "./base.ts";
+import { DatabaseMock } from "./database.ts";
 
-function addCourseMock(mock: AxiosMockAdapter) {
-  mock.onGet("/api/course").reply(() => {
-    return [HttpStatusCode.Ok, courses];
-  });
+@RequestMapping("/api/course")
+export class CourseMock {
+  @GetMapping()
+  static getCourses() {
+    return [
+      HttpStatusCode.Ok,
+      {
+        courses: DatabaseMock.courses.map((c) => ({
+          id: c.id,
+          name: c.name,
+          description: c.description,
+          attendees: c.attendees.length,
+          allowOnlyRegistered: c.allowOnlyRegistered,
+        })),
+      },
+    ];
+  }
 
-  mock.onPost("/api/course").reply((config) => {
+  @GetMapping("/:id")
+  static getCourse(config: RequestConfig) {
+    const id = parseInt(config.pathParams.id, 10);
+    const course = DatabaseMock.courses.find((c) => c.id === id);
+    if (course) {
+      return [
+        HttpStatusCode.Ok,
+        {
+          id: course.id,
+          name: course.name,
+          description: course.description,
+          allowOnlyRegistered: course.allowOnlyRegistered,
+        } as Course,
+      ];
+    } else {
+      return [HttpStatusCode.NotFound];
+    }
+  }
+
+  @PostMapping()
+  static createCourse(config: RequestConfig) {
     const data = JSON.parse(config.data) as CourseCreationRequest;
-    courses.push({
-      id: courses.length + 1,
+    DatabaseMock.courses.push({
+      id: DatabaseMock.nextCourseId++,
       name: data.name,
       description: data.description,
       allowOnlyRegistered: data.onlyListNameAllowed,
-      attendees: data.attendees,
+      attendees: data.attendees.map((a, i) => ({
+        ...a,
+        id: i + 1,
+      })),
+      sessions: [],
     });
+    DatabaseMock.update();
     return [HttpStatusCode.Ok];
-  });
+  }
 
-  mock.onPut(/\/api\/course\/\d+/).reply((config) => {
-    const id = Number(config.url?.split("/").pop());
+  @PutMapping("/:id")
+  static updateCourse(config: RequestConfig) {
+    const id = parseInt(config.pathParams.id, 10);
     const data = JSON.parse(config.data) as CourseUpdateRequest;
-    const course = courses.find((c) => c.id === id);
+    const course = DatabaseMock.courses.find((c) => c.id === id);
     if (course) {
       course.name = data.name;
       course.description = data.description;
       course.allowOnlyRegistered = data.onlyListNameAllowed;
+      DatabaseMock.update();
       return [HttpStatusCode.Ok];
     } else {
       return [HttpStatusCode.NotFound];
     }
-  });
+  }
 
-  mock.onDelete(/\/api\/course\/\d+/).reply((config) => {
-    const id = Number(config.url?.split("/").pop());
-    const index = courses.findIndex((c) => c.id === id);
+  @DeleteMapping("/:id")
+  static deleteCourse(config: RequestConfig) {
+    const id = parseInt(config.pathParams.id, 10);
+    const index = DatabaseMock.courses.findIndex((c) => c.id === id);
     if (index !== -1) {
-      courses.splice(index, 1);
+      DatabaseMock.courses.splice(index, 1);
+      DatabaseMock.update();
       return [HttpStatusCode.Ok];
     } else {
       return [HttpStatusCode.NotFound];
     }
-  });
+  }
 }
-
-export default addCourseMock;

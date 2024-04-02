@@ -1,8 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-import checkBoxAlertBlack from "../../assets/class/tooltipBlack.svg";
-import checkBoxAlertGrey from "../../assets/class/tooltipGrey.svg";
+import CheckBoxAlert from "../../assets/class/tooltip.svg?react";
 import Theme from "../../styles/Theme.tsx";
 import Checkbox from "../Checkbox.tsx";
 
@@ -18,6 +17,7 @@ function UnknownNameCheckbox({ checkboxId, checked, onChange }: checkboxProps) {
       <Checkbox checkboxId={checkboxId} checked={checked} onChange={onChange} />
       <Label htmlFor={checkboxId}>Only Listed Names Allowed</Label>
       <TooltipIcon>
+        <TooltipAlert />
         <TooltipText>
           If checked, unlisted attendees won't be added even with the passcode.
           This can be adjusted in settings.
@@ -43,24 +43,29 @@ const Label = styled.label`
 `;
 
 const TooltipIcon = styled.div`
-  background-image: url(${checkBoxAlertGrey});
-  background-size: cover;
-  background-position: center;
   width: 2rem;
   height: 2rem;
-  transition: background-image 0.2s ease;
+  transition: fill 0.2s ease;
 
   position: relative;
-
-  &:hover {
-    background-image: url(${checkBoxAlertBlack});
-  }
 
   &:hover div {
     visibility: visible;
     opacity: 1;
     transition-delay: 0s;
   }
+`;
+
+const TooltipAlert = styled(CheckBoxAlert)`
+  fill: ${({ theme }) => theme.colors.grey};
+
+  &:hover {
+    fill: ${({ theme }) => theme.colors.darkGrey};
+  }
+
+  width: 2rem;
+  height: 2rem;
+  transition: fill 0.2s ease;
 `;
 
 const TooltipText = styled.div`

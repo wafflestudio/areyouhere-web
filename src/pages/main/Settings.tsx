@@ -1,28 +1,51 @@
-import React, { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+import { updateCourse, useCourses } from "../../api/course.ts";
 import { PrimaryButton } from "../../components/Button.tsx";
-import UnknownNameCheckbox from "../../components/class/UnknownNameCheckbox.tsx";
 import { MultiLineTextField } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
+import { useClassId } from "../../hooks/urlParse.tsx";
 
 function Settings() {
+  const navigate = useNavigate();
+
   const [className, setClassName] = useState("");
   const [description, setDescription] = useState("");
 
   // 이름 목록에 unknown name 허용 체크박스
-  const [isCheckedUnknownName, setIsCheckedUnknownName] = useState(false);
+  const [onlyListNameAllowed, setOnlyListNameAllowed] = useState(false);
 
-  const handleUnknownNameCheckbox = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setIsCheckedUnknownName(e.target.checked);
-  };
+  const queryClient = useQueryClient();
+  const { mutate: updateClass } = useMutation({
+    mutationFn: updateCourse,
+    mutationKey: ["updateCourse"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+    },
+  });
+  const { data: classList } = useCourses();
+
+  const classId = useClassId();
+  const classItem = useMemo(
+    () => classList?.find((item) => item.id === classId),
+    [classList, classId]
+  );
+
+  useEffect(() => {
+    if (classItem) {
+      setClassName(classItem.name);
+      setDescription(classItem.description);
+      setOnlyListNameAllowed(classItem.allowOnlyRegistered);
+    }
+  }, [classItem]);
 
   return (
     <Container>
       <TitleBar label="Class Settings" />
-      <CreatClassContainer>
+      <SettingContainer>
         <MultiLineTextField
           textareaStyle={{ height: "4.5rem" }}
           label="Name of your class"
@@ -36,15 +59,22 @@ function Settings() {
           placeholder="Add a description."
           onChange={(e) => setDescription(e.target.value)}
         />
-        <UnknownNameCheckbox
-          checkboxId="unknownNameAllow"
-          checked={isCheckedUnknownName}
-          onChange={handleUnknownNameCheckbox}
-        />
-        <PrimaryButton style={{ width: "45rem" }} disabled={className === ""}>
+        <PrimaryButton
+          style={{ width: "45rem" }}
+          disabled={className === ""}
+          onClick={() => {
+            updateClass({
+              id: classId,
+              name: className,
+              description,
+              onlyListNameAllowed,
+            });
+            navigate(`/class/${classId}`);
+          }}
+        >
           Save Changes
         </PrimaryButton>
-      </CreatClassContainer>
+      </SettingContainer>
     </Container>
   );
 }
@@ -55,7 +85,7 @@ const Container = styled.div`
   align-items: flex-start;
 `;
 
-const CreatClassContainer = styled.div`
+const SettingContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;

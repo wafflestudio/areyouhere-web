@@ -7,7 +7,9 @@ import SignUp from "./pages/admin/SignUp";
 import ClassList from "./pages/class/ClassList.tsx";
 import CreateClass from "./pages/class/CreateClass.tsx";
 import Home from "./pages/Home";
-import Attendees from "./pages/main/Attendees.tsx";
+import AddAttendees from "./pages/main/Attendees/AddAttendees.tsx";
+import Attendee from "./pages/main/Attendees/Attendee.tsx";
+import Attendees from "./pages/main/Attendees/Attendees.tsx";
 import CodePopup from "./pages/main/dashboard/CodePopup.tsx";
 import Dashboard from "./pages/main/dashboard/Dashboard.tsx";
 import SessionDetail from "./pages/main/session/SessionDetail.tsx";
@@ -36,6 +38,11 @@ const router = createBrowserRouter([
           { path: "/class/:classId", element: <Dashboard /> },
           { path: "/class/:classId/sessions", element: <Sessions /> },
           { path: "/class/:classId/attendees", element: <Attendees /> },
+          { path: "/class/:classId/attendees/add", element: <AddAttendees /> },
+          {
+            path: "/class/:classId/attendee/:attendeeId",
+            element: <Attendee />,
+          },
           { path: "/class/:classId/statistics", element: <Statistics /> },
           { path: "/class/:classId/settings", element: <Settings /> },
           // 세션 선택 후

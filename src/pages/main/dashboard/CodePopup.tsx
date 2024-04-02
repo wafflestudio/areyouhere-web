@@ -3,6 +3,7 @@ import dateFormat from "dateformat";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
+import { useAttendanceStatus } from "../../../api/attendance.ts";
 import { deactivateAuthCode } from "../../../api/authCode";
 import { useCurrentSessionInfo } from "../../../api/dashboard";
 import logo from "../../../assets/dashboard/logo.svg";
@@ -13,16 +14,27 @@ function CodePopup() {
   const [time, setTime] = useState(new Date());
 
   const classId = useClassId();
-  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
+  const { data: currentSessionInfo, isLoading } =
+    useCurrentSessionInfo(classId);
+
+  if (!isLoading && currentSessionInfo == null) {
+    window.close();
+  }
+
+  const { data: attendanceStatus } = useAttendanceStatus(
+    classId,
+    currentSessionInfo?.id
+  );
 
   const queryClient = useQueryClient();
   const { mutate: deactivate } = useMutation({
     mutationFn: deactivateAuthCode,
     mutationKey: ["deactivateAuthCode"],
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["currentSessionInfo", classId],
       });
+      window.close();
     },
   });
 
@@ -30,25 +42,49 @@ function CodePopup() {
     const interval = setInterval(() => {
       setTime(new Date());
     }, 100);
-    return () => clearInterval(interval);
-  }, []);
+    const channel = new BroadcastChannel("sessionRefresh");
+    channel.onmessage = () => {
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
+    };
+    return () => {
+      clearInterval(interval);
+      channel.close();
+    };
+  }, [classId, queryClient]);
 
   return (
     <Container>
       <Logo src={logo} alt="Logo" />
       <ContentContainer>
-        <Title>Passcode</Title>
-        <Passcode>{currentSessionInfo?.authCode}</Passcode>
+        <TitleLabel>Session Name</TitleLabel>
+        <Title>{currentSessionInfo?.sessionName}</Title>
+        <PasscodeBubble>
+          <Passcode>{currentSessionInfo?.authCode}</Passcode>
+          <PresentBubble>
+            <PresentLabel style={{ marginTop: "0.6rem", verticalAlign: "top" }}>
+              Present
+            </PresentLabel>
+            <PresentCount>{attendanceStatus?.attendances}</PresentCount>
+            <PresentLabel
+              style={{ verticalAlign: "bottom" }}
+            >{` / Total ${attendanceStatus?.total}`}</PresentLabel>
+          </PresentBubble>
+        </PasscodeBubble>
         <Time>{dateFormat(time, "HH : MM : ss")}</Time>
         <ButtonContainer>
           <SecondaryButton
             onClick={() => {
               const code = currentSessionInfo?.authCode;
-              if (code != null) {
+              if (code != null && currentSessionInfo?.id != null) {
                 deactivate({
                   authCode: code,
+                  courseId: classId,
+                  sessionId: currentSessionInfo.id,
                 });
               }
+              window.close();
             }}
             style={{ borderRadius: "2rem", flex: "1" }}
             colorScheme="red"
@@ -71,7 +107,12 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
 
-  background-color: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.white}
+    linear-gradient(
+      180deg,
+      rgba(241, 242, 255, 0) 0%,
+      rgba(241, 242, 255, 1) 100%
+    );
 `;
 
 const Logo = styled.img`
@@ -97,43 +138,90 @@ const ContentContainer = styled.div`
   align-items: center;
 `;
 
-const Title = styled.p`
-  font-size: 3.2rem;
-  line-height: 3.8rem;
-  font-weight: 900;
+const TitleLabel = styled.p`
+  ${({ theme }) => theme.typography.b2};
   color: ${({ theme }) => theme.colors.primary["500"]};
 `;
 
-const Passcode = styled.div`
-  width: 100%;
-  padding: 2rem 5rem;
-  margin-top: 3.6rem;
-
-  border: 0.8rem solid ${({ theme }) => theme.colors.primary["500"]};
-  border-radius: 3rem;
-
-  font-size: 12.7rem;
-  line-height: 15.4rem;
-  font-weight: bold;
-  letter-spacing: 0.3em;
+const Title = styled.h3`
+  ${({ theme }) => theme.typography.h2};
   color: ${({ theme }) => theme.colors.black};
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60rem;
+
+  margin: 2rem 0;
 `;
 
-const Time = styled.p`
+const PasscodeBubble = styled.div`
+  position: relative;
+  padding: 2rem 10rem;
+  margin-top: 3.6rem;
+
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: 5rem 5rem 0 5rem;
+  box-shadow: ${({ theme }) => theme.effects.blur};
+`;
+
+const Passcode = styled.p`
+  font-size: 12.8rem;
+  line-height: 15.4rem;
+  font-weight: bold;
+  text-align: center;
+  text-indent: 0.3em;
+  letter-spacing: 0.3em;
+  color: ${({ theme }) => theme.colors.primary["500"]};
+`;
+
+const PresentBubble = styled.div`
+  position: absolute;
+  top: -4.5rem;
+  right: -7.4rem;
+  padding: 2rem 2.5rem;
+
+  border-radius: 3rem 3rem 3rem 0;
+  background: linear-gradient(94deg, #92aaff 0%, #3479ff 100%);
+  box-shadow: ${({ theme }) => theme.effects.blur};
+
+  display: inline-block;
+`;
+
+const PresentLabel = styled.span`
+  font-size: 1.3rem;
+  line-height: 1.3rem;
+  font-weight: bold;
+  color: ${({ theme }) => theme.colors.white};
+`;
+
+const PresentCount = styled.span`
+  font-size: 4.956rem;
+  line-height: 4.956rem;
+  font-weight: bold;
+  color: ${({ theme }) => theme.colors.white};
+
+  padding: 0 0.6rem;
+`;
+
+const Time = styled.span`
   font-size: 6.4rem;
   line-height: 7.8rem;
-  font-weight: bold;
+  font-weight: 300;
+  text-indent: 0.3em;
+  letter-spacing: 0.3em;
+
   color: ${({ theme }) => theme.colors.black};
 
-  margin-top: 1.5rem;
+  margin-top: 3.6rem;
 `;
 
 const ButtonContainer = styled.div`
-  width: 100%;
+  width: 30rem;
   height: 5rem;
   display: flex;
   gap: 3rem;
-  margin-top: 3.5rem;
+  margin-top: 3rem;
 `;
 
 export default CodePopup;

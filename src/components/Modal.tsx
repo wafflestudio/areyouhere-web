@@ -3,6 +3,8 @@ import styled from "styled-components";
 
 import { ModalProps } from "../type";
 
+export const MODAL_ANIMATION_DURATION = 300;
+
 const ModalContainer = styled.div`
   display: flex;
   align-items: center;
@@ -17,7 +19,7 @@ const ModalContainer = styled.div`
 
   // 모달 컴포넌트 css
   & > :not(.modal--background) {
-    animation: modal-content 0.3s;
+    animation: modal-content ${MODAL_ANIMATION_DURATION}ms;
 
     // 모달 화면 중앙 위치
     position: fixed;
@@ -28,7 +30,7 @@ const ModalContainer = styled.div`
     align-items: center;
 
     background-color: white;
-    border-radius: 1rem;
+    border-radius: 2rem;
 
     box-sizing: border-box;
   }
@@ -37,8 +39,8 @@ const ModalContainer = styled.div`
     pointer-events: none;
   }
 
-  &.closing :not(.modal--background) {
-    animation: modal-content-closing 0.3s; // Modal 관련 setTimeOut 300ms로 설정하기
+  &.closing > :not(.modal--background) {
+    animation: modal-content-closing ${MODAL_ANIMATION_DURATION}ms;
     opacity: 0;
   }
 
@@ -50,11 +52,11 @@ const ModalContainer = styled.div`
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: -1;
-    animation: modal-bg 0.3s;
+    animation: modal-bg ${MODAL_ANIMATION_DURATION}ms;
   }
 
   &.closing > .modal--background {
-    animation: modal-bg-closing 0.3s;
+    animation: modal-bg-closing ${MODAL_ANIMATION_DURATION}ms;
     opacity: 0;
   }
 

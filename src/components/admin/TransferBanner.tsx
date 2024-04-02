@@ -11,19 +11,15 @@ function TransferBanner(props: TransferBannerProps) {
   return (
     <>
       {props.from === "admin" ? (
-        <BannerLink from={props.from} to="/">
-          If you are Attendees
-        </BannerLink>
+        <BannerLink to="/">If you are Attendees</BannerLink>
       ) : (
-        <BannerLink from={props.from} to="/class">
-          If you are Admin
-        </BannerLink>
+        <BannerLink to="/class">If you are Admin</BannerLink>
       )}
     </>
   );
 }
 
-const BannerLink = styled(Link)<{ from: "admin" | "attendees" }>`
+const BannerLink = styled(Link)`
   width: 100%;
   height: 4rem;
   display: flex;
@@ -31,8 +27,7 @@ const BannerLink = styled(Link)<{ from: "admin" | "attendees" }>`
   align-items: center;
   background-color: #000000;
   color: white;
-  ${({ theme, from }) =>
-    from === "admin" ? theme.typography.b2 : theme.typography.b3};
+  ${({ theme }) => theme.typography.b3};
   text-decoration: none;
 `;
 
