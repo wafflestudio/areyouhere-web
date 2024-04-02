@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: release
 
     steps:
     - name: Checkout Repository
@@ -31,7 +32,7 @@ jobs:
 
     - name: Deploy via SSH
       run: |
-        scp -r ./dist/* ubuntu@areyouhere.today
+        scp -r ./dist/* ubuntu@areyouhere.today:~/project/areyouhere-web
 
     - name: Restart Nginx
       run: |
