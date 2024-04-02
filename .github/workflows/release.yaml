@@ -28,18 +28,18 @@ jobs:
     - name: Deploy via SCP
       uses: appleboy/scp-action@v0.1.7
       with:
-        host: ${{ env.SERVER_HOST }}
-        username: ${{ env.SERVER_USERNAME }}
+        host: ${{ vars.SERVER_HOST }}
+        username: ${{ vars.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        port: ${{ env.SERVER_SSH_PORT }}
+        port: ${{ vars.SERVER_SSH_PORT }}
         source: './dist/*'
-        target: ${{ env.DEPLOY_TARGET }}
+        target: ${{ vars.DEPLOY_TARGET }}
 
     - name: Restart nginx
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        port: ${{ secrets.PORT }}
+        host: ${{ vars.SERVER_HOST }}
+        username: ${{ vars.SERVER_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ vars.SERVER_SSH_PORT }}
         script: sudo systemctl restart nginx
