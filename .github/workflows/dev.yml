@@ -1,0 +1,46 @@
+name: Deploy to Dev Server
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4.1.2
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4.0.2
+      with:
+        node-version: '20'
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Build React App
+      run: npm run build
+
+    - name: Deploy via SCP
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ vars.SERVER_HOST }}
+        username: ${{ vars.SERVER_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ vars.SERVER_SSH_PORT }}
+        source: './dist/*'
+        target: ${{ vars.DEPLOY_TARGET }}
+        rm: true
+
+    - name: Restart nginx
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ vars.SERVER_HOST }}
+        username: ${{ vars.SERVER_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ vars.SERVER_SSH_PORT }}
+        script: sudo systemctl restart nginx
