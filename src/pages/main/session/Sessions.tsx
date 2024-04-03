@@ -216,8 +216,15 @@ function Sessions() {
               </tr>
             </TableHead>
             <TableBody>
-              {(editing ? Object.values(tempSessions) : sessions ?? []).map(
-                (session) => (
+              {(editing ? Object.values(tempSessions) : sessions ?? [])
+                .sort((a, b) => {
+                  if (option === "earliest") {
+                    return a.date.getTime() - b.date.getTime();
+                  } else {
+                    return b.date.getTime() - a.date.getTime();
+                  }
+                })
+                .map((session) => (
                   <SessionItem
                     isChecked={checkedState[session.id]}
                     onCheckboxChange={() => handleCheckboxChange(session.id)}
@@ -236,8 +243,7 @@ function Sessions() {
                     }
                     session={session}
                   />
-                )
-              )}
+                ))}
             </TableBody>
           </Table>
         </Content>

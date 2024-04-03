@@ -184,24 +184,36 @@ function Attendee() {
             {(isEditing
               ? Object.values(tempAttendances)
               : attendeeData?.attendanceInfo ?? []
-            ).map((attendance, index) => (
-              <AttendeeAttendanceItem
-                key={index}
-                attendance={attendance}
-                isEditing={isEditing}
-                onAttendanceStatusChange={(status) => {
-                  setTempAttendances({
-                    ...tempAttendances,
-                    [attendance.attendanceId]: {
-                      ...tempAttendances[attendance.attendanceId],
-                      attendanceStatus: status,
-                    },
-                  });
-                }}
-                // TODO: Link to session detail page
-                to={isEditing ? undefined : `/courses/${courseId}/sessions/1`}
-              />
-            ))}
+            )
+              .sort((a, b) => {
+                if (option === "earliest") {
+                  return (
+                    a.attendanceTime.getTime() - b.attendanceTime.getTime()
+                  );
+                } else {
+                  return (
+                    b.attendanceTime.getTime() - a.attendanceTime.getTime()
+                  );
+                }
+              })
+              .map((attendance, index) => (
+                <AttendeeAttendanceItem
+                  key={index}
+                  attendance={attendance}
+                  isEditing={isEditing}
+                  onAttendanceStatusChange={(status) => {
+                    setTempAttendances({
+                      ...tempAttendances,
+                      [attendance.attendanceId]: {
+                        ...tempAttendances[attendance.attendanceId],
+                        attendanceStatus: status,
+                      },
+                    });
+                  }}
+                  // TODO: Link to session detail page
+                  to={isEditing ? undefined : `/courses/${courseId}/sessions/1`}
+                />
+              ))}
           </TableBody>
         </Table>
       </ContentContainer>
