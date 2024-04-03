@@ -3,12 +3,17 @@ import dateFormat from "dateformat";
 import React, { useState } from "react";
 import styled from "styled-components";
 
-import { updateAttendanceStatus } from "../../../api/attendance.ts";
+import {
+  updateAttendanceStatus,
+  UpdateAttendanceStatusRequest,
+} from "../../../api/attendance.ts";
 import {
   AttendanceInfo,
   updateAttendee,
+  UpdateAttendeeRequest,
   useAttendee,
 } from "../../../api/attendee.ts";
+import Alert from "../../../components/Alert.tsx";
 import { PrimaryButton, TertiaryButton } from "../../../components/Button.tsx";
 import InfoBar from "../../../components/InfoBar.tsx";
 import AttendanceChip from "../../../components/sessions/AttendanceChip.tsx";
@@ -33,22 +38,38 @@ function Attendee() {
 
   const queryClient = useQueryClient();
   const { data: attendeeData } = useAttendee(attendeeId);
-  const { mutate: updateAttendees } = useMutation({
-    mutationFn: updateAttendee,
+  const { mutate: updateAttendeeInfo } = useMutation({
+    mutationFn: ({
+      updatedAttendees,
+      updateAttendances,
+      courseId,
+    }: UpdateAttendeeRequest & UpdateAttendanceStatusRequest) => {
+      return Promise.all([
+        updateAttendee({
+          updatedAttendees,
+          courseId,
+        }),
+        updateAttendanceStatus({
+          updateAttendances,
+        }),
+      ]);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["attendee", attendeeId] });
       setTempAttendee(null);
-      setIsEditing(false);
-    },
-  });
-  const { mutate: updateAttendances } = useMutation({
-    mutationFn: updateAttendanceStatus,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["attendee", attendeeId] });
       setTempAttendances({});
       setIsEditing(false);
+      setHasNamesakeError(false);
+    },
+    onError: (error) => {
+      // TODO: How to handle error?
+      // what if one request success and the other fails? Can we rollback?
+      console.error(error);
+      setHasNamesakeError(true);
     },
   });
+
+  const [hasNamesakeError, setHasNamesakeError] = useState(false);
 
   // 수정 관련
   const [tempAttendee, setTempAttendee] = useState<AttendeeInfo | null>(null);
@@ -64,11 +85,9 @@ function Attendee() {
           <PrimaryButton
             onClick={() => {
               if (tempAttendee != null) {
-                updateAttendees({
+                updateAttendeeInfo({
                   updatedAttendees: [tempAttendee],
                   courseId: courseId,
-                });
-                updateAttendances({
                   updateAttendances: Object.values(tempAttendances),
                 });
               }
@@ -99,6 +118,12 @@ function Attendee() {
         )}
       </TitleBar>
       <ContentContainer>
+        {hasNamesakeError && (
+          <Alert type="warning" style={{ marginBottom: "1.2rem" }}>
+            There are attendees with the same name and note. Please modify them
+            without duplication.
+          </Alert>
+        )}
         <InfoBar
           values={[
             {

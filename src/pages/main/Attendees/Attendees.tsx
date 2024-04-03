@@ -9,6 +9,7 @@ import {
   updateAttendee,
   useAttendees,
 } from "../../../api/attendee.ts";
+import Alert from "../../../components/Alert.tsx";
 import AlertModal from "../../../components/AlertModal.tsx";
 import AttendeesItem from "../../../components/attendees/AttendeesItem.tsx";
 import {
@@ -43,6 +44,7 @@ function Attendees() {
       queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
     },
   });
+
   const { mutate: updateAttendees } = useMutation({
     mutationFn: updateAttendee,
     mutationKey: ["updateAttendee"],
@@ -51,11 +53,16 @@ function Attendees() {
       // cleanup
       setTempAttendees(null);
       setEditing(false);
+      setHasNamesakeError(false);
+      setCheckedState({});
     },
     onError: () => {
       // TODO: show error message
+      setHasNamesakeError(true);
     },
   });
+
+  const [hasNamesakeError, setHasNamesakeError] = useState(false);
 
   const {
     checkedState,
@@ -113,7 +120,6 @@ function Attendees() {
           originalAttendeesMap.get(attendee.id)?.name !== attendee.name ||
           originalAttendeesMap.get(attendee.id)?.note !== attendee.note
       );
-      console.log(changedAttendees);
 
       // send changed attendees to server
       updateAttendees({
@@ -164,6 +170,12 @@ function Attendees() {
           )}
         </HeaderContainer>
         <ContentContainer>
+          {hasNamesakeError && (
+            <Alert type="warning" style={{ marginBottom: "1.2rem" }}>
+              There are attendees with the same name and note. Please modify
+              them without duplication.
+            </Alert>
+          )}
           <Table>
             <TableHead>
               <tr>
@@ -178,7 +190,7 @@ function Attendees() {
                 )}
                 <TableHeadItem
                   style={{
-                    width: "20rem",
+                    width: "18rem",
                     border: "none",
                   }}
                 >
@@ -186,15 +198,15 @@ function Attendees() {
                 </TableHeadItem>
                 <TableHeadItem
                   style={{
-                    width: "20rem",
+                    width: "26.5rem",
                     border: "none",
                   }}
                 >
-                  Notes
+                  Note
                 </TableHeadItem>
                 <TableHeadItem
                   style={{
-                    width: "14rem",
+                    width: "17rem",
                     border: "none",
                   }}
                 >
@@ -280,7 +292,7 @@ const HeaderContainer = styled.div`
   justify-content: space-between;
   margin-left: 6.2rem;
   margin-right: auto;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1.3rem;
 
   h5 {
     ${theme.typography.h5};
