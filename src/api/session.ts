@@ -35,8 +35,15 @@ export type CreateSessionRequest = {
   sessionName: string;
 };
 
+export type UpdateSessionsRequest = {
+  sessions: {
+    id: number;
+    name: string;
+  }[];
+};
+
 export type DeleteSessionRequest = {
-  sessionId: number;
+  sessionIds: number[];
 };
 
 export type SessionWithoutId = Omit<Session, "id">;
@@ -117,9 +124,11 @@ export const createSession = async (request: CreateSessionRequest) => {
 };
 
 export const deleteSession = async (request: DeleteSessionRequest) => {
-  return axios.delete(`/api/session`, {
-    params: request,
-  });
+  return axios.post(`/api/session/delete`, request);
+};
+
+export const updateSessions = async (request: UpdateSessionsRequest) => {
+  return axios.put("/api/session", request);
 };
 
 export const useSessions = (courseId: number) => {
