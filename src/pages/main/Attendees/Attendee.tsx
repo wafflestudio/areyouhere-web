@@ -1,23 +1,26 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import dateFormat from "dateformat";
-import React, { useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 
-import { updateAttendanceStatus } from "../../../api/attendance.ts";
+import {
+  updateAttendanceStatus,
+  UpdateAttendanceStatusRequest,
+} from "../../../api/attendance.ts";
 import {
   AttendanceInfo,
   updateAttendee,
+  UpdateAttendeeRequest,
   useAttendee,
 } from "../../../api/attendee.ts";
+import Alert from "../../../components/Alert.tsx";
+import AttendeeAttendanceItem from "../../../components/attendees/AttendeeAttendanceItem.tsx";
 import { PrimaryButton, TertiaryButton } from "../../../components/Button.tsx";
 import InfoBar from "../../../components/InfoBar.tsx";
-import AttendanceChip from "../../../components/sessions/AttendanceChip.tsx";
 import {
   Table,
   TableBody,
   TableHead,
   TableHeadItem,
-  TableItem,
   TableRow,
 } from "../../../components/table/Table.tsx";
 import TableControl from "../../../components/table/TableControl.tsx";
@@ -33,22 +36,38 @@ function Attendee() {
 
   const queryClient = useQueryClient();
   const { data: attendeeData } = useAttendee(attendeeId);
-  const { mutate: updateAttendees } = useMutation({
-    mutationFn: updateAttendee,
+  const { mutate: updateAttendeeInfo } = useMutation({
+    mutationFn: ({
+      updatedAttendees,
+      updateAttendances,
+      courseId,
+    }: UpdateAttendeeRequest & UpdateAttendanceStatusRequest) => {
+      return Promise.all([
+        updateAttendee({
+          updatedAttendees,
+          courseId,
+        }),
+        updateAttendanceStatus({
+          updateAttendances,
+        }),
+      ]);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["attendee", attendeeId] });
       setTempAttendee(null);
-      setIsEditing(false);
-    },
-  });
-  const { mutate: updateAttendances } = useMutation({
-    mutationFn: updateAttendanceStatus,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["attendee", attendeeId] });
       setTempAttendances({});
       setIsEditing(false);
+      setHasNamesakeError(false);
+    },
+    onError: (error) => {
+      // TODO: How to handle error?
+      // what if one request success and the other fails? Can we rollback?
+      console.error(error);
+      setHasNamesakeError(true);
     },
   });
+
+  const [hasNamesakeError, setHasNamesakeError] = useState(false);
 
   // 수정 관련
   const [tempAttendee, setTempAttendee] = useState<AttendeeInfo | null>(null);
@@ -64,11 +83,9 @@ function Attendee() {
           <PrimaryButton
             onClick={() => {
               if (tempAttendee != null) {
-                updateAttendees({
+                updateAttendeeInfo({
                   updatedAttendees: [tempAttendee],
                   courseId: courseId,
-                });
-                updateAttendances({
                   updateAttendances: Object.values(tempAttendances),
                 });
               }
@@ -99,6 +116,12 @@ function Attendee() {
         )}
       </TitleBar>
       <ContentContainer>
+        {hasNamesakeError && (
+          <Alert type="warning" style={{ marginBottom: "1.2rem" }}>
+            There are attendees with the same name and note. Please modify them
+            without duplication.
+          </Alert>
+        )}
         <InfoBar
           values={[
             {
@@ -161,68 +184,36 @@ function Attendee() {
             {(isEditing
               ? Object.values(tempAttendances)
               : attendeeData?.attendanceInfo ?? []
-            ).map((attendance, index) => (
-              <TableRow key={index}>
-                <TableItem noBorders>
-                  {dateFormat(attendance.attendanceTime, "yyyy-mm-dd")}
-                </TableItem>
-                <TableItem
-                  noBorders
-                  style={{
-                    width: "24rem",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
+            )
+              .sort((a, b) => {
+                if (option === "earliest") {
+                  return (
+                    a.attendanceTime.getTime() - b.attendanceTime.getTime()
+                  );
+                } else {
+                  return (
+                    b.attendanceTime.getTime() - a.attendanceTime.getTime()
+                  );
+                }
+              })
+              .map((attendance, index) => (
+                <AttendeeAttendanceItem
+                  key={index}
+                  attendance={attendance}
+                  isEditing={isEditing}
+                  onAttendanceStatusChange={(status) => {
+                    setTempAttendances({
+                      ...tempAttendances,
+                      [attendance.attendanceId]: {
+                        ...tempAttendances[attendance.attendanceId],
+                        attendanceStatus: status,
+                      },
+                    });
                   }}
-                >
-                  {attendance.sessionName}
-                </TableItem>
-                <TableItem noBorders>
-                  {isEditing ? (
-                    <AttendanceChipContainer>
-                      <AttendanceChip
-                        type={"attendance"}
-                        active={attendance.attendanceStatus}
-                        clickable
-                        onClick={() => {
-                          setTempAttendances({
-                            ...tempAttendances,
-                            [attendance.attendanceId]: {
-                              ...attendance,
-                              attendanceStatus: true,
-                            },
-                          });
-                        }}
-                      />
-                      <AttendanceChip
-                        type={"absence"}
-                        active={!attendance.attendanceStatus}
-                        clickable
-                        onClick={() => {
-                          setTempAttendances({
-                            ...tempAttendances,
-                            [attendance.attendanceId]: {
-                              ...attendance,
-                              attendanceStatus: false,
-                            },
-                          });
-                        }}
-                      />
-                    </AttendanceChipContainer>
-                  ) : (
-                    <AttendanceChip
-                      type={
-                        attendance.attendanceStatus ? "attendance" : "absence"
-                      }
-                      active
-                    />
-                  )}
-                </TableItem>
-                <TableItem noBorders>
-                  {dateFormat(attendance.attendanceTime, "HH:MM:ss")}
-                </TableItem>
-              </TableRow>
-            ))}
+                  // TODO: Link to session detail page
+                  to={isEditing ? undefined : `/courses/${courseId}/sessions/1`}
+                />
+              ))}
           </TableBody>
         </Table>
       </ContentContainer>
@@ -244,12 +235,6 @@ const ContentContainer = styled.div`
   margin-left: 6.2rem;
   margin-right: auto;
   margin-bottom: 5rem;
-`;
-
-const AttendanceChipContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 0.8rem;
 `;
 
 export default Attendee;
