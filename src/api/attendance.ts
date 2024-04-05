@@ -52,6 +52,11 @@ export type UpdateAttendanceStatusRequest = {
   updateAttendances: UpdateAttendee[];
 };
 
+export type DetailedAttendanceStatus = {
+  attendees: AttendeeInfo[];
+  absentees: AttendeeInfo[];
+};
+
 export const postAttend = async (
   request: AttendanceRequest
 ): Promise<AttendanceResult> => {
@@ -99,6 +104,18 @@ export const getAttendanceStatus = async (
   return res.data;
 };
 
+export const getDetailedAttendanceStatus = async (
+  authCode?: string
+): Promise<DetailedAttendanceStatus> => {
+  if (authCode == null) {
+    return { attendees: [], absentees: [] };
+  }
+  const res = await axios.get(`/api/attendance/detail`, {
+    params: { authCode },
+  });
+  return res.data;
+};
+
 export const updateAttendanceStatus = async (
   request: UpdateAttendanceStatusRequest
 ): Promise<void> => {
@@ -110,5 +127,12 @@ export const useAttendanceStatus = (courseId: number, sessionId?: number) => {
     queryKey: ["attendance", courseId, sessionId],
     queryFn: () => getAttendanceStatus(courseId, sessionId),
     refetchInterval: 1000,
+  });
+};
+
+export const useDetailedAttendanceStatus = (authCode?: string) => {
+  return useQuery({
+    queryKey: ["attendanceDetail", authCode],
+    queryFn: () => getDetailedAttendanceStatus(authCode),
   });
 };
