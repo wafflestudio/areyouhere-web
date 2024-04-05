@@ -210,8 +210,11 @@ function Attendee() {
                       },
                     });
                   }}
-                  // TODO: Link to session detail page
-                  to={isEditing ? undefined : `/courses/${courseId}/sessions/1`}
+                  to={
+                    isEditing
+                      ? undefined
+                      : `/class/${courseId}/sessions/${attendance.sessionId}`
+                  }
                 />
               ))}
           </TableBody>

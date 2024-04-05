@@ -136,12 +136,11 @@ function SessionDetail() {
                     };
                     setTempAttendees(newTempAttendees);
                   }}
-                  // TODO: 링크 잇기
-                  // to={
-                  //   isEditing
-                  //     ? undefined
-                  //     : `/class/${classId}/attendee/${attendee.attendee.id}`
-                  // }
+                  to={
+                    isEditing
+                      ? undefined
+                      : `/class/${classId}/attendee/${attendee.attendee.id}`
+                  }
                 />
               ))}
           </TableBody>

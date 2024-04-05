@@ -17,7 +17,7 @@ export type GetSessionsResponse = {
 
 export type SessionAttendee = {
   attendanceId: number;
-  attendee: Omit<AttendeeInfo, "id">;
+  attendee: AttendeeInfo;
   attendanceStatus: boolean;
   attendanceTime: Date;
 };
