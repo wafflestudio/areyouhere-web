@@ -96,8 +96,9 @@ function Home() {
             <TextField
               type="text"
               placeholder="Passcode"
+              maxLength={4}
               value={passcode}
-              onChange={(e) => setPasscode(e.target.value)}
+              onChange={(e) => setPasscode(e.target.value.toUpperCase())}
               style={{ marginTop: "1.1rem" }}
             />
             {errorMessage && (
@@ -135,6 +136,7 @@ function Home() {
             textFieldStyle={{ padding: "1.5rem" }}
             autoComplete="name"
             placeholder="Name"
+            maxLength={4}
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -142,7 +144,7 @@ function Home() {
             textFieldStyle={{ padding: "1.5rem" }}
             placeholder="Passcode"
             value={passcode}
-            onChange={(e) => setPasscode(e.target.value)}
+            onChange={(e) => setPasscode(e.target.value.toUpperCase())}
           />
           {errorMessage && (
             <Alert type="warning" style={{ marginTop: "1rem" }} size="small">

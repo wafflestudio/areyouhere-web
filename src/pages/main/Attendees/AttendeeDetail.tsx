@@ -29,7 +29,7 @@ import TitleBar from "../../../components/TitleBar.tsx";
 import { useAttendeeId, useClassId } from "../../../hooks/urlParse.tsx";
 import { AttendeeInfo } from "../../../type.ts";
 
-function Attendee() {
+function AttendeeDetail() {
   const courseId = useClassId();
   const attendeeId = useAttendeeId();
   const [option, setOption] = useState<string>("latest");
@@ -240,4 +240,4 @@ const ContentContainer = styled.div`
   margin-bottom: 5rem;
 `;
 
-export default Attendee;
+export default AttendeeDetail;

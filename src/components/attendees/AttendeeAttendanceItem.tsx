@@ -44,7 +44,9 @@ const AttendeeAttendanceItem = ({
         />
       </TableItem>
       <TableItem noBorders to={to}>
-        {dateFormat(attendance.attendanceTime, "HH:MM:ss")}
+        {attendance.attendanceStatus
+          ? dateFormat(attendance.attendanceTime, "HH:MM:ss")
+          : "--:--:--"}
       </TableItem>
     </TableRow>
   );

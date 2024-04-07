@@ -31,7 +31,17 @@ const AttendanceStatusDrawer = ({ authCode }: AttendanceStatusDrawerProps) => {
         </AttendedChip>
         <AttendeeContainer style={{ marginTop: "1.4rem" }}>
           {attendanceDetailedStatus?.attendees.map((attendee) => (
-            <span key={attendee.id}>{attendee.name}</span>
+            <span
+              key={attendee.id}
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "10rem",
+              }}
+            >
+              {attendee.name + " " + attendee.note}
+            </span>
           ))}
         </AttendeeContainer>
         <AbsentChip style={{ marginTop: "3rem" }}>
@@ -40,7 +50,17 @@ const AttendanceStatusDrawer = ({ authCode }: AttendanceStatusDrawerProps) => {
         </AbsentChip>
         <AttendeeContainer style={{ marginTop: "1.4rem" }}>
           {attendanceDetailedStatus?.absentees.map((absentee) => (
-            <span key={absentee.id}>{absentee.name}</span>
+            <span
+              key={absentee.id}
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "10rem",
+              }}
+            >
+              {absentee.name + " " + absentee.note}
+            </span>
           ))}
         </AttendeeContainer>
       </Drawer>
