@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -23,6 +23,10 @@ function CreateClass() {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
       navigate("/class");
     },
+    onSettled: () => {
+      setIsSubmitting(false);
+      isSubmittingRef.current = false;
+    },
   });
 
   const [className, setClassName] = useState("");
@@ -36,7 +40,11 @@ function CreateClass() {
   const [namesakeModalState, openNamesakeModal, closeNamesakeModal] =
     useModalState();
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(isSubmitting);
+
   const submit = () => {
+    if (isSubmittingRef.current) return;
     // 1. arrange by name
     const nameMap = new Map<string, number>();
     const namesakeArray: PickPartial<AttendeeInfo, "id">[][] = [];
@@ -61,6 +69,8 @@ function CreateClass() {
       return;
     }
     // 3-1. if namesakes do not exist, create class
+    setIsSubmitting(true);
+    isSubmittingRef.current = true;
     createClass({
       name: className,
       description,
@@ -116,7 +126,7 @@ function CreateClass() {
           <PrimaryButton
             style={{ width: "45rem" }}
             onClick={submit}
-            disabled={className === ""}
+            disabled={className === "" || isSubmitting}
           >
             Create a New Class
           </PrimaryButton>

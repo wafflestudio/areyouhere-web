@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
+import { useEffect } from "react";
 import styled from "styled-components";
 
 import { useAttendanceStatus } from "../../api/attendance";
 import { createAuthCode, deactivateAuthCode } from "../../api/authCode";
 import { useCurrentSessionInfo } from "../../api/dashboard";
 import expandDarkGrey from "../../assets/dashboard/expandDarkGrey.svg";
-import { useClassId, useSessionId } from "../../hooks/urlParse";
+import { useClassId } from "../../hooks/urlParse";
 import { SecondaryButton } from "../Button";
 
 interface InfoCardsProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -47,10 +48,18 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
     },
   });
 
-  const { data: attendanceStatus } = useAttendanceStatus(
+  const { data: attendanceStatus, isError } = useAttendanceStatus(
     classId,
     currentSessionInfo?.id
   );
+
+  useEffect(() => {
+    if (isError) {
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
+    }
+  }, [classId, isError, queryClient]);
 
   return (
     <InfoCardContainer {...props}>
