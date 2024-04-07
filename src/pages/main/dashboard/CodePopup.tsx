@@ -58,12 +58,14 @@ function CodePopup() {
   // 출석 수가 변경되었을 때, 출석 상세 정보를 다시 불러오는 코드
   useEffect(() => {
     if (attendanceStatus?.attendances == null) return;
+    if (attendanceStatus?.total == null) return;
     if (currentSessionInfo?.authCode == null) return;
     queryClient.invalidateQueries({
       queryKey: ["attendanceDetail", currentSessionInfo?.authCode],
     });
   }, [
     attendanceStatus?.attendances,
+    attendanceStatus?.total,
     queryClient,
     currentSessionInfo?.authCode,
   ]);
