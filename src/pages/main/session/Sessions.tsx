@@ -114,6 +114,8 @@ function Sessions() {
     updateSessionsMutation({
       sessions: changedSessions,
     });
+
+    setCheckedState({});
   };
 
   // 정렬 관련
@@ -139,6 +141,7 @@ function Sessions() {
                     colorScheme={"red"}
                     style={{ width: "9.5rem" }}
                     onClick={openDeleteModal}
+                    disabled={checkedCount === 0}
                   >
                     Delete
                   </SecondaryButton>
