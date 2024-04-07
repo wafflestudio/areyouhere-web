@@ -32,9 +32,6 @@ function CodePopup() {
     mutationFn: deactivateAuthCode,
     mutationKey: ["deactivateAuthCode"],
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["currentSessionInfo", classId],
-      });
       window.close();
     },
   });
