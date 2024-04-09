@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 
 import { useAttendanceStatus } from "../../api/attendance";
@@ -50,7 +50,8 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
 
   const { data: attendanceStatus, isError } = useAttendanceStatus(
     classId,
-    currentSessionInfo?.id
+    currentSessionInfo?.id,
+    activated
   );
 
   useEffect(() => {
@@ -109,7 +110,6 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
             ) : (
               <ActivateButton
                 onClick={() => {
-                  // TODO: Activate session
                   if (currentSessionInfo?.id != null) {
                     activateSession({
                       courseId: classId!,
@@ -128,18 +128,28 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
           </InfoCard>
           <InfoCard>
             <InfoCardTitle>Attendance</InfoCardTitle>
-            <AttendanceContainer>
-              <AttendanceCount>
-                {attendanceStatus?.attendances ?? 0}
-              </AttendanceCount>
-              <AttendanceTotal>/</AttendanceTotal>
-              <AttendanceTotal>{attendanceStatus?.total ?? 0}</AttendanceTotal>
-            </AttendanceContainer>
-            <Absentees>
-              {(attendanceStatus?.total ?? 0) -
-                (attendanceStatus?.attendances ?? 0)}{" "}
-              absentees
-            </Absentees>
+            {activated ? (
+              <>
+                <AttendanceContainer>
+                  <AttendanceCount>
+                    {attendanceStatus?.attendances ?? 0}
+                  </AttendanceCount>
+                  <AttendanceTotal>/</AttendanceTotal>
+                  <AttendanceTotal>
+                    {attendanceStatus?.total ?? 0}
+                  </AttendanceTotal>
+                </AttendanceContainer>
+                <Absentees>
+                  {(attendanceStatus?.total ?? 0) -
+                    (attendanceStatus?.attendances ?? 0)}{" "}
+                  absentees
+                </Absentees>
+              </>
+            ) : (
+              <AttendanceNotActivated>
+                No sessions have been activated yet.
+              </AttendanceNotActivated>
+            )}
           </InfoCard>
           <InfoCard>
             <InfoCardTitle>Details</InfoCardTitle>
@@ -278,6 +288,19 @@ const AttendanceTotal = styled.span`
   line-height: 4.8rem;
   font-weight: 700;
   color: ${({ theme }) => theme.colors.black};
+`;
+
+const AttendanceNotActivated = styled.p`
+  ${({ theme }) => theme.typography.b1};
+  color: ${({ theme }) => theme.colors.darkGrey};
+  padding: 0.8rem;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 `;
 
 const Absentees = styled.p`
