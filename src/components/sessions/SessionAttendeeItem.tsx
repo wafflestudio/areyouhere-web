@@ -45,9 +45,7 @@ function SessionAttendeeItem({
         />
       </TableItem>
       <TableItem to={to}>
-        {!isEditing && attendanceStatus
-          ? dateFormat(attendanceTime, "HH:MM:ss")
-          : "--:--:--"}
+        {attendanceStatus ? dateFormat(attendanceTime, "HH:MM:ss") : "--:--:--"}
       </TableItem>
     </tr>
   );
