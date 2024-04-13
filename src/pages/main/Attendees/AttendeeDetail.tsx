@@ -80,19 +80,28 @@ function AttendeeDetail() {
     <Container>
       <TitleBar label="Attendee Details">
         {isEditing ? (
-          <PrimaryButton
-            onClick={() => {
-              if (tempAttendee != null) {
-                updateAttendeeInfo({
-                  updatedAttendees: [tempAttendee],
-                  courseId: courseId,
-                  updateAttendances: Object.values(tempAttendances),
-                });
-              }
-            }}
-          >
-            Save
-          </PrimaryButton>
+          <ButtonContainer>
+            <TertiaryButton
+              onClick={() => {
+                setIsEditing(false);
+              }}
+            >
+              Cancel
+            </TertiaryButton>
+            <PrimaryButton
+              onClick={() => {
+                if (tempAttendee != null) {
+                  updateAttendeeInfo({
+                    updatedAttendees: [tempAttendee],
+                    courseId: courseId,
+                    updateAttendances: Object.values(tempAttendances),
+                  });
+                }
+              }}
+            >
+              Save
+            </PrimaryButton>
+          </ButtonContainer>
         ) : (
           <TertiaryButton
             onClick={() => {
@@ -238,6 +247,11 @@ const ContentContainer = styled.div`
   margin-left: 6.2rem;
   margin-right: auto;
   margin-bottom: 5rem;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 1rem;
 `;
 
 export default AttendeeDetail;

@@ -61,7 +61,7 @@ function Sessions() {
       queryClient.invalidateQueries({
         queryKey: ["sessions", classId],
       });
-      setEditing(false);
+      setIsEditing(false);
     },
   });
 
@@ -89,7 +89,7 @@ function Sessions() {
   };
 
   // 수정 관련
-  const [editing, setEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [tempSessions, setTempSessions] = useState<Record<number, Session>>({});
   const handleSave = () => {
     const changedSessions: { id: number; name: string }[] = [];
@@ -135,8 +135,16 @@ function Sessions() {
             value={option}
             onOptionChange={setOption}
             trailing={
-              editing ? (
+              isEditing ? (
                 <>
+                  <TertiaryButton
+                    onClick={() => {
+                      setIsEditing(false);
+                      setCheckedState({});
+                    }}
+                  >
+                    Cancel
+                  </TertiaryButton>
                   <SecondaryButton
                     colorScheme={"red"}
                     style={{ width: "9.5rem" }}
@@ -165,7 +173,7 @@ function Sessions() {
                         {}
                       ) ?? {}
                     );
-                    setEditing(!editing);
+                    setIsEditing(!isEditing);
                   }}
                 >
                   Edit
@@ -176,7 +184,7 @@ function Sessions() {
           <Table>
             <TableHead>
               <tr>
-                {editing && (
+                {isEditing && (
                   <CheckboxHeadItem>
                     <Checkbox
                       checkboxId="masterCheckbox"
@@ -219,7 +227,7 @@ function Sessions() {
               </tr>
             </TableHead>
             <TableBody>
-              {(editing ? Object.values(tempSessions) : sessions ?? [])
+              {(isEditing ? Object.values(tempSessions) : sessions ?? [])
                 .sort((a, b) => {
                   if (option === "earliest") {
                     return a.date.getTime() - b.date.getTime();
@@ -237,10 +245,10 @@ function Sessions() {
                         [session.id]: session,
                       });
                     }}
-                    editing={editing}
+                    editing={isEditing}
                     key={session.id}
                     to={
-                      editing
+                      isEditing
                         ? undefined
                         : `/class/${classId}/sessions/${session.id}`
                     }

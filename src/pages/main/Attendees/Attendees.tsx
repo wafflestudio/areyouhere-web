@@ -52,7 +52,7 @@ function Attendees() {
       queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
       // cleanup
       setTempAttendees(null);
-      setEditing(false);
+      setIsEditing(false);
       setHasNamesakeError(false);
       setCheckedState({});
     },
@@ -130,7 +130,7 @@ function Attendees() {
   };
 
   // 수정 관련
-  const [editing, setEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [tempAttendees, setTempAttendees] = useState<GetAttendeesResult | null>(
     null
   );
@@ -145,8 +145,16 @@ function Attendees() {
         </TitleBar>
         <HeaderContainer>
           <h5>{attendees?.length ?? 0} Attendees</h5>
-          {editing ? (
+          {isEditing ? (
             <ActionContainer>
+              <TertiaryButton
+                onClick={() => {
+                  setIsEditing(false);
+                  setCheckedState({});
+                }}
+              >
+                Cancel
+              </TertiaryButton>
               <SecondaryButton
                 onClick={openDeleteModal}
                 disabled={checkedCount === 0}
@@ -161,7 +169,7 @@ function Attendees() {
               onClick={() => {
                 if (attendees != null) {
                   setTempAttendees(attendees.slice());
-                  setEditing(true);
+                  setIsEditing(true);
                 }
               }}
             >
@@ -179,7 +187,7 @@ function Attendees() {
           <Table>
             <TableHead>
               <tr>
-                {editing && (
+                {isEditing && (
                   <CheckboxHeadItem>
                     <Checkbox
                       checkboxId="masterCheckbox"
@@ -222,9 +230,9 @@ function Attendees() {
                 </TableHeadItem>
               </tr>
             </TableHead>
-            {(editing ? tempAttendees : attendees)?.map((attendee, index) => (
+            {(isEditing ? tempAttendees : attendees)?.map((attendee, index) => (
               <AttendeesItem
-                editing={editing}
+                editing={isEditing}
                 key={attendee.attendee.id}
                 attendee={attendee.attendee}
                 attendance={attendee.attendance}
@@ -243,7 +251,7 @@ function Attendees() {
                   }
                 }}
                 to={
-                  editing
+                  isEditing
                     ? undefined
                     : `/class/${classId}/attendee/${attendee.attendee.id}`
                 }

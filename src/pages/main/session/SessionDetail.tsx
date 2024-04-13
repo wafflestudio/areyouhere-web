@@ -56,21 +56,30 @@ function SessionDetail() {
     <Container>
       <TitleBar label="Session Details">
         {isEditing ? (
-          <PrimaryButton
-            onClick={() => {
-              const updateData: UpdateAttendee[] = tempAttendees.map(
-                (attendee) => ({
-                  attendanceId: attendee.attendanceId,
-                  attendanceStatus: attendee.attendanceStatus,
-                })
-              );
-              updateAttendees({
-                updateAttendances: updateData,
-              });
-            }}
-          >
-            Save
-          </PrimaryButton>
+          <ButtonContainer>
+            <TertiaryButton
+              onClick={() => {
+                setIsEditing(false);
+              }}
+            >
+              Cancel
+            </TertiaryButton>
+            <PrimaryButton
+              onClick={() => {
+                const updateData: UpdateAttendee[] = tempAttendees.map(
+                  (attendee) => ({
+                    attendanceId: attendee.attendanceId,
+                    attendanceStatus: attendee.attendanceStatus,
+                  })
+                );
+                updateAttendees({
+                  updateAttendances: updateData,
+                });
+              }}
+            >
+              Save
+            </PrimaryButton>
+          </ButtonContainer>
         ) : (
           <TertiaryButton
             onClick={() => {
@@ -164,6 +173,11 @@ const ContentContainer = styled.div`
   margin-left: 6.2rem;
   margin-right: auto;
   margin-bottom: 5rem;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 1rem;
 `;
 
 export default SessionDetail;
