@@ -5,7 +5,10 @@ import styled from "styled-components";
 
 import { updateCourse, useCourses } from "../../api/course.ts";
 import { PrimaryButton } from "../../components/Button.tsx";
-import { MultiLineTextField } from "../../components/TextField.tsx";
+import {
+  MultiLineTextField,
+  SingleLineTextField,
+} from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 import { useClassId } from "../../hooks/urlParse.tsx";
 
@@ -46,14 +49,14 @@ function Settings() {
     <Container>
       <TitleBar label="Class Settings" />
       <SettingContainer>
-        <MultiLineTextField
-          textareaStyle={{ height: "4.5rem" }}
+        <SingleLineTextField
+          textFieldStyle={{ height: "4.5rem" }}
           label="Name of your class"
           value={className}
           onChange={(e) => setClassName(e.target.value)}
         />
         <MultiLineTextField
-          textareaStyle={{ height: "12rem" }}
+          textFieldStyle={{ height: "12rem" }}
           label="Description"
           value={description}
           placeholder="Add a description."

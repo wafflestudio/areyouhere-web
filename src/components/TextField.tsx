@@ -4,7 +4,12 @@ import styled from "styled-components";
 interface TextAreaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
-  textareaStyle?: React.CSSProperties;
+  textFieldStyle?: React.CSSProperties;
+}
+
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  textFieldStyle?: React.CSSProperties;
 }
 
 export const StyledInput = styled.input<{ hasError?: boolean }>`
@@ -38,6 +43,23 @@ interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   hasError?: boolean;
   supportingText?: React.ReactNode | string;
 }
+
+const SingleLineInput = styled.input`
+  padding: 1rem 1.5rem;
+  ${({ theme }) => theme.typography.b3};
+  border: 0.1rem solid #e3e3e3;
+  border-radius: 1rem;
+
+  width: 45rem;
+
+  :focus {
+    outline: none;
+  }
+
+  ::placeholder {
+    color: #9b9b9b;
+  }
+`;
 
 const StyledTextArea = styled.textarea`
   padding: 1rem 1.5rem;
@@ -79,16 +101,30 @@ function TextField({
   );
 }
 
+function SingleLineTextField({
+  label,
+  style,
+  textFieldStyle,
+  ...props
+}: InputProps) {
+  return (
+    <TextAreaContainer style={style}>
+      {label && <TextFieldLabel>{label}</TextFieldLabel>}
+      <SingleLineInput {...props} style={textFieldStyle} />
+    </TextAreaContainer>
+  );
+}
+
 function MultiLineTextField({
   label,
   style,
-  textareaStyle,
+  textFieldStyle,
   ...props
 }: TextAreaProps) {
   return (
     <TextAreaContainer style={style}>
       {label && <TextFieldLabel>{label}</TextFieldLabel>}
-      <StyledTextArea {...props} style={textareaStyle} />
+      <StyledTextArea {...props} style={textFieldStyle} />
     </TextAreaContainer>
   );
 }
@@ -96,7 +132,7 @@ function MultiLineTextField({
 const TextFieldLabel = styled.label`
   ${({ theme }) => theme.typography.b3};
   font-weight: 600;
-  margin-bottom: 0.4rem;
+  margin-top: 0.9rem;
 `;
 
 const SupportingLabel = styled.p<{ hasError?: boolean }>`
@@ -125,4 +161,4 @@ const TextAreaContainer = styled.div`
 `;
 
 export default TextField;
-export { MultiLineTextField };
+export { SingleLineTextField, MultiLineTextField };

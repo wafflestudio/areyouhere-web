@@ -7,7 +7,10 @@ import { createCourse } from "../../api/course.ts";
 import AddAttendeesChip from "../../components/attendees/AddAttendeesChip.tsx";
 import { PrimaryButton } from "../../components/Button.tsx";
 import NamesakeModal from "../../components/class/NamesakeModal.tsx";
-import { MultiLineTextField } from "../../components/TextField.tsx";
+import {
+  MultiLineTextField,
+  SingleLineTextField,
+} from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 import useModalState from "../../hooks/modal.tsx";
 import { AttendeeInfo, PickPartial } from "../../type.ts";
@@ -85,10 +88,6 @@ function CreateClass() {
     });
   };
 
-  // 따닥 방지
-  const isLoadingRef = useRef(false);
-  const rerender = useReru;
-
   return (
     <>
       <NamesakeModal
@@ -110,14 +109,14 @@ function CreateClass() {
       <Container>
         <TitleBar label="Create a New Class" />
         <CreatClassContainer>
-          <MultiLineTextField
-            textareaStyle={{ height: "4.5rem" }}
+          <SingleLineTextField
+            textFieldStyle={{ height: "4.5rem" }}
             label="Name of your class"
             value={className}
             onChange={(e) => setClassName(e.target.value)}
           />
           <MultiLineTextField
-            textareaStyle={{ height: "12rem" }}
+            textFieldStyle={{ height: "12rem" }}
             label="Description"
             value={description}
             placeholder="Add a description."
