@@ -85,6 +85,10 @@ function CreateClass() {
     });
   };
 
+  // 따닥 방지
+  const isLoadingRef = useRef(false);
+  const rerender = useReru;
+
   return (
     <>
       <NamesakeModal

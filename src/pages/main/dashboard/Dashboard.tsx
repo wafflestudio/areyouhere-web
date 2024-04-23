@@ -1,10 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { useCourse } from "../../../api/course.ts";
-import { usePreviousSessions } from "../../../api/dashboard.ts";
+import {
+  usePreviousSessions,
+  deletePendingSession,
+  useCurrentSessionInfo,
+} from "../../../api/dashboard.ts";
 import { createSession } from "../../../api/session.ts";
 import { PrimaryButton } from "../../../components/Button.tsx";
 import CreateSessionModal from "../../../components/dashboard/CreateSessionModal.tsx";
@@ -47,19 +52,68 @@ function Dashboard() {
     },
   });
 
+  const { mutate: deletePendingSessionMutate } = useMutation({
+    mutationFn: deletePendingSession,
+    mutationKey: ["deletePendingSession"],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["classId"],
+      });
+    },
+  });
+
   const { data: classItem } = useCourse(classId);
+
+  const [sessionState, setSessionState] = useState<
+    "none" | "pending" | "activated"
+  >("none");
+
+  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
+
+  useEffect(() => {
+    if (currentSessionInfo?.id == null) {
+      setSessionState("none");
+    } else if (currentSessionInfo?.authCode == null) {
+      setSessionState("pending");
+    } else {
+      setSessionState("activated");
+    }
+  }, [currentSessionInfo]);
 
   return (
     <>
       <Container>
         <TitleBar label={classItem?.name ?? ""}>
-          <PrimaryButton onClick={() => openCreateSessionModal()}>
-            Create New Session
-          </PrimaryButton>
+          {sessionState === "none" && (
+            <PrimaryButton onClick={() => openCreateSessionModal()}>
+              Create New Session
+            </PrimaryButton>
+          )}
+          {sessionState === "pending" && (
+            <PrimaryButton
+              onClick={() => deletePendingSessionMutate(classId)}
+              colorScheme="red"
+            >
+              Delete Current Session
+            </PrimaryButton>
+          )}
+          {/* 이렇게 deactivate 해놓기 vs 버튼 숨기기 중 뭐가 나으련지? */}
+          {sessionState === "activated" && (
+            <PrimaryButton
+              colorScheme="red"
+              disabled
+              style={{ cursor: "not-allowed" }}
+            >
+              Delete Current Session
+            </PrimaryButton>
+          )}
         </TitleBar>
         <ContentContainer>
           <Subtitle>Current Session</Subtitle>
-          <InfoCards onCreateNewSession={() => openCreateSessionModal()} />
+          <InfoCards
+            onCreateNewSession={() => openCreateSessionModal()}
+            setSessionState={setSessionState}
+          />
           <Subtitle style={{ marginTop: "5rem" }}>Previous Session</Subtitle>
           <ElevatedSessionTable>
             <TableHead>
@@ -118,13 +172,13 @@ function Dashboard() {
           state={createSessionModalState}
           onClose={closeCreateSessionModal}
           onSubmit={(sessionName) => {
-            // TODO: create a new session
             createSessionMutate({
               courseId: classId,
               sessionName,
             });
             closeCreateSessionModal();
           }}
+          setSessionState={setSessionState}
         />
       )}
     </>

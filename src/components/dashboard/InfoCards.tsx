@@ -12,9 +12,16 @@ import { SecondaryButton } from "../Button";
 
 interface InfoCardsProps extends React.HTMLAttributes<HTMLDivElement> {
   onCreateNewSession?: () => void;
+  setSessionState?: React.Dispatch<
+    React.SetStateAction<"none" | "pending" | "activated">
+  >;
 }
 
-function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
+function InfoCards({
+  onCreateNewSession,
+  setSessionState,
+  ...props
+}: InfoCardsProps) {
   const classId = useClassId();
 
   const queryClient = useQueryClient();
@@ -93,13 +100,13 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
                     style={{ borderRadius: "3rem", width: "100%" }}
                     colorScheme="red"
                     onClick={() => {
-                      // TODO: Deactivate session
                       if (currentSessionInfo?.authCode != null) {
                         deactivateSession({
                           authCode: currentSessionInfo.authCode,
                           sessionId: currentSessionInfo.id,
                           courseId: classId!,
                         });
+                        setSessionState?.("none");
                       }
                     }}
                   >
@@ -119,6 +126,7 @@ function InfoCards({ onCreateNewSession, ...props }: InfoCardsProps) {
                       `/class/${classId}/sessions/${currentSessionInfo.id}/code`,
                       "_blank"
                     );
+                    setSessionState?.("activated");
                   }
                 }}
               >
