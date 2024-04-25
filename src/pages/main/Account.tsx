@@ -63,7 +63,6 @@ function Account() {
           }
 
           mutate({ name: name, password });
-          navigate("/class");
         }}
       >
         <SingleLineTextField

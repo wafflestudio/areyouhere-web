@@ -52,6 +52,9 @@ function Dashboard() {
     },
   });
 
+  const { data: classItem } = useCourse(classId);
+  const { data: currentSessionInfo, refetch } = useCurrentSessionInfo(classId);
+
   const { mutate: deletePendingSessionMutate } = useMutation({
     mutationFn: deletePendingSession,
     mutationKey: ["deletePendingSession"],
@@ -59,16 +62,13 @@ function Dashboard() {
       queryClient.invalidateQueries({
         queryKey: ["classId"],
       });
+      refetch();
     },
   });
-
-  const { data: classItem } = useCourse(classId);
 
   const [sessionState, setSessionState] = useState<
     "none" | "pending" | "activated"
   >("none");
-
-  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
 
   useEffect(() => {
     if (currentSessionInfo?.id == null) {
@@ -91,7 +91,10 @@ function Dashboard() {
           )}
           {sessionState === "pending" && (
             <PrimaryButton
-              onClick={() => deletePendingSessionMutate(classId)}
+              onClick={() => {
+                deletePendingSessionMutate(classId);
+                refetch();
+              }}
               colorScheme="red"
             >
               Delete Current Session
