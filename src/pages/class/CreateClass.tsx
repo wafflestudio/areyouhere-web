@@ -110,7 +110,6 @@ function CreateClass() {
         <TitleBar label="Create a New Class" />
         <CreatClassContainer>
           <SingleLineTextField
-            textFieldStyle={{ height: "4.5rem" }}
             label="Name of your class"
             value={className}
             onChange={(e) => setClassName(e.target.value)}

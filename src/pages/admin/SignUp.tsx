@@ -5,7 +5,7 @@ import styled from "styled-components";
 
 import {
   EMAIL_REGEX,
-  NICKNAME_REGEX,
+  NAME_REGEX,
   PASSWORD_REGEX,
   signUp,
   useEmailConflict,
@@ -23,12 +23,12 @@ function SignUp() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [nickname, setNickname] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const nicknameError = nickname.match(NICKNAME_REGEX) == null;
+  const nameError = name.match(NAME_REGEX) == null;
   const emailError = email.match(EMAIL_REGEX) == null;
   const passwordError = password.match(PASSWORD_REGEX) == null;
   const confirmPasswordError = password !== confirmPassword;
@@ -64,7 +64,7 @@ function SignUp() {
           e.preventDefault();
 
           if (
-            nicknameError ||
+            nameError ||
             emailError ||
             passwordError ||
             confirmPasswordError
@@ -73,20 +73,20 @@ function SignUp() {
             return;
           }
 
-          mutate({ nickname, email, password });
+          mutate({ name, email, password });
         }}
       >
         <TextField
           autoComplete="name"
           type="text"
           label="Name"
-          onChange={(e) => setNickname(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           supportingText={
-            showError && nicknameError
-              ? "Nickname must be 2-16 characters long"
+            showError && nameError
+              ? "Name must be 2-16 characters long"
               : undefined
           }
-          hasError={showError && nicknameError}
+          hasError={showError && nameError}
         />
         <TextField
           autoComplete="email"
@@ -134,7 +134,7 @@ function SignUp() {
         <PrimaryButton
           style={{ marginTop: "3.0rem" }}
           disabled={
-            nickname === "" ||
+            name === "" ||
             email === "" ||
             password === "" ||
             confirmPassword === ""

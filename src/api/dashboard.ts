@@ -69,12 +69,7 @@ export const usePreviousSessions = (courseId: number) => {
 };
 
 export const deletePendingSession = async (courseId: number): Promise<void> => {
-  const res = await axios.delete(`/api/session`, {
+  return await axios.delete(`/api/session`, {
     params: { courseId },
-    validateStatus: () => true,
   });
-
-  if (res.status !== HttpStatusCode.Ok) {
-    throw new Error("Failed to delete pending session");
-  }
 };
