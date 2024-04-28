@@ -3,6 +3,7 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 import { logout } from "../api/user.ts";
+import accountIcon from "../assets/sidebar/account.svg";
 import attendeesDefault from "../assets/sidebar/attendeesDefault.svg";
 import attendeesHover from "../assets/sidebar/attendeesHover.svg";
 import attendeesOnClick from "../assets/sidebar/attendeesOnClick.svg";
@@ -106,37 +107,52 @@ function SideBar() {
     return false;
   };
 
+  const renderIcon = (item: MenuItem, index: number) => {
+    const urlMatches = determineIcon(item);
+    return (
+      <IconContainer key={index} onClick={() => navigate(item.path)}>
+        <img
+          src={urlMatches ? item.onClickIcon : item.defaultIcon}
+          alt={`${item.path}-icon`}
+          onMouseOver={(e) => {
+            if (!urlMatches) e.currentTarget.src = item.hoverIcon;
+          }}
+          onMouseOut={(e) => {
+            if (!urlMatches) e.currentTarget.src = item.defaultIcon;
+            else e.currentTarget.src = item.onClickIcon;
+          }}
+        />
+      </IconContainer>
+    );
+  };
+
   return (
     <Container>
+      {/* 로고 */}
       <IconContainer onClick={() => navigate("/")}>
         <img src={logo} alt="logo" />
       </IconContainer>
-      {location !== "/class" &&
-        location !== "/class/create" &&
-        menuItems.map((item, index) => {
-          const urlMatches = determineIcon(item);
-          return (
-            <IconContainer key={index} onClick={() => navigate(item.path)}>
-              <img
-                src={urlMatches ? item.onClickIcon : item.defaultIcon}
-                alt={`${item.path}-icon`}
-                onMouseOver={(e) => {
-                  if (!urlMatches) e.currentTarget.src = item.hoverIcon;
-                }}
-                onMouseOut={(e) => {
-                  if (!urlMatches) e.currentTarget.src = item.defaultIcon;
-                  else e.currentTarget.src = item.onClickIcon;
-                }}
-              />
-            </IconContainer>
-          );
-        })}
-      <IconContainer
-        onClick={() => logoutAndRedirect()}
-        style={{ marginTop: "auto" }}
-      >
-        <img src={logoutIcon} alt="logout" />
-      </IconContainer>
+      {/* class 관련 */}
+      {location === "/class" ||
+      location === "/class/create" ||
+      location === "/account"
+        ? renderIcon(menuItems[0], 0)
+        : menuItems.map((item, index) => renderIcon(item, index))}
+      {/* 계정, 로그아웃 */}
+      <AccountContainer>
+        <IconContainer
+          onClick={() => navigate(`/account`)}
+          style={{ marginTop: "auto" }}
+        >
+          <img src={accountIcon} alt="account" />
+        </IconContainer>
+        <IconContainer
+          onClick={() => logoutAndRedirect()}
+          style={{ marginTop: "auto" }}
+        >
+          <img src={logoutIcon} alt="logout" />
+        </IconContainer>
+      </AccountContainer>
     </Container>
   );
 }
@@ -170,6 +186,10 @@ const IconContainer = styled.div`
     width: 100%;
     height: 100%;
   }
+`;
+
+const AccountContainer = styled.div`
+  margin-top: auto;
 `;
 
 export default SideBar;

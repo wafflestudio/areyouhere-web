@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios, { HttpStatusCode } from "axios";
 
 export type SignUpRequest = {
-  nickname: string;
+  name: string;
   email: string;
   password: string;
 };
@@ -17,10 +17,15 @@ export type User = {
   name: string;
 };
 
+export type editProfileRequest = {
+  name: string;
+  password: string;
+};
+
 export const EMAIL_REGEX =
   "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 export const PASSWORD_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[\\W_]).{8,20}$";
-export const NICKNAME_REGEX = "^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣]{2,16}$";
+export const NAME_REGEX = "^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣]{2,16}$";
 
 export const getUser = async (): Promise<User | null> => {
   const res = await axios.get<User>("/api/auth/me", {
@@ -79,8 +84,6 @@ export const isEmailConflict = async (
     return false;
   }
 
-  console.log("isEmailConflict", email);
-
   const res = await axios.get(`/api/auth/email-availability`, {
     params: { email },
     validateStatus: () => true,
@@ -103,4 +106,14 @@ export const useEmailConflict = (email: string, enabled: boolean) => {
     queryKey: ["user", email],
     queryFn: () => isEmailConflict(email, enabled),
   });
+};
+
+export const editProfile = async (
+  request: editProfileRequest
+): Promise<void> => {
+  return await axios.put("/api/auth", request);
+};
+
+export const deleteUser = async (): Promise<void> => {
+  return await axios.delete("/api/auth");
 };

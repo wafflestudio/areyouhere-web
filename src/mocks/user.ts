@@ -18,7 +18,7 @@ export class AuthMock {
     DatabaseMock.users.push({
       id: DatabaseMock.nextUserId++,
       email: data.email,
-      name: data.nickname,
+      name: data.name,
       password: data.password,
     });
     DatabaseMock.update();

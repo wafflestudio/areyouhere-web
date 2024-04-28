@@ -7,6 +7,7 @@ import SignUp from "./pages/admin/SignUp";
 import ClassList from "./pages/class/ClassList.tsx";
 import CreateClass from "./pages/class/CreateClass.tsx";
 import Home from "./pages/Home";
+import Account from "./pages/main/Account.tsx";
 import AddAttendees from "./pages/main/Attendees/AddAttendees.tsx";
 import AttendeeDetail from "./pages/main/Attendees/AttendeeDetail.tsx";
 import Attendees from "./pages/main/Attendees/Attendees.tsx";
@@ -31,6 +32,8 @@ const router = createBrowserRouter([
         path: "/",
         element: <AuthRequiredRoute />,
         children: [
+          // 유저 계정
+          { path: "/account", element: <Account /> },
           // 클래스 관련
           { path: "/class", element: <ClassList /> },
           { path: "/class/create", element: <CreateClass /> },

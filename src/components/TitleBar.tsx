@@ -32,10 +32,16 @@ const Container = styled.div`
 
   & h2 {
     ${({ theme }) => theme.typography.h2};
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100rem;
   }
 `;
 
 const Divider = styled.div`
+  align-self: center;
   width: calc(100% - 7rem);
   border-top: ${({ theme }) => theme.colors.grey} 1px solid;
   margin: 2rem 3rem 3rem 2rem;

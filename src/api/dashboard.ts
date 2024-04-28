@@ -67,3 +67,9 @@ export const usePreviousSessions = (courseId: number) => {
     queryFn: () => getPreviousSessions(courseId),
   });
 };
+
+export const deletePendingSession = async (courseId: number): Promise<void> => {
+  return await axios.delete(`/api/session`, {
+    params: { courseId },
+  });
+};
