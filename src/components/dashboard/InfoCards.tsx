@@ -69,6 +69,15 @@ function InfoCards({
     }
   }, [classId, isError, queryClient]);
 
+  useEffect(() => {
+    const channel = new BroadcastChannel("sessionDelete");
+    channel.onmessage = () => {
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
+    };
+  }, [classId, queryClient]);
+
   return (
     <InfoCardContainer {...props}>
       {currentSessionInfo?.id != null ? (

@@ -53,16 +53,19 @@ function Dashboard() {
   });
 
   const { data: classItem } = useCourse(classId);
-  const { data: currentSessionInfo, refetch } = useCurrentSessionInfo(classId);
+  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
 
   const { mutate: deletePendingSessionMutate } = useMutation({
     mutationFn: deletePendingSession,
     mutationKey: ["deletePendingSession"],
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["classId"],
+        queryKey: ["classId", "currentSessionInfo"],
       });
-      refetch();
+      setSessionState("none");
+      const channel = new BroadcastChannel("sessionDelete");
+      channel.postMessage("delete");
+      channel.close();
     },
   });
 
@@ -93,7 +96,6 @@ function Dashboard() {
             <PrimaryButton
               onClick={() => {
                 deletePendingSessionMutate(classId);
-                refetch();
               }}
               colorScheme="red"
             >
