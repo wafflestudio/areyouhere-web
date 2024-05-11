@@ -10,16 +10,12 @@ interface CreateSessionModalProps {
   state: ModalStateType;
   onClose: () => void;
   onSubmit?: (sessionName: string) => void;
-  setSessionState: React.Dispatch<
-    React.SetStateAction<"none" | "pending" | "activated">
-  >;
 }
 
 function CreateSessionModal({
   state,
   onClose,
   onSubmit,
-  setSessionState,
 }: CreateSessionModalProps) {
   const [sessionName, setSessionName] = useState("");
 
@@ -38,7 +34,6 @@ function CreateSessionModal({
           <PrimaryButton
             onClick={() => {
               onSubmit?.(sessionName);
-              setSessionState("pending");
             }}
             disabled={sessionName === ""}
           >

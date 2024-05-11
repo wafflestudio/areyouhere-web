@@ -49,6 +49,7 @@ function Dashboard() {
       queryClient.invalidateQueries({
         queryKey: ["currentSessionInfo", classId],
       });
+      setSessionState("pending");
     },
   });
 
@@ -173,7 +174,6 @@ function Dashboard() {
             });
             closeCreateSessionModal();
           }}
-          setSessionState={setSessionState}
         />
       )}
     </>
