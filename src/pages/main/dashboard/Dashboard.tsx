@@ -100,16 +100,6 @@ function Dashboard() {
               Delete Current Session
             </PrimaryButton>
           )}
-          {/* 이렇게 deactivate 해놓기 vs 버튼 숨기기 중 뭐가 나으련지? */}
-          {sessionState === "activated" && (
-            <PrimaryButton
-              colorScheme="red"
-              disabled
-              style={{ cursor: "not-allowed" }}
-            >
-              Delete Current Session
-            </PrimaryButton>
-          )}
         </TitleBar>
         <ContentContainer>
           <Subtitle>Current Session</Subtitle>
