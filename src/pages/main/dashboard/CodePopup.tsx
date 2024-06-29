@@ -8,6 +8,7 @@ import { deactivateAuthCode } from "../../../api/authCode";
 import { useCurrentSessionInfo } from "../../../api/dashboard";
 import logo from "../../../assets/dashboard/logo.svg";
 import { SecondaryButton } from "../../../components/Button";
+import AttendanceStatusDrawer from "../../../components/dashboard/AttendanceStatusDrawer.tsx";
 import { useClassId } from "../../../hooks/urlParse";
 
 function CodePopup() {
@@ -31,9 +32,6 @@ function CodePopup() {
     mutationFn: deactivateAuthCode,
     mutationKey: ["deactivateAuthCode"],
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["currentSessionInfo", classId],
-      });
       window.close();
     },
   });
@@ -54,46 +52,65 @@ function CodePopup() {
     };
   }, [classId, queryClient]);
 
+  // 출석 수가 변경되었을 때, 출석 상세 정보를 다시 불러오는 코드
+  useEffect(() => {
+    if (attendanceStatus?.attendances == null) return;
+    if (attendanceStatus?.total == null) return;
+    if (currentSessionInfo?.authCode == null) return;
+    queryClient.invalidateQueries({
+      queryKey: ["attendanceDetail", currentSessionInfo?.authCode],
+    });
+  }, [
+    attendanceStatus?.attendances,
+    attendanceStatus?.total,
+    queryClient,
+    currentSessionInfo?.authCode,
+  ]);
+
   return (
-    <Container>
-      <Logo src={logo} alt="Logo" />
-      <ContentContainer>
-        <TitleLabel>Session Name</TitleLabel>
-        <Title>{currentSessionInfo?.sessionName}</Title>
-        <PasscodeBubble>
-          <Passcode>{currentSessionInfo?.authCode}</Passcode>
-          <PresentBubble>
-            <PresentLabel style={{ marginTop: "0.6rem", verticalAlign: "top" }}>
-              Present
-            </PresentLabel>
-            <PresentCount>{attendanceStatus?.attendances}</PresentCount>
-            <PresentLabel
-              style={{ verticalAlign: "bottom" }}
-            >{` / Total ${attendanceStatus?.total}`}</PresentLabel>
-          </PresentBubble>
-        </PasscodeBubble>
-        <Time>{dateFormat(time, "HH : MM : ss")}</Time>
-        <ButtonContainer>
-          <SecondaryButton
-            onClick={() => {
-              const code = currentSessionInfo?.authCode;
-              if (code != null && currentSessionInfo?.id != null) {
-                deactivate({
-                  authCode: code,
-                  courseId: classId,
-                  sessionId: currentSessionInfo.id,
-                });
-              }
-              window.close();
-            }}
-            style={{ borderRadius: "2rem", flex: "1" }}
-            colorScheme="red"
-          >
-            Deactivate
-          </SecondaryButton>
-        </ButtonContainer>
-      </ContentContainer>
-    </Container>
+    <>
+      <Container>
+        <Logo src={logo} alt="Logo" />
+        <ContentContainer>
+          <TitleLabel>Session Name</TitleLabel>
+          <Title>{currentSessionInfo?.sessionName}</Title>
+          <PasscodeBubble>
+            <Passcode>{currentSessionInfo?.authCode}</Passcode>
+            <PresentBubble>
+              <PresentLabel
+                style={{ marginTop: "0.6rem", verticalAlign: "top" }}
+              >
+                Present
+              </PresentLabel>
+              <PresentCount>{attendanceStatus?.attendances}</PresentCount>
+              <PresentLabel
+                style={{ verticalAlign: "bottom" }}
+              >{` / Total ${attendanceStatus?.total}`}</PresentLabel>
+            </PresentBubble>
+          </PasscodeBubble>
+          <Time>{dateFormat(time, "HH : MM : ss")}</Time>
+          <ButtonContainer>
+            <SecondaryButton
+              onClick={() => {
+                const code = currentSessionInfo?.authCode;
+                if (code != null && currentSessionInfo?.id != null) {
+                  deactivate({
+                    authCode: code,
+                    courseId: classId,
+                    sessionId: currentSessionInfo.id,
+                  });
+                }
+              }}
+              style={{ borderRadius: "2rem", flex: "1" }}
+              colorScheme="red"
+            >
+              Deactivate
+            </SecondaryButton>
+          </ButtonContainer>
+        </ContentContainer>
+      </Container>
+      <AttendanceStatusDrawer authCode={currentSessionInfo?.authCode} />
+    </>
   );
 }
 

@@ -4,6 +4,7 @@ import { Outlet } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 
 import queryClient from "./api/queryClient";
+import FloatingSupportButton from "./components/FloatingSupportButton";
 import GlobalStyles from "./styles/GlobalStyles";
 import Theme from "./styles/Theme";
 // import "./mocks/index";
@@ -14,8 +15,12 @@ function App() {
       <ThemeProvider theme={Theme}>
         <GlobalStyles />
         <Outlet />
+        <FloatingSupportButton />
       </ThemeProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      <ReactQueryDevtools
+        initialIsOpen={false}
+        buttonPosition={"bottom-left"}
+      />
     </QueryClientProvider>
   );
 }

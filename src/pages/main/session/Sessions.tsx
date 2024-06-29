@@ -3,7 +3,12 @@ import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
-import { deleteSession, Session, useSessions } from "../../../api/session.ts";
+import {
+  deleteSession,
+  Session,
+  updateSessions,
+  useSessions,
+} from "../../../api/session.ts";
 import AlertModal from "../../../components/AlertModal.tsx";
 import {
   PrimaryButton,
@@ -35,10 +40,28 @@ function Sessions() {
   const { mutate: deleteSessions } = useMutation({
     mutationFn: deleteSession,
     mutationKey: ["deleteSession"],
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries({
+        queryKey: ["sessions", classId],
+      });
+
+      // 삭제된 세션들을 tempSessions에서도 삭제
+      const newTempSessions = { ...tempSessions };
+      variables.sessionIds.forEach((id) => {
+        delete newTempSessions[id];
+      });
+      setTempSessions(newTempSessions);
+    },
+  });
+
+  const { mutate: updateSessionsMutation } = useMutation({
+    mutationFn: updateSessions,
+    mutationKey: ["updateSessions"],
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["sessions", classId],
       });
+      setIsEditing(false);
     },
   });
 
@@ -58,15 +81,41 @@ function Sessions() {
   // 삭제 관련
   const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
   const handleDelete = () => {
-    // TODO
+    deleteSessions({
+      sessionIds: Object.keys(checkedState)
+        .map((id) => parseInt(id, 10))
+        .filter((id) => checkedState[id]),
+    });
   };
 
   // 수정 관련
-  const [editing, setEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [tempSessions, setTempSessions] = useState<Record<number, Session>>({});
   const handleSave = () => {
-    // TODO
-    setEditing(false);
+    const changedSessions: { id: number; name: string }[] = [];
+    const originalSessionMap: Record<number, Session> =
+      sessions?.reduce(
+        (acc, session) => ({
+          ...acc,
+          [session.id]: session,
+        }),
+        {}
+      ) ?? {};
+
+    for (const id in tempSessions) {
+      if (originalSessionMap[id].name !== tempSessions[id].name) {
+        changedSessions.push({
+          id: parseInt(id, 10),
+          name: tempSessions[id].name,
+        });
+      }
+    }
+
+    updateSessionsMutation({
+      sessions: changedSessions,
+    });
+
+    setCheckedState({});
   };
 
   // 정렬 관련
@@ -86,12 +135,21 @@ function Sessions() {
             value={option}
             onOptionChange={setOption}
             trailing={
-              editing ? (
+              isEditing ? (
                 <>
+                  <TertiaryButton
+                    onClick={() => {
+                      setIsEditing(false);
+                      setCheckedState({});
+                    }}
+                  >
+                    Cancel
+                  </TertiaryButton>
                   <SecondaryButton
                     colorScheme={"red"}
                     style={{ width: "9.5rem" }}
                     onClick={openDeleteModal}
+                    disabled={checkedCount === 0}
                   >
                     Delete
                   </SecondaryButton>
@@ -115,7 +173,7 @@ function Sessions() {
                         {}
                       ) ?? {}
                     );
-                    setEditing(!editing);
+                    setIsEditing(!isEditing);
                   }}
                 >
                   Edit
@@ -126,7 +184,7 @@ function Sessions() {
           <Table>
             <TableHead>
               <tr>
-                {editing && (
+                {isEditing && (
                   <CheckboxHeadItem>
                     <Checkbox
                       checkboxId="masterCheckbox"
@@ -169,8 +227,15 @@ function Sessions() {
               </tr>
             </TableHead>
             <TableBody>
-              {(editing ? Object.values(tempSessions) : sessions ?? []).map(
-                (session) => (
+              {(isEditing ? Object.values(tempSessions) : sessions ?? [])
+                .sort((a, b) => {
+                  if (option === "earliest") {
+                    return a.date.getTime() - b.date.getTime();
+                  } else {
+                    return b.date.getTime() - a.date.getTime();
+                  }
+                })
+                .map((session) => (
                   <SessionItem
                     isChecked={checkedState[session.id]}
                     onCheckboxChange={() => handleCheckboxChange(session.id)}
@@ -180,17 +245,16 @@ function Sessions() {
                         [session.id]: session,
                       });
                     }}
-                    editing={editing}
+                    editing={isEditing}
                     key={session.id}
                     to={
-                      editing
+                      isEditing
                         ? undefined
                         : `/class/${classId}/sessions/${session.id}`
                     }
                     session={session}
                   />
-                )
-              )}
+                ))}
             </TableBody>
           </Table>
         </Content>

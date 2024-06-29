@@ -94,7 +94,7 @@ function AddAttendeesChip({
   return (
     <>
       <MultiLineTextField
-        textareaStyle={{ height: "7rem" }}
+        textFieldStyle={{ height: "7rem" }}
         label="Attendee name"
         value={attendeeInput}
         placeholder="Add attendee names using the 'enter' key or paste from a spreadsheet."

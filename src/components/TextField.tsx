@@ -1,23 +1,39 @@
 import React from "react";
 import styled from "styled-components";
 
-interface TextAreaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label?: string;
-  textareaStyle?: React.CSSProperties;
+interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string | React.ReactNode;
+  textFieldStyle?: React.CSSProperties;
+  hasError?: boolean;
+  supportingText?: React.ReactNode | string;
 }
 
+interface SingleLineTextFieldProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  hasError?: boolean;
+  supportingText?: string;
+  textFieldStyle?: React.CSSProperties;
+}
+
+interface MultiLineTextFieldProps
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string;
+  textFieldStyle?: React.CSSProperties;
+}
+
+// TextField에 사용됨
 export const StyledInput = styled.input<{ hasError?: boolean }>`
   padding: 1rem 1.5rem;
   ${({ theme }) => theme.typography.b3};
 
-  border: 1px solid
+  border: 0.1rem solid
     ${({ theme, hasError }) => (hasError ? theme.colors.red["500"] : "#e3e3e3")};
   border-radius: 1rem;
   outline: none;
 
   &:focus {
-    border: 1px solid
+    border: 0.1rem solid
       ${({ theme, hasError }) =>
         hasError ? theme.colors.red["500"] : theme.colors.primary["400"]};
   }
@@ -30,27 +46,29 @@ export const StyledInput = styled.input<{ hasError?: boolean }>`
   ::placeholder {
     color: #9b9b9b;
   }
+
+  &:read-only {
+    background-color: ${({ theme }) => theme.colors.lightGrey};
+    border: none;
+    color: ${({ theme }) => theme.colors.darkGrey};
+  }
 `;
 
-interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string | React.ReactNode;
-  textFieldStyle?: React.CSSProperties;
-  hasError?: boolean;
-  supportingText?: React.ReactNode | string;
-}
-
-const StyledTextArea = styled.textarea`
+// MultiLineTextField에 사용됨
+const MultiLineTextarea = styled.textarea`
   padding: 1rem 1.5rem;
   ${({ theme }) => theme.typography.b3};
+
   border: 0.1rem solid #e3e3e3;
   border-radius: 1rem;
+  outline: none;
 
   width: 45rem;
 
   resize: none;
 
-  :focus {
-    outline: none;
+  &:focus {
+    border: 0.1rem solid ${({ theme }) => theme.colors.primary["400"]};
   }
 
   ::placeholder {
@@ -79,16 +97,49 @@ function TextField({
   );
 }
 
+// create class, setting, account setting에서만 쓰임
+function SingleLineTextField({
+  label,
+  style,
+  textFieldStyle,
+  hasError,
+  supportingText,
+  ...props
+}: SingleLineTextFieldProps) {
+  return (
+    <TextAreaContainer style={style}>
+      {label && (
+        <TextFieldLabel style={{ marginTop: "0.9rem" }}>{label}</TextFieldLabel>
+      )}
+      <div>
+        <TextField
+          {...props}
+          style={{
+            width: "45rem",
+            ...textFieldStyle,
+          }}
+          hasError={hasError}
+        />
+        {supportingText != null && (
+          <SupportingLabel hasError={hasError}>
+            {supportingText}
+          </SupportingLabel>
+        )}
+      </div>
+    </TextAreaContainer>
+  );
+}
+
 function MultiLineTextField({
   label,
   style,
-  textareaStyle,
+  textFieldStyle,
   ...props
-}: TextAreaProps) {
+}: MultiLineTextFieldProps) {
   return (
     <TextAreaContainer style={style}>
       {label && <TextFieldLabel>{label}</TextFieldLabel>}
-      <StyledTextArea {...props} style={textareaStyle} />
+      <MultiLineTextarea {...props} style={textFieldStyle} />
     </TextAreaContainer>
   );
 }
@@ -96,7 +147,6 @@ function MultiLineTextField({
 const TextFieldLabel = styled.label`
   ${({ theme }) => theme.typography.b3};
   font-weight: 600;
-  margin-bottom: 0.4rem;
 `;
 
 const SupportingLabel = styled.p<{ hasError?: boolean }>`
@@ -118,11 +168,12 @@ const TextAreaContainer = styled.div`
   gap: 1.8rem;
 
   div {
-    width: 18rem;
-    text-align: right;
-    padding-top: 1rem;
+    width: 45rem;
+
+    display: flex;
+    flex-direction: column;
   }
 `;
 
 export default TextField;
-export { MultiLineTextField };
+export { SingleLineTextField, MultiLineTextField };

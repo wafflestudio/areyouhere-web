@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dateFormat from "dateformat";
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 import {
@@ -15,24 +14,24 @@ import {
 } from "../../../api/session";
 import { PrimaryButton, TertiaryButton } from "../../../components/Button.tsx";
 import InfoBar from "../../../components/InfoBar.tsx";
-import AttendanceChip from "../../../components/sessions/AttendanceChip";
+import SessionAttendeeItem from "../../../components/sessions/SessionAttendeeItem.tsx";
 import {
   Table,
   TableBody,
   TableHead,
   TableHeadItem,
-  TableItem,
 } from "../../../components/table/Table.tsx";
 import TableControl from "../../../components/table/TableControl.tsx";
 import TitleBar from "../../../components/TitleBar";
+import { useClassId, useSessionId } from "../../../hooks/urlParse.tsx";
 
 function SessionDetail() {
   const [filter, setFilter] = useState<string>("all");
   const [isEditing, setIsEditing] = useState(false);
   const [tempAttendees, setTempAttendees] = useState<SessionAttendee[]>([]);
 
-  const location = useLocation();
-  const sessionId = parseInt(location.pathname.split("/")[4], 10);
+  const classId = useClassId();
+  const sessionId = useSessionId();
   const { data: session } = useSession(sessionId);
   const { data: sessionAttendees } = useSessionAttendees(sessionId);
 
@@ -42,9 +41,14 @@ function SessionDetail() {
     mutationKey: ["updateAttendances"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["session", sessionId] });
+
+      // 임시로 tempAttendees에 저장된 데이터로 덮어씌워서 fetch가 끝나기 전 이전 데이터가 잠시 보이는 것을 방지
+      queryClient.setQueryData(["sessionAttendees", sessionId], tempAttendees);
       queryClient.invalidateQueries({
         queryKey: ["sessionAttendees", sessionId],
       });
+
+      setIsEditing(false);
     },
   });
 
@@ -52,22 +56,30 @@ function SessionDetail() {
     <Container>
       <TitleBar label="Session Details">
         {isEditing ? (
-          <PrimaryButton
-            onClick={() => {
-              const updateData: UpdateAttendee[] = tempAttendees.map(
-                (attendee) => ({
-                  attendanceId: attendee.attendanceId,
-                  attendanceStatus: attendee.attendanceStatus,
-                })
-              );
-              updateAttendees({
-                updateAttendances: updateData,
-              });
-              setIsEditing(false);
-            }}
-          >
-            Save
-          </PrimaryButton>
+          <ButtonContainer>
+            <TertiaryButton
+              onClick={() => {
+                setIsEditing(false);
+              }}
+            >
+              Cancel
+            </TertiaryButton>
+            <PrimaryButton
+              onClick={() => {
+                const updateData: UpdateAttendee[] = tempAttendees.map(
+                  (attendee) => ({
+                    attendanceId: attendee.attendanceId,
+                    attendanceStatus: attendee.attendanceStatus,
+                  })
+                );
+                updateAttendees({
+                  updateAttendances: updateData,
+                });
+              }}
+            >
+              Save
+            </PrimaryButton>
+          </ButtonContainer>
         ) : (
           <TertiaryButton
             onClick={() => {
@@ -119,63 +131,26 @@ function SessionDetail() {
                 }
               })
               .map(({ attendee, index }) => (
-                <tr>
-                  <TableItem
-                    style={{
-                      width: "24rem",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {attendee.attendee.name}
-                  </TableItem>
-                  <TableItem>
-                    <AttendanceChipContainer>
-                      {(isEditing || attendee.attendanceStatus) && (
-                        <AttendanceChip
-                          type="attendance"
-                          active={attendee.attendanceStatus}
-                          clickable={isEditing}
-                          onClick={() => {
-                            if (isEditing) {
-                              const newTempAttendees = [...tempAttendees];
-                              newTempAttendees[index] = {
-                                ...newTempAttendees[index],
-                                attendanceStatus:
-                                  !newTempAttendees[index].attendanceStatus,
-                              };
-                              setTempAttendees(newTempAttendees);
-                            }
-                          }}
-                        />
-                      )}
-                      {(isEditing || !attendee.attendanceStatus) && (
-                        <AttendanceChip
-                          type="absence"
-                          active={!attendee.attendanceStatus}
-                          clickable={isEditing}
-                          onClick={() => {
-                            if (isEditing) {
-                              const newTempAttendees = [...tempAttendees];
-                              newTempAttendees[index] = {
-                                ...newTempAttendees[index],
-                                attendanceStatus:
-                                  !newTempAttendees[index].attendanceStatus,
-                              };
-                              setTempAttendees(newTempAttendees);
-                            }
-                          }}
-                        />
-                      )}
-                    </AttendanceChipContainer>
-                  </TableItem>
-                  <TableItem>
-                    {sessionAttendees?.[index]?.attendanceStatus === true
-                      ? dateFormat(attendee?.attendanceTime, "HH:MM:ss")
-                      : "--:--:--"}
-                  </TableItem>
-                </tr>
+                <SessionAttendeeItem
+                  key={index}
+                  name={attendee.attendee.name}
+                  attendanceStatus={attendee.attendanceStatus}
+                  attendanceTime={attendee.attendanceTime}
+                  isEditing={isEditing}
+                  onAttendanceStatusChange={(status) => {
+                    const newTempAttendees = [...tempAttendees];
+                    newTempAttendees[index] = {
+                      ...attendee,
+                      attendanceStatus: status,
+                    };
+                    setTempAttendees(newTempAttendees);
+                  }}
+                  to={
+                    isEditing
+                      ? undefined
+                      : `/class/${classId}/attendee/${attendee.attendee.id}`
+                  }
+                />
               ))}
           </TableBody>
         </Table>
@@ -200,10 +175,8 @@ const ContentContainer = styled.div`
   margin-bottom: 5rem;
 `;
 
-const AttendanceChipContainer = styled.div`
+const ButtonContainer = styled.div`
   display: flex;
-  flex-direction: row;
-  align-items: center;
   gap: 1rem;
 `;
 

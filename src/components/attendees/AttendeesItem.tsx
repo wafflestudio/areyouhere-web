@@ -91,6 +91,7 @@ function AttendeesItem({
                 onAttendeeChange({ ...attendee, note: e.target.value });
               }
             }}
+            style={{ width: "100%" }}
           />
         ) : (
           <div

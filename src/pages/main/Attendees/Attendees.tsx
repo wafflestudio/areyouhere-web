@@ -9,6 +9,7 @@ import {
   updateAttendee,
   useAttendees,
 } from "../../../api/attendee.ts";
+import Alert from "../../../components/Alert.tsx";
 import AlertModal from "../../../components/AlertModal.tsx";
 import AttendeesItem from "../../../components/attendees/AttendeesItem.tsx";
 import {
@@ -43,6 +44,7 @@ function Attendees() {
       queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
     },
   });
+
   const { mutate: updateAttendees } = useMutation({
     mutationFn: updateAttendee,
     mutationKey: ["updateAttendee"],
@@ -50,12 +52,17 @@ function Attendees() {
       queryClient.invalidateQueries({ queryKey: ["attendees", classId] });
       // cleanup
       setTempAttendees(null);
-      setEditing(false);
+      setIsEditing(false);
+      setHasNamesakeError(false);
+      setCheckedState({});
     },
     onError: () => {
       // TODO: show error message
+      setHasNamesakeError(true);
     },
   });
+
+  const [hasNamesakeError, setHasNamesakeError] = useState(false);
 
   const {
     checkedState,
@@ -113,7 +120,6 @@ function Attendees() {
           originalAttendeesMap.get(attendee.id)?.name !== attendee.name ||
           originalAttendeesMap.get(attendee.id)?.note !== attendee.note
       );
-      console.log(changedAttendees);
 
       // send changed attendees to server
       updateAttendees({
@@ -124,7 +130,7 @@ function Attendees() {
   };
 
   // 수정 관련
-  const [editing, setEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [tempAttendees, setTempAttendees] = useState<GetAttendeesResult | null>(
     null
   );
@@ -139,8 +145,16 @@ function Attendees() {
         </TitleBar>
         <HeaderContainer>
           <h5>{attendees?.length ?? 0} Attendees</h5>
-          {editing ? (
+          {isEditing ? (
             <ActionContainer>
+              <TertiaryButton
+                onClick={() => {
+                  setIsEditing(false);
+                  setCheckedState({});
+                }}
+              >
+                Cancel
+              </TertiaryButton>
               <SecondaryButton
                 onClick={openDeleteModal}
                 disabled={checkedCount === 0}
@@ -155,7 +169,7 @@ function Attendees() {
               onClick={() => {
                 if (attendees != null) {
                   setTempAttendees(attendees.slice());
-                  setEditing(true);
+                  setIsEditing(true);
                 }
               }}
             >
@@ -164,10 +178,16 @@ function Attendees() {
           )}
         </HeaderContainer>
         <ContentContainer>
+          {hasNamesakeError && (
+            <Alert type="warning" style={{ marginBottom: "1.2rem" }}>
+              There are attendees with the same name and note. Please modify
+              them without duplication.
+            </Alert>
+          )}
           <Table>
             <TableHead>
               <tr>
-                {editing && (
+                {isEditing && (
                   <CheckboxHeadItem>
                     <Checkbox
                       checkboxId="masterCheckbox"
@@ -178,7 +198,7 @@ function Attendees() {
                 )}
                 <TableHeadItem
                   style={{
-                    width: "20rem",
+                    width: "18rem",
                     border: "none",
                   }}
                 >
@@ -186,15 +206,15 @@ function Attendees() {
                 </TableHeadItem>
                 <TableHeadItem
                   style={{
-                    width: "20rem",
+                    width: "26.5rem",
                     border: "none",
                   }}
                 >
-                  Notes
+                  Note
                 </TableHeadItem>
                 <TableHeadItem
                   style={{
-                    width: "14rem",
+                    width: "17rem",
                     border: "none",
                   }}
                 >
@@ -210,9 +230,9 @@ function Attendees() {
                 </TableHeadItem>
               </tr>
             </TableHead>
-            {(editing ? tempAttendees : attendees)?.map((attendee, index) => (
+            {(isEditing ? tempAttendees : attendees)?.map((attendee, index) => (
               <AttendeesItem
-                editing={editing}
+                editing={isEditing}
                 key={attendee.attendee.id}
                 attendee={attendee.attendee}
                 attendance={attendee.attendance}
@@ -231,7 +251,7 @@ function Attendees() {
                   }
                 }}
                 to={
-                  editing
+                  isEditing
                     ? undefined
                     : `/class/${classId}/attendee/${attendee.attendee.id}`
                 }
@@ -280,7 +300,7 @@ const HeaderContainer = styled.div`
   justify-content: space-between;
   margin-left: 6.2rem;
   margin-right: auto;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1.3rem;
 
   h5 {
     ${theme.typography.h5};

@@ -19,6 +19,7 @@ export type GetAttendeesResult = {
 
 export type AttendanceInfo = {
   attendanceId: number;
+  sessionId: number;
   sessionName: string;
   attendanceStatus: boolean;
   attendanceTime: Date;
@@ -85,6 +86,7 @@ export const getAttendee = async (
       ...res.data,
       attendanceInfo: res.data.attendanceInfo?.map((info) => ({
         attendanceId: info.attendanceId,
+        sessionId: info.sessionId,
         sessionName: info.sessionName,
         attendanceStatus: info.attendanceStatus,
         attendanceTime: new Date(info.attendanceTime),
