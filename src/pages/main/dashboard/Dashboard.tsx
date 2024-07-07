@@ -61,12 +61,9 @@ function Dashboard() {
     mutationKey: ["deletePendingSession"],
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["classId", "currentSessionInfo"],
+        queryKey: ["currentSessionInfo", classId],
       });
       setSessionState("none");
-      const channel = new BroadcastChannel("sessionDelete");
-      channel.postMessage("delete");
-      channel.close();
     },
   });
 
