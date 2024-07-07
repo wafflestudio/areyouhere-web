@@ -1,24 +1,25 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { updateCourse, useCourses } from "../../api/course.ts";
 import { PrimaryButton } from "../../components/Button.tsx";
+import SnackBar from "../../components/SnackBar.tsx";
 import {
   MultiLineTextField,
   SingleLineTextField,
 } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
+import useSnackbar from "../../hooks/snackbar.tsx";
 import { useClassId } from "../../hooks/urlParse.tsx";
 
 function Settings() {
-  const navigate = useNavigate();
+  const { showSnackbar, show } = useSnackbar();
 
   const [className, setClassName] = useState("");
   const [description, setDescription] = useState("");
 
-  // 이름 목록에 unknown name 허용 체크박스
+  // 이름 목록에 unknown name 허용 체크박스 (현재는 미사용)
   const [onlyListNameAllowed, setOnlyListNameAllowed] = useState(false);
 
   const queryClient = useQueryClient();
@@ -27,6 +28,7 @@ function Settings() {
     mutationKey: ["updateCourse"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
+      show();
     },
   });
   const { data: classList } = useCourses();
@@ -64,7 +66,11 @@ function Settings() {
         />
         <PrimaryButton
           style={{ width: "45rem" }}
-          disabled={className === ""}
+          disabled={
+            className === "" ||
+            (className === classItem?.name &&
+              description === classItem?.description)
+          }
           onClick={() => {
             updateClass({
               id: classId,
@@ -72,11 +78,13 @@ function Settings() {
               description,
               onlyListNameAllowed,
             });
-            navigate(`/class/${classId}`);
           }}
         >
           Save Changes
         </PrimaryButton>
+        {showSnackbar && (
+          <SnackBar isSuccess={true} message="Successfully saved changes." />
+        )}
       </SettingContainer>
     </Container>
   );
