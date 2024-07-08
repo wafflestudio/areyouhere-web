@@ -3,15 +3,14 @@ import styled, { keyframes } from "styled-components";
 import alertTriangleRed from "../assets/alert/alertTriangleRed.svg";
 import circleCheckGreen from "../assets/alert/circleCheckGreen.svg";
 
-function SnackBar({
-  isSuccess,
-  message,
-}: {
+interface SnackBarProps extends React.HTMLAttributes<HTMLDivElement> {
   isSuccess: boolean;
   message: string;
-}) {
+}
+
+function SnackBar({ isSuccess, message, ...props }: SnackBarProps) {
   return (
-    <Container isSuccess={isSuccess}>
+    <Container isSuccess={isSuccess} {...props}>
       <img src={isSuccess ? circleCheckGreen : alertTriangleRed} alt="icon" />
       <h2>{message}</h2>
     </Container>
@@ -40,13 +39,18 @@ const Container = styled.div<{ isSuccess: boolean }>`
   display: flex;
   flex-direction: row;
 
-  width: 100%;
+  width: 85%;
   height: 5.6rem;
 
   padding: 1.6rem 2.4rem;
   gap: 1rem;
 
   border-radius: 0.8rem;
+
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
 
   background-color: ${({ theme, isSuccess }) =>
     isSuccess ? theme.colors.green[50] : theme.colors.red[50]};

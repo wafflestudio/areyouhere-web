@@ -51,6 +51,7 @@ function Account() {
     mutationKey: ["deleteUser"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
+      navigate("/");
     },
   });
 
@@ -79,6 +80,7 @@ function Account() {
         <SingleLineTextField
           type="text"
           label="Name"
+          maxLength={50}
           onChange={(e) => setName(e.target.value)}
           supportingText={
             showError && nameError
@@ -92,6 +94,7 @@ function Account() {
           type="password"
           label="Password"
           value={password}
+          maxLength={50}
           onChange={(e) => setPassword(e.target.value)}
           supportingText={
             " Password must be at least 8 characters long, with a letter, number, and special character."
@@ -102,6 +105,7 @@ function Account() {
           type="password"
           label="Confirm password"
           value={confirmPassword}
+          maxLength={50}
           onChange={(e) => setConfirmPassword(e.target.value)}
           supportingText={
             showError && confirmPasswordError
@@ -122,7 +126,7 @@ function Account() {
           </DeleteUserButton>
         </div>
         {showSnackbar && (
-          <SnackBar isSuccess={true} message="Successfully saved changes." />
+          <SnackBar isSuccess={true} message="All saved changes." />
         )}
       </AccountForm>
       {/* 계정 삭제 모달 */}
@@ -144,7 +148,6 @@ function Account() {
         onConfirm={() => {
           deleteUserMutate();
           closeDeleteModal();
-          navigate("/");
         }}
       />
     </Container>

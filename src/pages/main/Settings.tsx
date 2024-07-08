@@ -55,6 +55,8 @@ function Settings() {
           textFieldStyle={{ height: "4.5rem" }}
           label="Name of your class"
           value={className}
+          placeholder="Enter the name of your class."
+          maxLength={50}
           onChange={(e) => setClassName(e.target.value)}
         />
         <MultiLineTextField
@@ -62,6 +64,7 @@ function Settings() {
           label="Description"
           value={description}
           placeholder="Add a description."
+          maxLength={250}
           onChange={(e) => setDescription(e.target.value)}
         />
         <PrimaryButton
@@ -83,7 +86,7 @@ function Settings() {
           Save Changes
         </PrimaryButton>
         {showSnackbar && (
-          <SnackBar isSuccess={true} message="Successfully saved changes." />
+          <SnackBar isSuccess={true} message="All changes saved." />
         )}
       </SettingContainer>
     </Container>
