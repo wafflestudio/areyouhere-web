@@ -112,6 +112,8 @@ function CreateClass() {
           <SingleLineTextField
             label="Name of your class"
             value={className}
+            placeholder="Enter the name of your class."
+            maxLength={50}
             onChange={(e) => setClassName(e.target.value)}
           />
           <MultiLineTextField
@@ -119,6 +121,7 @@ function CreateClass() {
             label="Description"
             value={description}
             placeholder="Add a description."
+            maxLength={250}
             onChange={(e) => setDescription(e.target.value)}
           />
           <AddAttendeesChip
