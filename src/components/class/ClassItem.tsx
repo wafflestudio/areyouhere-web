@@ -121,6 +121,8 @@ const ContentLink = styled(Link)`
 
   p.description {
     flex: 1;
+
+    white-space: pre-wrap;
   }
 `;
 
