@@ -17,6 +17,7 @@ import { SingleLineTextField } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 import useModalState from "../../hooks/modal.tsx";
 import useSnackbar from "../../hooks/snackbar.tsx";
+import useSubmitHandler from "../../hooks/submitHandler.tsx";
 
 function Account() {
   const navigate = useNavigate();
@@ -56,6 +57,8 @@ function Account() {
   });
 
   const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
+
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
 
   return (
     <Container>
@@ -117,7 +120,12 @@ function Account() {
         <div>
           <PrimaryButton
             style={{ width: "45rem" }}
-            disabled={name === "" || password === "" || confirmPassword === ""}
+            disabled={
+              name === "" ||
+              password === "" ||
+              confirmPassword === "" ||
+              isSubmitting
+            }
           >
             Save Changes
           </PrimaryButton>

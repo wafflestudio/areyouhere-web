@@ -30,6 +30,7 @@ import TitleBar from "../../../components/TitleBar.tsx";
 import { useCheckbox } from "../../../hooks/checkbox.tsx";
 import useModalState from "../../../hooks/modal.tsx";
 import useSnackbar from "../../../hooks/snackbar.tsx";
+import useSubmitHandler from "../../../hooks/submitHandler.tsx";
 
 function Sessions() {
   const location = useLocation();
@@ -127,6 +128,8 @@ function Sessions() {
   // snackbar
   const { showSnackbar, show } = useSnackbar();
 
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
+
   return (
     <>
       <Container>
@@ -161,7 +164,8 @@ function Sessions() {
                   </SecondaryButton>
                   <PrimaryButton
                     style={{ width: "9.5rem" }}
-                    onClick={() => handleSave()}
+                    onClick={() => handleSubmit(handleSave)}
+                    disabled={isSubmitting}
                   >
                     Save
                   </PrimaryButton>
@@ -285,6 +289,7 @@ function Sessions() {
         onConfirm={() => {
           handleDelete();
           closeDeleteModal();
+          setIsEditing(false);
         }}
       />
     </>

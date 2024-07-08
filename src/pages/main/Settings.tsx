@@ -11,6 +11,7 @@ import {
 } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 import useSnackbar from "../../hooks/snackbar.tsx";
+import useSubmitHandler from "../../hooks/submitHandler.tsx";
 import { useClassId } from "../../hooks/urlParse.tsx";
 
 function Settings() {
@@ -47,6 +48,17 @@ function Settings() {
     }
   }, [classItem]);
 
+  const submit = () => {
+    updateClass({
+      id: classId,
+      name: className,
+      description,
+      onlyListNameAllowed,
+    });
+  };
+
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
+
   return (
     <Container>
       <TitleBar label="Class Settings" />
@@ -72,15 +84,11 @@ function Settings() {
           disabled={
             className === "" ||
             (className === classItem?.name &&
-              description === classItem?.description)
+              description === classItem?.description) ||
+            isSubmitting
           }
           onClick={() => {
-            updateClass({
-              id: classId,
-              name: className,
-              description,
-              onlyListNameAllowed,
-            });
+            handleSubmit(submit);
           }}
         >
           Save Changes

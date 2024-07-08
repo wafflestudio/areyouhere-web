@@ -12,6 +12,7 @@ import { PrimaryButton } from "../../../components/Button.tsx";
 import NamesakeModal from "../../../components/class/NamesakeModal.tsx";
 import TitleBar from "../../../components/TitleBar";
 import useModalState from "../../../hooks/modal.tsx";
+import useSubmitHandler from "../../../hooks/submitHandler.tsx";
 import { useClassId } from "../../../hooks/urlParse.tsx";
 import { AttendeeInfo, PickPartial } from "../../../type.ts";
 
@@ -93,6 +94,8 @@ function AddAttendees() {
     navigate(-1);
   };
 
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
+
   return (
     <>
       <NamesakeModal
@@ -118,8 +121,8 @@ function AddAttendees() {
           />
           <PrimaryButton
             style={{ width: "45rem" }}
-            disabled={attendeeList.length === 0}
-            onClick={submit}
+            disabled={attendeeList.length === 0 || isSubmitting}
+            onClick={() => handleSubmit(submit)}
           >
             Add New Attendees
           </PrimaryButton>

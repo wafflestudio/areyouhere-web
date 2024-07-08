@@ -29,6 +29,7 @@ import TitleBar from "../../../components/TitleBar.tsx";
 import { useCheckbox } from "../../../hooks/checkbox.tsx";
 import useModalState from "../../../hooks/modal.tsx";
 import useSnackbar from "../../../hooks/snackbar.tsx";
+import useSubmitHandler from "../../../hooks/submitHandler.tsx";
 import { useClassId } from "../../../hooks/urlParse.tsx";
 import theme from "../../../styles/Theme.tsx";
 import { AttendeeInfo } from "../../../type.ts";
@@ -142,6 +143,8 @@ function Attendees() {
   // snackbar
   const { showSnackbar, show } = useSnackbar();
 
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
+
   return (
     <>
       <Container>
@@ -170,7 +173,12 @@ function Attendees() {
               >
                 Delete
               </SecondaryButton>
-              <PrimaryButton onClick={handleSave}>Save</PrimaryButton>
+              <PrimaryButton
+                onClick={() => handleSubmit(handleSave)}
+                disabled={isSubmitting}
+              >
+                Save
+              </PrimaryButton>
             </ActionContainer>
           ) : (
             <TertiaryButton
@@ -293,6 +301,7 @@ function Attendees() {
         onConfirm={() => {
           handleDelete();
           closeDeleteModal();
+          setIsEditing(false);
         }}
       />
     </>
