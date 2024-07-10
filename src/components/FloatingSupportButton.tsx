@@ -32,7 +32,7 @@ const FloatingSupportButton = () => {
             Contact Support
           </ReportMenuLink>
           <Divider />
-          <ReportMenuLink to="/feedback">
+          <ReportMenuLink to="https://tally.so/r/w7WY6P" target="_blank">
             <img src={feedback} alt="Feedback" />
             Feedback
           </ReportMenuLink>
