@@ -3,15 +3,13 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 import bubbleTip from "../assets/support/bubbleTip.svg";
-import contactSupport from "../assets/support/contactSupport.svg";
 import feedback from "../assets/support/feedback.svg";
 import questionMark from "../assets/support/questionMark.svg";
+import terms from "../assets/support/terms.svg";
 
 const FloatingSupportButton = () => {
   const [showBubble, setShowBubble] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-
-  console.log(showBubble, showMenu);
 
   return (
     <Container
@@ -27,14 +25,14 @@ const FloatingSupportButton = () => {
           <BubbleTipImg src={bubbleTip} alt="Bubble Tip" />
         </ReportBubble>
         <ReportMenuContainer style={{ opacity: showMenu ? 1 : 0 }}>
-          <ReportMenuLink to="/support">
-            <img src={contactSupport} alt="Contact Support" />
-            Contact Support
+          <ReportMenuLink to="https://tally.so/r/w7WY6P" target="_blank">
+            <img src={feedback} alt="Contact Support" />
+            Contact & Feedback
           </ReportMenuLink>
           <Divider />
-          <ReportMenuLink to="https://tally.so/r/w7WY6P" target="_blank">
-            <img src={feedback} alt="Feedback" />
-            Feedback
+          <ReportMenuLink to="/terms_of_use" target="_blank">
+            <img src={terms} alt="Terms of Use" />
+            Terms of Use
           </ReportMenuLink>
         </ReportMenuContainer>
       </ContextContainer>
@@ -46,7 +44,7 @@ const FloatingSupportButton = () => {
           setShowBubble(false);
         }}
         onClick={(e) => {
-          setShowMenu(true);
+          setShowMenu(!showMenu);
           setShowBubble(false);
           e.stopPropagation();
         }}
