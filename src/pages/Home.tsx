@@ -11,6 +11,7 @@ import { PrimaryButton } from "../components/Button.tsx";
 import NoteSelectModal from "../components/home/NoteSelectModal.tsx";
 import TextField from "../components/TextField";
 import useModalState from "../hooks/modal.tsx";
+import useSubmitHandler from "../hooks/submitHandler.tsx";
 
 const ErrorMessages: Record<AttendanceErrorCode, string> = {
   [AttendanceErrorCode.InvalidAuthCode]: `Could not find a session corresponding to passcode. Please check your credentials or contact the administrator for help.`,
@@ -56,6 +57,12 @@ function Home() {
   const [noteSelectModalState, openNoteSelectModal, closeNoteSelectModal] =
     useModalState();
 
+  const submit = () => {
+    performAttendance({ attendeeName: name, authCode: passcode });
+  };
+
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
+
   return (
     <>
       <NoteSelectModal
@@ -83,7 +90,7 @@ function Home() {
           <InputContainer
             onSubmit={(e) => {
               e.preventDefault();
-              performAttendance({ attendeeName: name, authCode: passcode });
+              handleSubmit(submit);
             }}
           >
             <TextField
@@ -113,7 +120,7 @@ function Home() {
                 width: "11.5rem",
                 marginLeft: "auto",
               }}
-              disabled={name === "" || passcode === ""}
+              disabled={name === "" || passcode === "" || isSubmitting}
             >
               <img src={sendIcon} alt="Send" width={20} height={20} />
               Send

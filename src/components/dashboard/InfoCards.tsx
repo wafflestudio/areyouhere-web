@@ -49,9 +49,6 @@ function InfoCards({
       queryClient.invalidateQueries({
         queryKey: ["previousSessions", classId],
       });
-      const channel = new BroadcastChannel("sessionRefresh");
-      channel.postMessage("refresh");
-      channel.close();
     },
   });
 
@@ -68,6 +65,15 @@ function InfoCards({
       });
     }
   }, [classId, isError, queryClient]);
+
+  useEffect(() => {
+    const channel = new BroadcastChannel("sessionDelete");
+    channel.onmessage = () => {
+      queryClient.invalidateQueries({
+        queryKey: ["currentSessionInfo", classId],
+      });
+    };
+  }, [classId, queryClient]);
 
   return (
     <InfoCardContainer {...props}>

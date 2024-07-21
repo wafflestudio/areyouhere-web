@@ -18,6 +18,7 @@ import {
 import TransferBanner from "../../components/admin/TransferBanner.tsx";
 import { PrimaryButton } from "../../components/Button.tsx";
 import TextField from "../../components/TextField.tsx";
+import useSubmitHandler from "../../hooks/submitHandler.tsx";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -55,6 +56,17 @@ function SignUp() {
     }
   }, [navigate, user]);
 
+  const submit = () => {
+    if (nameError || emailError || passwordError || confirmPasswordError) {
+      setShowError(true);
+      return;
+    }
+
+    mutate({ name, email, password });
+  };
+
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
+
   return (
     <Container>
       <TransferBanner from="admin" />
@@ -62,18 +74,7 @@ function SignUp() {
       <InputContainer
         onSubmit={(e) => {
           e.preventDefault();
-
-          if (
-            nameError ||
-            emailError ||
-            passwordError ||
-            confirmPasswordError
-          ) {
-            setShowError(true);
-            return;
-          }
-
-          mutate({ name, email, password });
+          handleSubmit(submit);
         }}
       >
         <TextField
@@ -137,7 +138,8 @@ function SignUp() {
             name === "" ||
             email === "" ||
             password === "" ||
-            confirmPassword === ""
+            confirmPassword === "" ||
+            isSubmitting
           }
         >
           Sign up

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -13,6 +13,7 @@ import {
 } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 import useModalState from "../../hooks/modal.tsx";
+import useSubmitHandler from "../../hooks/submitHandler.tsx";
 import { AttendeeInfo, PickPartial } from "../../type.ts";
 
 function CreateClass() {
@@ -25,10 +26,6 @@ function CreateClass() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
       navigate("/class");
-    },
-    onSettled: () => {
-      setIsSubmitting(false);
-      isSubmittingRef.current = false;
     },
   });
 
@@ -43,11 +40,7 @@ function CreateClass() {
   const [namesakeModalState, openNamesakeModal, closeNamesakeModal] =
     useModalState();
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const isSubmittingRef = useRef(isSubmitting);
-
   const submit = () => {
-    if (isSubmittingRef.current) return;
     // 1. arrange by name
     const nameMap = new Map<string, number>();
     const namesakeArray: PickPartial<AttendeeInfo, "id">[][] = [];
@@ -72,8 +65,6 @@ function CreateClass() {
       return;
     }
     // 3-1. if namesakes do not exist, create class
-    setIsSubmitting(true);
-    isSubmittingRef.current = true;
     createClass({
       name: className,
       description,
@@ -87,6 +78,8 @@ function CreateClass() {
       onlyListNameAllowed: false,
     });
   };
+
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
 
   return (
     <>
@@ -112,6 +105,8 @@ function CreateClass() {
           <SingleLineTextField
             label="Name of your class"
             value={className}
+            placeholder="Enter the name of your class."
+            maxLength={50}
             onChange={(e) => setClassName(e.target.value)}
           />
           <MultiLineTextField
@@ -119,6 +114,7 @@ function CreateClass() {
             label="Description"
             value={description}
             placeholder="Add a description."
+            maxLength={250}
             onChange={(e) => setDescription(e.target.value)}
           />
           <AddAttendeesChip
@@ -127,7 +123,7 @@ function CreateClass() {
           />
           <PrimaryButton
             style={{ width: "45rem" }}
-            onClick={submit}
+            onClick={() => handleSubmit(submit)}
             disabled={className === "" || isSubmitting}
           >
             Create a New Class

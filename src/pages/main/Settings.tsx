@@ -1,24 +1,26 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { updateCourse, useCourses } from "../../api/course.ts";
 import { PrimaryButton } from "../../components/Button.tsx";
+import SnackBar from "../../components/SnackBar.tsx";
 import {
   MultiLineTextField,
   SingleLineTextField,
 } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
+import useSnackbar from "../../hooks/snackbar.tsx";
+import useSubmitHandler from "../../hooks/submitHandler.tsx";
 import { useClassId } from "../../hooks/urlParse.tsx";
 
 function Settings() {
-  const navigate = useNavigate();
+  const { showSnackbar, show } = useSnackbar();
 
   const [className, setClassName] = useState("");
   const [description, setDescription] = useState("");
 
-  // 이름 목록에 unknown name 허용 체크박스
+  // 이름 목록에 unknown name 허용 체크박스 (현재는 미사용)
   const [onlyListNameAllowed, setOnlyListNameAllowed] = useState(false);
 
   const queryClient = useQueryClient();
@@ -27,6 +29,7 @@ function Settings() {
     mutationKey: ["updateCourse"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
+      show();
     },
   });
   const { data: classList } = useCourses();
@@ -45,6 +48,17 @@ function Settings() {
     }
   }, [classItem]);
 
+  const submit = () => {
+    updateClass({
+      id: classId,
+      name: className,
+      description,
+      onlyListNameAllowed,
+    });
+  };
+
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
+
   return (
     <Container>
       <TitleBar label="Class Settings" />
@@ -53,6 +67,8 @@ function Settings() {
           textFieldStyle={{ height: "4.5rem" }}
           label="Name of your class"
           value={className}
+          placeholder="Enter the name of your class."
+          maxLength={50}
           onChange={(e) => setClassName(e.target.value)}
         />
         <MultiLineTextField
@@ -60,23 +76,26 @@ function Settings() {
           label="Description"
           value={description}
           placeholder="Add a description."
+          maxLength={250}
           onChange={(e) => setDescription(e.target.value)}
         />
         <PrimaryButton
           style={{ width: "45rem" }}
-          disabled={className === ""}
+          disabled={
+            className === "" ||
+            (className === classItem?.name &&
+              description === classItem?.description) ||
+            isSubmitting
+          }
           onClick={() => {
-            updateClass({
-              id: classId,
-              name: className,
-              description,
-              onlyListNameAllowed,
-            });
-            navigate(`/class/${classId}`);
+            handleSubmit(submit);
           }}
         >
           Save Changes
         </PrimaryButton>
+        {showSnackbar && (
+          <SnackBar isSuccess={true} message="All changes saved." />
+        )}
       </SettingContainer>
     </Container>
   );

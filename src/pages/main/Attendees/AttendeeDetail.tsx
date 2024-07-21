@@ -26,6 +26,7 @@ import {
 import TableControl from "../../../components/table/TableControl.tsx";
 import { StyledInput } from "../../../components/TextField.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
+import useSubmitHandler from "../../../hooks/submitHandler.tsx";
 import { useAttendeeId, useClassId } from "../../../hooks/urlParse.tsx";
 import { AttendeeInfo } from "../../../type.ts";
 
@@ -67,6 +68,16 @@ function AttendeeDetail() {
     },
   });
 
+  const submit = () => {
+    if (tempAttendee != null) {
+      updateAttendeeInfo({
+        updatedAttendees: [tempAttendee],
+        courseId: courseId,
+        updateAttendances: Object.values(tempAttendances),
+      });
+    }
+  };
+
   const [hasNamesakeError, setHasNamesakeError] = useState(false);
 
   // 수정 관련
@@ -75,6 +86,8 @@ function AttendeeDetail() {
     Record<number, AttendanceInfo>
   >({});
   const [isEditing, setIsEditing] = useState(false);
+
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
 
   return (
     <Container>
@@ -90,14 +103,9 @@ function AttendeeDetail() {
             </TertiaryButton>
             <PrimaryButton
               onClick={() => {
-                if (tempAttendee != null) {
-                  updateAttendeeInfo({
-                    updatedAttendees: [tempAttendee],
-                    courseId: courseId,
-                    updateAttendances: Object.values(tempAttendances),
-                  });
-                }
+                handleSubmit(submit);
               }}
+              disabled={isSubmitting}
             >
               Save
             </PrimaryButton>

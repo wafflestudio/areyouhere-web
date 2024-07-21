@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -12,9 +12,12 @@ import {
 } from "../../api/user.ts";
 import AlertModal from "../../components/AlertModal.tsx";
 import { PrimaryButton } from "../../components/Button.tsx";
+import SnackBar from "../../components/SnackBar.tsx";
 import { SingleLineTextField } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 import useModalState from "../../hooks/modal.tsx";
+import useSnackbar from "../../hooks/snackbar.tsx";
+import useSubmitHandler from "../../hooks/submitHandler.tsx";
 
 function Account() {
   const navigate = useNavigate();
@@ -30,13 +33,17 @@ function Account() {
   const passwordError = password.match(PASSWORD_REGEX) == null;
   const confirmPasswordError = password !== confirmPassword;
 
+  const { showSnackbar, show } = useSnackbar();
   const [showError, setShowError] = useState(false);
 
-  const { mutate } = useMutation({
+  const { mutate: editUserMutate } = useMutation({
     mutationFn: editProfile,
     mutationKey: ["editProfile"],
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      setPassword("");
+      setConfirmPassword("");
+      show();
     },
   });
 
@@ -44,11 +51,14 @@ function Account() {
     mutationFn: deleteUser,
     mutationKey: ["deleteUser"],
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      navigate("/");
     },
   });
 
   const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
+
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
 
   return (
     <Container>
@@ -62,7 +72,7 @@ function Account() {
             return;
           }
 
-          mutate({ name: name, password });
+          editUserMutate({ name, password });
         }}
       >
         <SingleLineTextField
@@ -73,6 +83,7 @@ function Account() {
         <SingleLineTextField
           type="text"
           label="Name"
+          maxLength={50}
           onChange={(e) => setName(e.target.value)}
           supportingText={
             showError && nameError
@@ -85,6 +96,8 @@ function Account() {
         <SingleLineTextField
           type="password"
           label="Password"
+          value={password}
+          maxLength={50}
           onChange={(e) => setPassword(e.target.value)}
           supportingText={
             " Password must be at least 8 characters long, with a letter, number, and special character."
@@ -94,6 +107,8 @@ function Account() {
         <SingleLineTextField
           type="password"
           label="Confirm password"
+          value={confirmPassword}
+          maxLength={50}
           onChange={(e) => setConfirmPassword(e.target.value)}
           supportingText={
             showError && confirmPasswordError
@@ -105,7 +120,12 @@ function Account() {
         <div>
           <PrimaryButton
             style={{ width: "45rem" }}
-            disabled={name === "" || password === "" || confirmPassword === ""}
+            disabled={
+              name === "" ||
+              password === "" ||
+              confirmPassword === "" ||
+              isSubmitting
+            }
           >
             Save Changes
           </PrimaryButton>
@@ -113,6 +133,9 @@ function Account() {
             Delete my account
           </DeleteUserButton>
         </div>
+        {showSnackbar && (
+          <SnackBar isSuccess={true} message="All saved changes." />
+        )}
       </AccountForm>
       {/* 계정 삭제 모달 */}
       <AlertModal
@@ -133,7 +156,6 @@ function Account() {
         onConfirm={() => {
           deleteUserMutate();
           closeDeleteModal();
-          navigate("/");
         }}
       />
     </Container>
@@ -161,6 +183,7 @@ const AccountForm = styled.form`
 
 const DeleteUserButton = styled.p`
   ${({ theme }) => theme.typography.b3};
+  width: fit-content;
   color: #a0a0a0;
   text-decoration: underline;
 

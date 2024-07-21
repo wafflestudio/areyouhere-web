@@ -17,6 +17,7 @@ import {
 } from "../../../components/Button.tsx";
 import Checkbox from "../../../components/Checkbox.tsx";
 import SessionItem from "../../../components/sessions/SessionItem.tsx";
+import SnackBar from "../../../components/SnackBar.tsx";
 import {
   CheckboxHeadItem,
   Table,
@@ -28,6 +29,8 @@ import TableControl from "../../../components/table/TableControl.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
 import { useCheckbox } from "../../../hooks/checkbox.tsx";
 import useModalState from "../../../hooks/modal.tsx";
+import useSnackbar from "../../../hooks/snackbar.tsx";
+import useSubmitHandler from "../../../hooks/submitHandler.tsx";
 
 function Sessions() {
   const location = useLocation();
@@ -62,6 +65,7 @@ function Sessions() {
         queryKey: ["sessions", classId],
       });
       setIsEditing(false);
+      show();
     },
   });
 
@@ -121,6 +125,11 @@ function Sessions() {
   // 정렬 관련
   const [option, setOption] = useState<string>("latest");
 
+  // snackbar
+  const { showSnackbar, show } = useSnackbar();
+
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
+
   return (
     <>
       <Container>
@@ -155,7 +164,8 @@ function Sessions() {
                   </SecondaryButton>
                   <PrimaryButton
                     style={{ width: "9.5rem" }}
-                    onClick={() => handleSave()}
+                    onClick={() => handleSubmit(handleSave)}
+                    disabled={isSubmitting}
                   >
                     Save
                   </PrimaryButton>
@@ -257,6 +267,9 @@ function Sessions() {
                 ))}
             </TableBody>
           </Table>
+          {showSnackbar && (
+            <SnackBar isSuccess={true} message="All changes saved." />
+          )}
         </Content>
       </Container>
       <AlertModal
@@ -276,6 +289,7 @@ function Sessions() {
         onConfirm={() => {
           handleDelete();
           closeDeleteModal();
+          setIsEditing(false);
         }}
       />
     </>
