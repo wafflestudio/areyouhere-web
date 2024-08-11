@@ -25,6 +25,7 @@ const Theme: DefaultTheme = {
 
     red: {
       "50": "#FFEEEA",
+      "75": "#FFCBC3",
       "100": "#FFCBC3",
       "200": "#FFA99E",
       "300": "#FF877D",
@@ -38,7 +39,6 @@ const Theme: DefaultTheme = {
 
     green: {
       "50": "#E8F8E2",
-      "75": "#FFCBC3",
       "100": "#B9EAAB",
       "200": "#89DA78",
       "300": "#55C847",

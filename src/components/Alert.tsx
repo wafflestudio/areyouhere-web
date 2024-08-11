@@ -25,9 +25,9 @@ function Alert({ type, children, size, ...props }: AlertProps) {
 const AlertContainer = styled.div`
   width: 100%;
   padding: 1.6rem;
+  border-radius: 0.8rem;
   display: flex;
   flex-direction: row;
-  align-items: top;
 
   background-color: ${({ theme }) => theme.colors.red["50"]};
 `;

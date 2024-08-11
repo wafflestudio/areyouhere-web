@@ -18,6 +18,7 @@ import {
   TertiaryButton,
 } from "../../../components/Button.tsx";
 import Checkbox from "../../../components/Checkbox.tsx";
+import SnackBar from "../../../components/SnackBar.tsx";
 import {
   CheckboxHeadItem,
   Table,
@@ -27,6 +28,8 @@ import {
 import TitleBar from "../../../components/TitleBar.tsx";
 import { useCheckbox } from "../../../hooks/checkbox.tsx";
 import useModalState from "../../../hooks/modal.tsx";
+import useSnackbar from "../../../hooks/snackbar.tsx";
+import useSubmitHandler from "../../../hooks/submitHandler.tsx";
 import { useClassId } from "../../../hooks/urlParse.tsx";
 import theme from "../../../styles/Theme.tsx";
 import { AttendeeInfo } from "../../../type.ts";
@@ -55,6 +58,8 @@ function Attendees() {
       setIsEditing(false);
       setHasNamesakeError(false);
       setCheckedState({});
+      // show snackbar
+      show();
     },
     onError: () => {
       // TODO: show error message
@@ -135,6 +140,11 @@ function Attendees() {
     null
   );
 
+  // snackbar
+  const { showSnackbar, show } = useSnackbar();
+
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
+
   return (
     <>
       <Container>
@@ -150,6 +160,7 @@ function Attendees() {
               <TertiaryButton
                 onClick={() => {
                   setIsEditing(false);
+                  setHasNamesakeError(false);
                   setCheckedState({});
                 }}
               >
@@ -162,7 +173,12 @@ function Attendees() {
               >
                 Delete
               </SecondaryButton>
-              <PrimaryButton onClick={handleSave}>Save</PrimaryButton>
+              <PrimaryButton
+                onClick={() => handleSubmit(handleSave)}
+                disabled={isSubmitting}
+              >
+                Save
+              </PrimaryButton>
             </ActionContainer>
           ) : (
             <TertiaryButton
@@ -258,6 +274,13 @@ function Attendees() {
               />
             ))}
           </Table>
+          {showSnackbar && (
+            <SnackBar
+              isSuccess={true}
+              message="All changes saved."
+              style={{ marginTop: "3rem" }}
+            />
+          )}
         </ContentContainer>
       </Container>
       {/* 모달 */}
@@ -278,6 +301,7 @@ function Attendees() {
         onConfirm={() => {
           handleDelete();
           closeDeleteModal();
+          setIsEditing(false);
         }}
       />
     </>

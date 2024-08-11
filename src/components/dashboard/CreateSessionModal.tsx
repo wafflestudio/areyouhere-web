@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
 
+import useSubmitHandler from "../../hooks/submitHandler.tsx";
 import { ModalStateType } from "../../type";
 import { GreyButton, PrimaryButton } from "../Button";
 import Modal from "../Modal";
@@ -10,18 +11,16 @@ interface CreateSessionModalProps {
   state: ModalStateType;
   onClose: () => void;
   onSubmit?: (sessionName: string) => void;
-  setSessionState: React.Dispatch<
-    React.SetStateAction<"none" | "pending" | "activated">
-  >;
 }
 
 function CreateSessionModal({
   state,
   onClose,
   onSubmit,
-  setSessionState,
 }: CreateSessionModalProps) {
   const [sessionName, setSessionName] = useState("");
+
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
 
   return (
     <Modal state={state} onBackgroundClick={onClose}>
@@ -37,10 +36,12 @@ function CreateSessionModal({
           <GreyButton onClick={onClose}>Cancel</GreyButton>
           <PrimaryButton
             onClick={() => {
-              onSubmit?.(sessionName);
-              setSessionState("pending");
+              handleSubmit(() => {
+                onSubmit?.(sessionName);
+                setSessionName("");
+              });
             }}
-            disabled={sessionName === ""}
+            disabled={sessionName === "" || isSubmitting}
           >
             Create a New Session
           </PrimaryButton>

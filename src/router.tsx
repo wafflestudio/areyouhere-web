@@ -18,6 +18,7 @@ import Sessions from "./pages/main/session/Sessions.tsx";
 import Settings from "./pages/main/Settings.tsx";
 import Statistics from "./pages/main/Statistics.tsx";
 import Result from "./pages/Result";
+import TermsOfUse from "./pages/TermsOfUse.tsx";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
       { path: "/result", element: <Result /> },
       { path: "/admin/signin", element: <SignIn /> },
       { path: "/admin/signup", element: <SignUp /> },
+      { path: "/terms_of_use", element: <TermsOfUse /> },
       {
         path: "/",
         element: <AuthRequiredRoute />,

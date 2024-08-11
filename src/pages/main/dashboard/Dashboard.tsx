@@ -49,20 +49,21 @@ function Dashboard() {
       queryClient.invalidateQueries({
         queryKey: ["currentSessionInfo", classId],
       });
+      setSessionState("pending");
     },
   });
 
   const { data: classItem } = useCourse(classId);
-  const { data: currentSessionInfo, refetch } = useCurrentSessionInfo(classId);
+  const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
 
   const { mutate: deletePendingSessionMutate } = useMutation({
     mutationFn: deletePendingSession,
     mutationKey: ["deletePendingSession"],
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["classId"],
+        queryKey: ["currentSessionInfo", classId],
       });
-      refetch();
+      setSessionState("none");
     },
   });
 
@@ -93,19 +94,8 @@ function Dashboard() {
             <PrimaryButton
               onClick={() => {
                 deletePendingSessionMutate(classId);
-                refetch();
               }}
               colorScheme="red"
-            >
-              Delete Current Session
-            </PrimaryButton>
-          )}
-          {/* 이렇게 deactivate 해놓기 vs 버튼 숨기기 중 뭐가 나으련지? */}
-          {sessionState === "activated" && (
-            <PrimaryButton
-              colorScheme="red"
-              disabled
-              style={{ cursor: "not-allowed" }}
             >
               Delete Current Session
             </PrimaryButton>
@@ -181,7 +171,6 @@ function Dashboard() {
             });
             closeCreateSessionModal();
           }}
-          setSessionState={setSessionState}
         />
       )}
     </>
