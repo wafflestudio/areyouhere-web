@@ -7,9 +7,11 @@ import {
   EMAIL_REGEX,
   NAME_REGEX,
   PASSWORD_REGEX,
+  sendVerificationEmail,
   signUp,
   useEmailConflict,
   useUser,
+  verifyEmail,
 } from "../../api/user";
 import {
   OptionalActionLabel,
@@ -28,23 +30,47 @@ function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [sentEmail, setSentEmail] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verified, setVerified] = useState(false);
 
   const nameError = name.match(NAME_REGEX) == null;
   const emailError = email.match(EMAIL_REGEX) == null;
   const passwordError = password.match(PASSWORD_REGEX) == null;
   const confirmPasswordError = password !== confirmPassword;
+  const [verificationCodeError, setVerificationCodeError] = useState(false);
 
   const [showError, setShowError] = useState(false);
 
   const { data: user } = useUser();
 
   // TODO: handle failure cases
-  const { mutate } = useMutation({
+  const { mutate: signUpMutate } = useMutation({
     mutationFn: signUp,
     mutationKey: ["signUp"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       // navigate("/class");
+    },
+  });
+
+  const { mutate: sendVerificationCodeMutate } = useMutation({
+    mutationFn: sendVerificationEmail,
+    mutationKey: ["sendVerificationCode"],
+    onSuccess: () => {
+      setSentEmail(true);
+    },
+  });
+
+  const { mutate: verifyEmailMutate } = useMutation({
+    mutationFn: verifyEmail,
+    mutationKey: ["verifyEmail"],
+    onSuccess: () => {
+      setVerificationCodeError(false);
+      setVerified(true);
+    },
+    onError: () => {
+      setVerificationCodeError(true);
     },
   });
 
@@ -62,7 +88,7 @@ function SignUp() {
       return;
     }
 
-    mutate({ name, email, password });
+    signUpMutate({ name, email, password });
   };
 
   const { isSubmitting, handleSubmit } = useSubmitHandler();
@@ -89,21 +115,65 @@ function SignUp() {
           }
           hasError={showError && nameError}
         />
-        <TextField
-          autoComplete="email"
-          type="email"
-          label="Email address"
-          style={{ marginTop: "2.5rem" }}
-          onChange={(e) => setEmail(e.target.value)}
-          supportingText={
-            showError && emailError
-              ? "Invalid email address"
-              : isEmailConflict
-                ? "Email already exists"
-                : undefined
-          }
-          hasError={isEmailConflict || (showError && emailError)}
-        />
+        <EmailBar style={{ marginTop: "2.5rem" }}>
+          <TextField
+            style={{ flex: "1" }}
+            autoComplete="email"
+            type="email"
+            label="Email address"
+            onChange={(e) => setEmail(e.target.value)}
+            supportingText={
+              showError && emailError
+                ? "Invalid email address"
+                : isEmailConflict
+                  ? "Email already exists"
+                  : undefined
+            }
+            hasError={isEmailConflict || (showError && emailError)}
+          />
+          <PrimaryButton
+            style={{
+              height: "4.2rem",
+              marginBottom:
+                isEmailConflict || (showError && emailError)
+                  ? "1.8rem"
+                  : "0.0rem",
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              sendVerificationCodeMutate(email);
+            }}
+          >
+            {sentEmail ? "Resend" : "Send Code"}
+          </PrimaryButton>
+        </EmailBar>
+        {sentEmail && (
+          <EmailBar style={{ marginTop: "2.5rem" }}>
+            <TextField
+              style={{ flex: "1" }}
+              type="text"
+              label="Verification code"
+              onChange={(e) => setVerificationCode(e.target.value)}
+              supportingText={
+                verificationCodeError ? "Invalid verification code" : undefined
+              }
+              hasError={verificationCodeError}
+            />
+            <PrimaryButton
+              style={{
+                height: "4.2rem",
+                marginBottom: verificationCodeError ? "1.8rem" : "0.0rem",
+              }}
+              disabled={verified}
+              onClick={(e) => {
+                e.preventDefault();
+                verifyEmailMutate({ email, code: verificationCode });
+              }}
+            >
+              Verify
+            </PrimaryButton>
+          </EmailBar>
+        )}
         <TextField
           autoComplete="new-password"
           type="password"
@@ -175,6 +245,13 @@ const InputContainer = styled.form`
 
   display: flex;
   flex-direction: column;
+`;
+
+const EmailBar = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 0.8rem;
+  align-items: end;
 `;
 
 export default SignUp;

@@ -22,6 +22,11 @@ export type editProfileRequest = {
   password: string;
 };
 
+export type VerifyEmailRequest = {
+  email: string;
+  code: string;
+};
+
 export const EMAIL_REGEX =
   "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 export const PASSWORD_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[\\W_]).{8,20}$";
@@ -90,6 +95,18 @@ export const isEmailConflict = async (
   });
 
   return res.status == HttpStatusCode.Conflict;
+};
+
+// GET /api/auth/email?email=”String”
+export const sendVerificationEmail = async (email: string): Promise<void> => {
+  return await axios.get("/api/auth/email", {
+    params: { email },
+  });
+};
+
+// POST /api/auth/verification
+export const verifyEmail = async (req: VerifyEmailRequest): Promise<void> => {
+  return await axios.post("/api/auth/verification", req);
 };
 
 export const useUser = () => {
