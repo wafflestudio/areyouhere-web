@@ -97,10 +97,10 @@ function Account() {
           type="password"
           label="Password"
           value={password}
-          maxLength={50}
+          maxLength={20}
           onChange={(e) => setPassword(e.target.value)}
           supportingText={
-            " Password must be at least 8 characters long, with a letter, number, and special character."
+            "Password must be 8-20 characters long, including at least one letter, one number, and one special character."
           }
           hasError={showError && passwordError}
         />
