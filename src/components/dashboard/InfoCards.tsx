@@ -184,7 +184,7 @@ function InfoCards({
               <DetailsLabel>Start Time</DetailsLabel>
               <DetailsValue>
                 {activated
-                  ? dateFormat(currentSessionInfo?.sessionTime, "TT hh:mm")
+                  ? dateFormat(currentSessionInfo?.sessionTime, "TT hh:MM")
                   : "-"}
               </DetailsValue>
             </DetailsBar>
