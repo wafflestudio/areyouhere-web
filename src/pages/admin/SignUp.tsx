@@ -83,7 +83,7 @@ function SignUp() {
   }, [navigate, user]);
 
   const submit = () => {
-    if (nameError || emailError || passwordError || confirmPasswordError) {
+    if (nameError || passwordError || confirmPasswordError) {
       setShowError(true);
       return;
     }
@@ -123,22 +123,19 @@ function SignUp() {
             label="Email address"
             onChange={(e) => setEmail(e.target.value)}
             supportingText={
-              showError && emailError
-                ? "Invalid email address"
-                : isEmailConflict
-                  ? "Email already exists"
-                  : undefined
+              isEmailConflict ? "Email already exists" : undefined
             }
-            hasError={isEmailConflict || (showError && emailError)}
+            hasError={isEmailConflict}
           />
           <PrimaryButton
             style={{
               height: "4.2rem",
               marginBottom:
-                isEmailConflict || (showError && emailError)
+                (showError && emailError) || isEmailConflict
                   ? "1.8rem"
                   : "0.0rem",
             }}
+            disabled={email === "" || emailError || isEmailConflict}
             onClick={(e) => {
               e.preventDefault();
               sendVerificationCodeMutate(email);
@@ -209,7 +206,8 @@ function SignUp() {
             email === "" ||
             password === "" ||
             confirmPassword === "" ||
-            isSubmitting
+            isSubmitting ||
+            !verified
           }
         >
           Sign up
