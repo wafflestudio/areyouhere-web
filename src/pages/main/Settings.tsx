@@ -93,10 +93,10 @@ function Settings() {
         >
           Save Changes
         </PrimaryButton>
-        {showSnackbar && (
-          <SnackBar isSuccess={true} message="All changes saved." />
-        )}
       </SettingContainer>
+      {showSnackbar && (
+        <SnackBar isSuccess={true} message="All changes saved." />
+      )}
     </Container>
   );
 }
