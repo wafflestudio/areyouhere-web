@@ -143,13 +143,13 @@ function Home() {
             textFieldStyle={{ padding: "1.5rem" }}
             autoComplete="name"
             placeholder="Name"
-            maxLength={4}
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
           <TextField
             textFieldStyle={{ padding: "1.5rem" }}
             placeholder="Passcode"
+            maxLength={4}
             value={passcode}
             onChange={(e) => setPasscode(e.target.value.toUpperCase())}
           />

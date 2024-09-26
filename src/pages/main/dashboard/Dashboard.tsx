@@ -14,6 +14,7 @@ import { createSession } from "../../../api/session.ts";
 import { PrimaryButton } from "../../../components/Button.tsx";
 import CreateSessionModal from "../../../components/dashboard/CreateSessionModal.tsx";
 import InfoCards from "../../../components/dashboard/InfoCards.tsx";
+import SnackBar from "../../../components/SnackBar.tsx";
 import {
   Table,
   TableBody,
@@ -23,6 +24,7 @@ import {
 } from "../../../components/table/Table.tsx";
 import TitleBar from "../../../components/TitleBar.tsx";
 import useModalState from "../../../hooks/modal.tsx";
+import useSnackbar from "../../../hooks/snackbar.tsx";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -51,7 +53,12 @@ function Dashboard() {
       });
       setSessionState("pending");
     },
+    onError: () => {
+      show();
+    },
   });
+
+  const { showSnackbar, show } = useSnackbar();
 
   const { data: classItem } = useCourse(classId);
   const { data: currentSessionInfo } = useCurrentSessionInfo(classId);
@@ -172,6 +179,9 @@ function Dashboard() {
             closeCreateSessionModal();
           }}
         />
+      )}
+      {showSnackbar && (
+        <SnackBar isSuccess={false} message="Failed to create a session." />
       )}
     </>
   );

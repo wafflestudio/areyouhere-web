@@ -83,7 +83,7 @@ function SignUp() {
   }, [navigate, user]);
 
   const submit = () => {
-    if (nameError || emailError || passwordError || confirmPasswordError) {
+    if (nameError || passwordError || confirmPasswordError) {
       setShowError(true);
       return;
     }
@@ -115,7 +115,7 @@ function SignUp() {
           }
           hasError={showError && nameError}
         />
-        <EmailBar style={{ marginTop: "2.5rem" }}>
+        <EmailBar>
           <TextField
             style={{ flex: "1" }}
             autoComplete="email"
@@ -123,22 +123,19 @@ function SignUp() {
             label="Email address"
             onChange={(e) => setEmail(e.target.value)}
             supportingText={
-              showError && emailError
-                ? "Invalid email address"
-                : isEmailConflict
-                  ? "Email already exists"
-                  : undefined
+              isEmailConflict ? "Email already exists" : undefined
             }
-            hasError={isEmailConflict || (showError && emailError)}
+            hasError={isEmailConflict}
           />
           <PrimaryButton
             style={{
               height: "4.2rem",
               marginBottom:
-                isEmailConflict || (showError && emailError)
+                (showError && emailError) || isEmailConflict
                   ? "1.8rem"
                   : "0.0rem",
             }}
+            disabled={email === "" || emailError || isEmailConflict}
             onClick={(e) => {
               e.preventDefault();
               sendVerificationCodeMutate(email);
@@ -148,11 +145,11 @@ function SignUp() {
           </PrimaryButton>
         </EmailBar>
         {sentEmail && (
-          <EmailBar style={{ marginTop: "2.5rem" }}>
+          <EmailBar>
             <TextField
               style={{ flex: "1" }}
               type="text"
-              label="Verification code"
+              label="Verification code timer"
               onChange={(e) => setVerificationCode(e.target.value)}
               supportingText={
                 verificationCodeError ? "Invalid verification code" : undefined
@@ -209,7 +206,8 @@ function SignUp() {
             email === "" ||
             password === "" ||
             confirmPassword === "" ||
-            isSubmitting
+            isSubmitting ||
+            !verified
           }
         >
           Sign up
@@ -250,8 +248,9 @@ const InputContainer = styled.form`
 const EmailBar = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 0.8rem;
   align-items: end;
+  margin-top: 2.5rem;
+  gap: 0.8rem;
 `;
 
 export default SignUp;
