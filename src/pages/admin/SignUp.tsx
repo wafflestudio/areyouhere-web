@@ -115,7 +115,7 @@ function SignUp() {
           }
           hasError={showError && nameError}
         />
-        <EmailBar style={{ marginTop: "2.5rem" }}>
+        <EmailBar>
           <TextField
             style={{ flex: "1" }}
             autoComplete="email"
@@ -145,11 +145,11 @@ function SignUp() {
           </PrimaryButton>
         </EmailBar>
         {sentEmail && (
-          <EmailBar style={{ marginTop: "2.5rem" }}>
+          <EmailBar>
             <TextField
               style={{ flex: "1" }}
               type="text"
-              label="Verification code"
+              label="Verification code timer"
               onChange={(e) => setVerificationCode(e.target.value)}
               supportingText={
                 verificationCodeError ? "Invalid verification code" : undefined
@@ -248,8 +248,9 @@ const InputContainer = styled.form`
 const EmailBar = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 0.8rem;
   align-items: end;
+  margin-top: 2.5rem;
+  gap: 0.8rem;
 `;
 
 export default SignUp;
