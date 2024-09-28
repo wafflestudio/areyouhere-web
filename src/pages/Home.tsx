@@ -5,17 +5,17 @@ import styled from "styled-components";
 
 import { AttendanceErrorCode, postAttend } from "../api/attendance.ts";
 import sendIcon from "../assets/send.svg";
-import TransferBanner from "../components/admin/TransferBanner.tsx";
 import Alert from "../components/Alert.tsx";
 import { PrimaryButton } from "../components/Button.tsx";
 import NoteSelectModal from "../components/home/NoteSelectModal.tsx";
+import TransferBanner from "../components/host/TransferBanner.tsx";
 import TextField from "../components/TextField";
 import useModalState from "../hooks/modal.tsx";
 import useSubmitHandler from "../hooks/submitHandler.tsx";
 
 const ErrorMessages: Record<AttendanceErrorCode, string> = {
-  [AttendanceErrorCode.InvalidAuthCode]: `Could not find a session corresponding to passcode. Please check your credentials or contact the administrator for help.`,
-  [AttendanceErrorCode.InvalidName]: `Could not find a session corresponding to your name. Please check your credentials or contact the administrator for help.`,
+  [AttendanceErrorCode.InvalidAuthCode]: `Could not find a session corresponding to passcode. Please check your credentials or contact the host for help.`,
+  [AttendanceErrorCode.InvalidName]: `Could not find a session corresponding to your name. Please check your credentials or contact the host for help.`,
   [AttendanceErrorCode.AlreadyAttended]: `You have already attended the session.`,
   [AttendanceErrorCode.DifferentName]: `You have already attended the session with a different name.`,
   [AttendanceErrorCode.FailedToAttend]: `Failed to attend the session. Please try again later.`,

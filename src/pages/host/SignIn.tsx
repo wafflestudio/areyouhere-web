@@ -4,13 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { EMAIL_REGEX, signIn, useUser } from "../../api/user";
+import Alert from "../../components/Alert";
+import { PrimaryButton } from "../../components/Button";
 import {
   OptionalActionLabel,
   OptionalActionLink,
-} from "../../components/admin/OptionalAction";
-import TransferBanner from "../../components/admin/TransferBanner";
-import Alert from "../../components/Alert";
-import { PrimaryButton } from "../../components/Button";
+} from "../../components/host/OptionalAction";
+import TransferBanner from "../../components/host/TransferBanner";
 import TextField from "../../components/TextField";
 
 function SignIn() {
@@ -48,7 +48,7 @@ function SignIn() {
 
   return (
     <Container>
-      <TransferBanner from="admin" />
+      <TransferBanner from="host" />
       <LoginContainer>
         <DisplayMessage>
           Simply manage attendance
@@ -86,7 +86,7 @@ function SignIn() {
             onChange={(e) => setPassword(e.target.value)}
           />
           <ForgotPasswordLink
-            to="/admin/forgotpassword"
+            to="/host/forgot-password"
             style={{ marginTop: "1.4rem" }}
           >
             Forgot Password
@@ -105,7 +105,7 @@ function SignIn() {
           </PrimaryButton>
           <OptionalActionLabel style={{ marginTop: "5.0rem" }}>
             Don't have an account?{" "}
-            <OptionalActionLink to="/admin/signup">
+            <OptionalActionLink to="/host/signup">
               Sign up now
             </OptionalActionLink>
           </OptionalActionLabel>

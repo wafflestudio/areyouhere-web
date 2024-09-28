@@ -44,7 +44,7 @@ function SideBar() {
     mutationKey: ["logout"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      navigate("/admin/signin");
+      navigate("/host/signin");
     },
   });
 

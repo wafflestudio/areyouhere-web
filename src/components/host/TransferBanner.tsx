@@ -1,19 +1,19 @@
-// Admin과 Attendees를 전환하기 위한 상단 배너입니다.
+// Host와 Attendees를 전환하기 위한 상단 배너입니다.
 
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 interface TransferBannerProps {
-  from: "admin" | "attendees";
+  from: "host" | "attendees";
 }
 
 function TransferBanner(props: TransferBannerProps) {
   return (
     <>
-      {props.from === "admin" ? (
-        <BannerLink to="/">If you are Attendees</BannerLink>
+      {props.from === "host" ? (
+        <BannerLink to="/">If you are an Attendee, click here!</BannerLink>
       ) : (
-        <BannerLink to="/class">If you are Admin</BannerLink>
+        <BannerLink to="/class">If you are the Host, click here!</BannerLink>
       )}
     </>
   );

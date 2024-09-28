@@ -13,12 +13,12 @@ import {
   useUser,
   verifyEmail,
 } from "../../api/user";
+import { PrimaryButton } from "../../components/Button.tsx";
 import {
   OptionalActionLabel,
   OptionalActionLink,
-} from "../../components/admin/OptionalAction.tsx";
-import TransferBanner from "../../components/admin/TransferBanner.tsx";
-import { PrimaryButton } from "../../components/Button.tsx";
+} from "../../components/host/OptionalAction.tsx";
+import TransferBanner from "../../components/host/TransferBanner.tsx";
 import TextField from "../../components/TextField.tsx";
 import useSubmitHandler from "../../hooks/submitHandler.tsx";
 
@@ -95,7 +95,7 @@ function SignUp() {
 
   return (
     <Container>
-      <TransferBanner from="admin" />
+      <TransferBanner from="host" />
       <Title>Create a free account</Title>
       <InputContainer
         onSubmit={(e) => {
@@ -214,7 +214,7 @@ function SignUp() {
         </PrimaryButton>
         <OptionalActionLabel style={{ marginTop: "5.0rem" }}>
           Already a member?{" "}
-          <OptionalActionLink to="/admin/signin">Sign in</OptionalActionLink>
+          <OptionalActionLink to="/host/signin">Sign in</OptionalActionLink>
         </OptionalActionLabel>
       </InputContainer>
     </Container>
