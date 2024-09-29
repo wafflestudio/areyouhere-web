@@ -3,17 +3,23 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
+import { useUser } from "../../api/user.ts";
+
 interface TransferBannerProps {
   from: "host" | "attendees";
 }
 
 function TransferBanner(props: TransferBannerProps) {
+  const { data: user } = useUser();
+
   return (
     <>
       {props.from === "host" ? (
         <BannerLink to="/">If you are an Attendee, click here!</BannerLink>
       ) : (
-        <BannerLink to="/class">If you are the Host, click here!</BannerLink>
+        <BannerLink to={user ? "/class" : "/host/signin"}>
+          If you are the Host, click here!
+        </BannerLink>
       )}
     </>
   );
