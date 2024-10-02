@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -7,7 +7,6 @@ import {
   deleteUser,
   editProfile,
   NAME_REGEX,
-  PASSWORD_REGEX,
   useUser,
 } from "../../api/user.ts";
 import AlertModal from "../../components/AlertModal.tsx";
@@ -16,6 +15,7 @@ import SnackBar from "../../components/SnackBar.tsx";
 import { SingleLineTextField } from "../../components/TextField.tsx";
 import TitleBar from "../../components/TitleBar.tsx";
 import useModalState from "../../hooks/modal.tsx";
+import { usePasswordValidation } from "../../hooks/password.tsx";
 import useSnackbar from "../../hooks/snackbar.tsx";
 import useSubmitHandler from "../../hooks/submitHandler.tsx";
 
@@ -24,17 +24,6 @@ function Account() {
   const queryClient = useQueryClient();
 
   const { data: user } = useUser();
-
-  const [name, setName] = useState(user?.name ?? "");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const nameError = name.match(NAME_REGEX) == null;
-  const passwordError = password.match(PASSWORD_REGEX) == null;
-  const confirmPasswordError = password !== confirmPassword;
-
-  const { showSnackbar, show } = useSnackbar();
-  const [showError, setShowError] = useState(false);
 
   const { mutate: editUserMutate } = useMutation({
     mutationFn: editProfile,
@@ -58,6 +47,38 @@ function Account() {
 
   const [deleteModalState, openDeleteModal, closeDeleteModal] = useModalState();
 
+  const [name, setName] = useState(user?.name ?? "");
+  const [isNameFocused, setIsNameFocused] = useState(false);
+  const [isNameError, setIsNameError] = useState(false);
+
+  useEffect(() => {
+    if (name === "") {
+      setIsNameError(false);
+    } else {
+      setIsNameError(!NAME_REGEX.test(name));
+    }
+  }, [isNameFocused]);
+
+  const {
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    setIsPasswordFocused,
+    setIsConfirmPasswordFocused,
+    isPasswordError,
+    isConfirmPasswordError,
+    isButtonDisabled,
+  } = usePasswordValidation();
+
+  const { showSnackbar, show } = useSnackbar();
+
+  const submit = () => {
+    if (!isNameError && !isPasswordError && !isConfirmPasswordError) {
+      editUserMutate({ name, password });
+    }
+  };
+
   const { isSubmitting, handleSubmit } = useSubmitHandler();
 
   return (
@@ -66,13 +87,7 @@ function Account() {
       <AccountForm
         onSubmit={(e) => {
           e.preventDefault();
-
-          if (nameError || passwordError || confirmPasswordError) {
-            setShowError(true);
-            return;
-          }
-
-          editUserMutate({ name, password });
+          handleSubmit(submit);
         }}
       >
         <SingleLineTextField
@@ -84,47 +99,60 @@ function Account() {
           type="text"
           label="Name"
           maxLength={50}
+          onFocus={() => {
+            setIsNameFocused(true);
+          }}
+          onBlur={() => {
+            setIsNameFocused(false);
+          }}
           onChange={(e) => setName(e.target.value)}
           supportingText={
-            showError && nameError
-              ? "name must be 2-16 characters long"
-              : undefined
+            isNameError ? "Name must be 2-16 characters long." : undefined
           }
-          hasError={showError && nameError}
+          hasError={isNameError}
           value={name}
         />
         <SingleLineTextField
           type="password"
+          name="password"
           label="Password"
           value={password}
-          maxLength={20}
           onChange={(e) => setPassword(e.target.value)}
+          onFocus={() => {
+            setIsPasswordFocused(true);
+          }}
+          onBlur={() => {
+            setIsPasswordFocused(false);
+          }}
           supportingText={
-            "Password must be 8-20 characters long, including at least one letter, one number, and one special character."
+            isPasswordError
+              ? "Password must be 8-20 characters long, including at least one letter, one number, and one special character."
+              : undefined
           }
-          hasError={showError && passwordError}
+          hasError={isPasswordError}
         />
         <SingleLineTextField
           type="password"
-          label="Confirm password"
+          name="confirmPassword"
+          label="Confirm Password"
           value={confirmPassword}
-          maxLength={50}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          onFocus={() => {
+            setIsConfirmPasswordFocused(true);
+          }}
+          onBlur={() => {
+            setIsConfirmPasswordFocused(false);
+          }}
           supportingText={
-            showError && confirmPasswordError
-              ? "Passwords do not match"
-              : undefined
+            isConfirmPasswordError ? "Passwords do not match." : undefined
           }
-          hasError={showError && confirmPasswordError}
+          hasError={isConfirmPasswordError}
         />
         <div>
           <PrimaryButton
             style={{ width: "45rem" }}
             disabled={
-              name === "" ||
-              password === "" ||
-              confirmPassword === "" ||
-              isSubmitting
+              !NAME_REGEX.test(name) || isButtonDisabled || isSubmitting
             }
           >
             Save Changes

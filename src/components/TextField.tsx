@@ -98,6 +98,7 @@ function TextField({
 }
 
 // create class, setting, account setting에서만 쓰임
+// label이 왼쪽에 있음
 function SingleLineTextField({
   label,
   style,
