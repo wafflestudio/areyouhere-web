@@ -6,8 +6,7 @@ import styled from "styled-components";
 import {
   EMAIL_REGEX,
   NAME_REGEX,
-  PASSWORD_REGEX,
-  sendVerificationEmail,
+  sendSignInEmail,
   signUp,
   useEmailConflict,
   useUser,
@@ -20,29 +19,49 @@ import {
 } from "../../components/host/OptionalAction.tsx";
 import TransferBanner from "../../components/host/TransferBanner.tsx";
 import TextField from "../../components/TextField.tsx";
+import { usePasswordValidation } from "../../hooks/password.tsx";
 import useSubmitHandler from "../../hooks/submitHandler.tsx";
 
 function SignUp() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const { data: user } = useUser();
+
+  // Name
   const [name, setName] = useState("");
+  const [isNameFocused, setIsNameFocused] = useState(false);
+  const [isNameError, setIsNameError] = useState(false);
+
+  useEffect(() => {
+    if (name === "") {
+      setIsNameError(false);
+    } else {
+      setIsNameError(!NAME_REGEX.test(name));
+    }
+  }, [isNameFocused]);
+
+  // Email
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [sentEmail, setSentEmail] = useState(false);
+  const isEmailError = !EMAIL_REGEX.test(email);
+
   const [verificationCode, setVerificationCode] = useState("");
   const [verified, setVerified] = useState(false);
-
-  const nameError = name.match(NAME_REGEX) == null;
-  const emailError = email.match(EMAIL_REGEX) == null;
-  const passwordError = password.match(PASSWORD_REGEX) == null;
-  const confirmPasswordError = password !== confirmPassword;
   const [verificationCodeError, setVerificationCodeError] = useState(false);
 
-  const [showError, setShowError] = useState(false);
-
-  const { data: user } = useUser();
+  // Password
+  const {
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    setIsPasswordFocused,
+    setIsConfirmPasswordFocused,
+    isPasswordError,
+    isConfirmPasswordError,
+    isButtonDisabled,
+  } = usePasswordValidation();
 
   // TODO: handle failure cases
   const { mutate: signUpMutate } = useMutation({
@@ -54,9 +73,9 @@ function SignUp() {
     },
   });
 
-  const { mutate: sendVerificationCodeMutate } = useMutation({
-    mutationFn: sendVerificationEmail,
-    mutationKey: ["sendVerificationCode"],
+  const { mutate: sendSignInEmailMutate } = useMutation({
+    mutationFn: sendSignInEmail,
+    mutationKey: ["sendSignInEmail"],
     onSuccess: () => {
       setSentEmail(true);
     },
@@ -74,7 +93,7 @@ function SignUp() {
     },
   });
 
-  const { data: isEmailConflict } = useEmailConflict(email, !emailError);
+  const { data: isEmailConflict } = useEmailConflict(email, !isEmailError);
 
   useEffect(() => {
     if (user != null) {
@@ -83,12 +102,9 @@ function SignUp() {
   }, [navigate, user]);
 
   const submit = () => {
-    if (nameError || passwordError || confirmPasswordError) {
-      setShowError(true);
-      return;
+    if (!isNameError && !isPasswordError && !isConfirmPasswordError) {
+      signUpMutate({ name, email, password });
     }
-
-    signUpMutate({ name, email, password });
   };
 
   const { isSubmitting, handleSubmit } = useSubmitHandler();
@@ -96,7 +112,7 @@ function SignUp() {
   return (
     <Container>
       <TransferBanner from="host" />
-      <Title>Create a free account</Title>
+      <Title>Create a Free Account</Title>
       <InputContainer
         onSubmit={(e) => {
           e.preventDefault();
@@ -104,41 +120,43 @@ function SignUp() {
         }}
       >
         <TextField
-          autoComplete="name"
           type="text"
           label="Name"
+          maxLength={50}
+          onFocus={() => {
+            setIsNameFocused(true);
+          }}
+          onBlur={() => {
+            setIsNameFocused(false);
+          }}
           onChange={(e) => setName(e.target.value)}
           supportingText={
-            showError && nameError
-              ? "Name must be 2-16 characters long"
-              : undefined
+            isNameError ? "Name must be 2-16 characters long." : undefined
           }
-          hasError={showError && nameError}
+          hasError={isNameError}
+          value={name}
         />
         <EmailBar>
           <TextField
             style={{ flex: "1" }}
             autoComplete="email"
             type="email"
-            label="Email address"
+            label="Email Address"
             onChange={(e) => setEmail(e.target.value)}
             supportingText={
-              isEmailConflict ? "Email already exists" : undefined
+              isEmailConflict ? "Email already exists." : undefined
             }
             hasError={isEmailConflict}
           />
           <PrimaryButton
             style={{
               height: "4.2rem",
-              marginBottom:
-                (showError && emailError) || isEmailConflict
-                  ? "1.8rem"
-                  : "0.0rem",
+              marginBottom: isEmailConflict ? "1.8rem" : "0.0rem",
             }}
-            disabled={email === "" || emailError || isEmailConflict}
+            disabled={email === "" || isEmailError || isEmailConflict}
             onClick={(e) => {
               e.preventDefault();
-              sendVerificationCodeMutate(email);
+              sendSignInEmailMutate(email);
             }}
           >
             {sentEmail ? "Resend" : "Send Code"}
@@ -149,10 +167,10 @@ function SignUp() {
             <TextField
               style={{ flex: "1" }}
               type="text"
-              label="Verification code timer"
+              label="Verification code"
               onChange={(e) => setVerificationCode(e.target.value)}
               supportingText={
-                verificationCodeError ? "Invalid verification code" : undefined
+                verificationCodeError ? "Invalid verification code." : undefined
               }
               hasError={verificationCodeError}
             />
@@ -161,7 +179,7 @@ function SignUp() {
                 height: "4.2rem",
                 marginBottom: verificationCodeError ? "1.8rem" : "0.0rem",
               }}
-              disabled={verified}
+              disabled={verificationCode == "" || verified}
               onClick={(e) => {
                 e.preventDefault();
                 verifyEmailMutate({ email, code: verificationCode });
@@ -172,49 +190,55 @@ function SignUp() {
           </EmailBar>
         )}
         <TextField
-          autoComplete="new-password"
           type="password"
+          name="password"
           label="Password"
-          style={{ marginTop: "2.5rem" }}
-          maxLength={20}
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
+          onFocus={() => {
+            setIsPasswordFocused(true);
+          }}
+          onBlur={() => {
+            setIsPasswordFocused(false);
+          }}
           supportingText={
-            <span>
-              Password must be 8-20 characters long, including at least one
-              letter, one number, and one special character.
-            </span>
+            "Password must be 8-20 characters long, including at least one letter, one number, and one special character."
           }
-          hasError={showError && passwordError}
+          hasError={isPasswordError}
+          style={{ marginTop: "2.5rem" }}
         />
         <TextField
-          autoComplete="new-password"
           type="password"
-          label="Confirm password"
-          style={{ marginTop: "2.5rem" }}
+          name="confirmPassword"
+          label="Confirm Password"
+          value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          onFocus={() => {
+            setIsConfirmPasswordFocused(true);
+          }}
+          onBlur={() => {
+            setIsConfirmPasswordFocused(false);
+          }}
           supportingText={
-            showError && confirmPasswordError
-              ? "Passwords do not match"
-              : undefined
+            isConfirmPasswordError ? "Passwords do not match." : undefined
           }
-          hasError={showError && confirmPasswordError}
+          hasError={isConfirmPasswordError}
+          style={{ marginTop: "2.5rem" }}
         />
         <PrimaryButton
           style={{ marginTop: "3.0rem" }}
           disabled={
-            name === "" ||
-            email === "" ||
-            password === "" ||
-            confirmPassword === "" ||
-            isSubmitting ||
-            !verified
+            !NAME_REGEX.test(name) ||
+            !verified ||
+            isButtonDisabled ||
+            isSubmitting
           }
         >
-          Sign up
+          Sign Up
         </PrimaryButton>
         <OptionalActionLabel style={{ marginTop: "5.0rem" }}>
           Already a member?{" "}
-          <OptionalActionLink to="/host/signin">Sign in</OptionalActionLink>
+          <OptionalActionLink to="/host/signin">Sign In</OptionalActionLink>
         </OptionalActionLabel>
       </InputContainer>
     </Container>
