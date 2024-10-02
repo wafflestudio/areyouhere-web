@@ -1,29 +1,57 @@
+import { useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
-import { EMAIL_REGEX } from "../../../api/user.ts";
+import { EMAIL_REGEX, sendForgotPasswordEmail } from "../../../api/user.ts";
 import { PrimaryButton, TertiaryButton } from "../../../components/Button.tsx";
 import {
   OptionalActionLabel,
   OptionalActionLink,
 } from "../../../components/host/OptionalAction.tsx";
 import TextField from "../../../components/TextField.tsx";
+import useSubmitHandler from "../../../hooks/submitHandler.tsx";
 
 function Email() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const { email, setEmail } = useOutletContext<{
+    email: string;
+    setEmail: React.Dispatch<React.SetStateAction<string>>;
+  }>();
 
-  const emailError = email.match(EMAIL_REGEX) == null;
+  const isEmailError = !EMAIL_REGEX.test(email);
+  const [isEmailExist, setIsEmailExist] = useState(true);
 
-  const onSubmit = () => {
-    // TODO : 이메일 전송 api 추가
-    navigate("/host/forgot-password/verify");
+  const { mutate: sendForgotPasswordEmailMutate } = useMutation({
+    mutationFn: sendForgotPasswordEmail,
+    mutationKey: ["sendForgotPasswordEmail"],
+    onSuccess: () => {
+      setIsEmailExist(true);
+      navigate("/host/forgot-password/verify");
+    },
+    onError: (error) => {
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 403) {
+        setIsEmailExist(false);
+      }
+    },
+  });
+
+  const submit = () => {
+    sendForgotPasswordEmailMutate(email);
   };
 
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
+
   return (
-    <>
-      <h1>Forgot password?</h1>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit(submit);
+      }}
+    >
+      <h1>Forgot Password?</h1>
       <h2>
         Please enter the email address you used when you joined and we’ll send
         you the verification code to reset password.
@@ -34,10 +62,11 @@ function Email() {
         label="Email Address"
         onChange={(e) => setEmail(e.target.value)}
         style={{ marginBottom: "3rem" }}
+        supportingText={!isEmailExist ? "Email does not exist." : undefined}
+        hasError={!isEmailExist}
       />
       <PrimaryButton
-        disabled={email === "" || emailError}
-        onClick={onSubmit}
+        disabled={email === "" || isEmailError || isSubmitting}
         style={{ marginBottom: "1.5rem" }}
       >
         Send Code
@@ -52,9 +81,9 @@ function Email() {
       </TertiaryButton>
       <OptionalActionLabel>
         Don't have an account?{" "}
-        <OptionalActionLink to="/host/signup">Sign up now</OptionalActionLink>
+        <OptionalActionLink to="/host/signup">Sign Up Now</OptionalActionLink>
       </OptionalActionLabel>
-    </>
+    </form>
   );
 }
 

@@ -44,7 +44,7 @@ const router = createBrowserRouter([
           { path: "success", element: <Success /> },
         ],
       },
-      { path: "/terms_of_use", element: <TermsOfUse /> },
+      { path: "/terms-of-use", element: <TermsOfUse /> },
       {
         path: "/",
         element: <AuthRequiredRoute />,

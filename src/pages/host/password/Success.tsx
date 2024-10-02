@@ -1,11 +1,24 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
 import successIcon from "../../../assets/success.svg";
 import { PrimaryButton } from "../../../components/Button.tsx";
 
 function Success() {
   const navigate = useNavigate();
+
+  const { email, isVerified, isPasswordSet } = useOutletContext<{
+    email: string;
+    isVerified: boolean;
+    isPasswordSet: boolean;
+  }>();
+
+  // 직접 접근 차단
+  useEffect(() => {
+    if (email === "" || !isVerified || !isPasswordSet) {
+      navigate("/host/forgot-password/email");
+    }
+  }, []);
 
   return (
     <>

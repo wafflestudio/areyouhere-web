@@ -28,9 +28,9 @@ export type VerifyEmailRequest = {
 };
 
 export const EMAIL_REGEX =
-  "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
-export const PASSWORD_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[\\W_]).{8,20}$";
-export const NAME_REGEX = "^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣]{2,16}$";
+  /^[\w!#$%&'*+/=?`{|}~^.-]+(?:\.[\w!#$%&'*+/=?`{|}~^.-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}$/;
+export const PASSWORD_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[\W_]).{8,20}$/;
+export const NAME_REGEX = /^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣]{2,16}$/;
 
 export const getUser = async (): Promise<User | null> => {
   const res = await axios.get<User>("/api/auth/me", {
@@ -98,8 +98,15 @@ export const isEmailConflict = async (
 };
 
 // GET /api/auth/email?email=”String”
-export const sendVerificationEmail = async (email: string): Promise<void> => {
+export const sendSignInEmail = async (email: string): Promise<void> => {
   return await axios.get("/api/auth/email", {
+    params: { email },
+  });
+};
+
+// GET /api/auth/password?email=”String”
+export const sendForgotPasswordEmail = async (email: string): Promise<void> => {
+  return await axios.get("/api/auth/password", {
     params: { email },
   });
 };
@@ -107,6 +114,11 @@ export const sendVerificationEmail = async (email: string): Promise<void> => {
 // POST /api/auth/verification
 export const verifyEmail = async (req: VerifyEmailRequest): Promise<void> => {
   return await axios.post("/api/auth/verification", req);
+};
+
+// POST /api/auth/password
+export const setNewPassword = async (req: SignInRequest): Promise<void> => {
+  return await axios.post("/api/auth/password", req);
 };
 
 export const useUser = () => {

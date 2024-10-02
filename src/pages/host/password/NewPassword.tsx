@@ -1,54 +1,62 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import React, { useEffect } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
-import { PASSWORD_REGEX } from "../../../api/user.ts";
+import { setNewPassword } from "../../../api/user.ts";
 import { PrimaryButton } from "../../../components/Button.tsx";
 import TextField from "../../../components/TextField.tsx";
+import { usePasswordValidation } from "../../../hooks/password.tsx";
+import useSubmitHandler from "../../../hooks/submitHandler.tsx";
 
 function NewPassword() {
   const navigate = useNavigate();
 
-  const [password, setpassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const { email, isVerified, setIsPasswordSet } = useOutletContext<{
+    email: string;
+    isVerified: boolean;
+    setIsPasswordSet: React.Dispatch<React.SetStateAction<boolean>>;
+  }>();
 
-  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] =
-    useState(false);
-
-  const [isPasswordValid, setIsPasswordValid] = useState(true);
-  const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
-  const [isButtonAble, setIsButtonAble] = useState(false);
-
+  // 직접 접근 차단
   useEffect(() => {
-    if (password === "") {
-      setIsPasswordValid(true);
-    } else {
-      setIsPasswordValid(PASSWORD_REGEX.test(password));
+    if (email == "" || !isVerified) {
+      navigate("/host/forgot-password/email");
     }
+  }, []);
 
-    if (confirmPassword === "") {
-      setIsConfirmPasswordValid(true);
-    } else {
-      setIsConfirmPasswordValid(password === confirmPassword);
-    }
-  }, [isPasswordFocused, isConfirmPasswordFocused]);
+  const {
+    password,
+    setPassword,
+    setConfirmPassword,
+    setIsPasswordFocused,
+    setIsConfirmPasswordFocused,
+    isPasswordError,
+    isConfirmPasswordError,
+    isButtonDisabled,
+  } = usePasswordValidation();
 
-  useEffect(() => {
-    setIsButtonAble(
-      password !== "" &&
-        confirmPassword !== "" &&
-        PASSWORD_REGEX.test(password) &&
-        password === confirmPassword
-    );
-  }, [password, confirmPassword]);
+  const { mutate: setNewPasswordMutate } = useMutation({
+    mutationFn: setNewPassword,
+    mutationKey: ["setNewPassword"],
+    onSuccess: () => {
+      setIsPasswordSet(true);
+      navigate("/host/forgot-password/success");
+    },
+  });
 
-  const onSubmit = () => {
-    // TODO : 비밀번호 재설정 api 추가
-    navigate("/host/forgot-password/success");
+  const submit = () => {
+    setNewPasswordMutate({ email, password });
   };
 
+  const { isSubmitting, handleSubmit } = useSubmitHandler();
+
   return (
-    <>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit(submit);
+      }}
+    >
       <h1>Set New Password</h1>
       <h2>
         Password must be 8-20 characters long, including at least one letter,
@@ -58,7 +66,7 @@ function NewPassword() {
         type="password"
         name="password"
         label="Password"
-        onChange={(e) => setpassword(e.target.value)}
+        onChange={(e) => setPassword(e.target.value)}
         onFocus={() => {
           setIsPasswordFocused(true);
         }}
@@ -66,11 +74,11 @@ function NewPassword() {
           setIsPasswordFocused(false);
         }}
         supportingText={
-          !isPasswordValid
+          isPasswordError
             ? "Password must be 8-20 characters long, including at least one letter, one number, and one special character."
             : undefined
         }
-        hasError={!isPasswordValid}
+        hasError={isPasswordError}
         style={{ marginBottom: "1rem" }}
       />
       <TextField
@@ -85,19 +93,18 @@ function NewPassword() {
           setIsConfirmPasswordFocused(false);
         }}
         supportingText={
-          !isConfirmPasswordValid ? "Passwords do not match." : undefined
+          isConfirmPasswordError ? "Passwords do not match." : undefined
         }
-        hasError={!isConfirmPasswordValid}
+        hasError={isConfirmPasswordError}
         style={{ marginBottom: "3rem" }}
       />
       <PrimaryButton
-        disabled={!isButtonAble}
-        onClick={onSubmit}
+        disabled={isButtonDisabled || isSubmitting}
         style={{ marginBottom: "1.5rem" }}
       >
         Set New Password
       </PrimaryButton>
-    </>
+    </form>
   );
 }
 
