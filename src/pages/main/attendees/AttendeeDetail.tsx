@@ -63,7 +63,6 @@ function AttendeeDetail() {
     onError: (error) => {
       // TODO: How to handle error?
       // what if one request success and the other fails? Can we rollback?
-      console.error(error);
       setHasNamesakeError(true);
     },
   });

@@ -49,7 +49,6 @@ function Home() {
       }
     },
     onError: (error) => {
-      console.error(error);
       setErrorMessage(ErrorMessages[error.message as AttendanceErrorCode]);
     },
   });
