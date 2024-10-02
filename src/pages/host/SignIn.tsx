@@ -20,7 +20,7 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const emailError = email.match(EMAIL_REGEX) == null;
+  const emailError = !EMAIL_REGEX.test(email);
   const [showError, setShowError] = useState(false);
 
   const [resultError, setResultError] = useState<string | undefined>();
@@ -71,7 +71,7 @@ function SignIn() {
             type="text"
             name="email"
             autoComplete="username"
-            label="Email address"
+            label="Email Address"
             onChange={(e) => setEmail(e.target.value)}
             supportingText={
               showError && emailError ? "Invalid email address" : undefined
@@ -86,7 +86,7 @@ function SignIn() {
             onChange={(e) => setPassword(e.target.value)}
           />
           <ForgotPasswordLink
-            to="/host/forgot-password"
+            to="/host/forgot-password/email"
             style={{ marginTop: "1.4rem" }}
           >
             Forgot Password
@@ -106,7 +106,7 @@ function SignIn() {
           <OptionalActionLabel style={{ marginTop: "5.0rem" }}>
             Don't have an account?{" "}
             <OptionalActionLink to="/host/signup">
-              Sign up now
+              Sign Up Now
             </OptionalActionLink>
           </OptionalActionLabel>
         </InputContainer>
