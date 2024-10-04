@@ -17,7 +17,7 @@ function AuthRequiredRoute() {
   }
 
   if (!user) {
-    return <Navigate to="/admin/signin" replace />;
+    return <Navigate to="/host/signin" replace />;
   }
 
   if (classId) {

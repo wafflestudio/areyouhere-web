@@ -30,7 +30,7 @@ const FloatingSupportButton = () => {
             Contact & Feedback
           </ReportMenuLink>
           <Divider />
-          <ReportMenuLink to="/terms_of_use" target="_blank">
+          <ReportMenuLink to="/terms-of-use" target="_blank">
             <img src={terms} alt="Terms of Use" />
             Terms of Use
           </ReportMenuLink>

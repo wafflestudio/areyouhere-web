@@ -1,16 +1,21 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import App from "./App";
-import AuthRequiredRoute from "./components/admin/AuthRequiredRoute.tsx";
-import SignIn from "./pages/admin/SignIn";
-import SignUp from "./pages/admin/SignUp";
+import AuthRequiredRoute from "./components/host/AuthRequiredRoute.tsx";
 import ClassList from "./pages/class/ClassList.tsx";
 import CreateClass from "./pages/class/CreateClass.tsx";
 import Home from "./pages/Home";
+import Email from "./pages/host/password/Email.tsx";
+import ForgotPassword from "./pages/host/password/ForgotPassword.tsx";
+import NewPassword from "./pages/host/password/NewPassword.tsx";
+import Success from "./pages/host/password/Success.tsx";
+import Verify from "./pages/host/password/Verify.tsx";
+import SignIn from "./pages/host/SignIn";
+import SignUp from "./pages/host/SignUp";
 import Account from "./pages/main/Account.tsx";
-import AddAttendees from "./pages/main/Attendees/AddAttendees.tsx";
-import AttendeeDetail from "./pages/main/Attendees/AttendeeDetail.tsx";
-import Attendees from "./pages/main/Attendees/Attendees.tsx";
+import AddAttendees from "./pages/main/attendees/AddAttendees.tsx";
+import AttendeeDetail from "./pages/main/attendees/AttendeeDetail.tsx";
+import Attendees from "./pages/main/attendees/Attendees.tsx";
 import CodePopup from "./pages/main/dashboard/CodePopup.tsx";
 import Dashboard from "./pages/main/dashboard/Dashboard.tsx";
 import SessionDetail from "./pages/main/session/SessionDetail.tsx";
@@ -27,9 +32,19 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       { path: "/result", element: <Result /> },
-      { path: "/admin/signin", element: <SignIn /> },
-      { path: "/admin/signup", element: <SignUp /> },
-      { path: "/terms_of_use", element: <TermsOfUse /> },
+      { path: "/host/signin", element: <SignIn /> },
+      { path: "/host/signup", element: <SignUp /> },
+      {
+        path: "/host/forgot-password",
+        element: <ForgotPassword />,
+        children: [
+          { path: "email", element: <Email /> },
+          { path: "verify", element: <Verify /> },
+          { path: "new-password", element: <NewPassword /> },
+          { path: "success", element: <Success /> },
+        ],
+      },
+      { path: "/terms-of-use", element: <TermsOfUse /> },
       {
         path: "/",
         element: <AuthRequiredRoute />,
