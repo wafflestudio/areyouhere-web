@@ -1,27 +1,27 @@
 import { useState, useRef } from "react";
 
 function useSnackbar() {
-  const [showSnackbar, setShowSnackbar] = useState(false);
+  const [isSnackBarShown, setIsSnackBarShown] = useState(false);
   const snackbarTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const show = () => {
-    setShowSnackbar(true);
+    setIsSnackBarShown(true);
     if (snackbarTimeoutRef.current) {
       clearTimeout(snackbarTimeoutRef.current);
     }
     snackbarTimeoutRef.current = setTimeout(() => {
-      setShowSnackbar(false);
+      setIsSnackBarShown(false);
     }, 2200);
   };
 
   const hide = () => {
-    setShowSnackbar(false);
+    setIsSnackBarShown(false);
     if (snackbarTimeoutRef.current) {
       clearTimeout(snackbarTimeoutRef.current);
     }
   };
 
-  return { showSnackbar, show, hide };
+  return { showSnackbar: isSnackBarShown, show, hide };
 }
 
 export default useSnackbar;

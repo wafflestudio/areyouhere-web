@@ -58,12 +58,12 @@ function AttendeeDetail() {
       setTempAttendee(null);
       setTempAttendances({});
       setIsEditing(false);
-      setHasNamesakeError(false);
+      setIsNamesakeError(false);
     },
     onError: (error) => {
       // TODO: How to handle error?
       // what if one request success and the other fails? Can we rollback?
-      setHasNamesakeError(true);
+      setIsNamesakeError(true);
     },
   });
 
@@ -77,7 +77,7 @@ function AttendeeDetail() {
     }
   };
 
-  const [hasNamesakeError, setHasNamesakeError] = useState(false);
+  const [isNamesakeError, setIsNamesakeError] = useState(false);
 
   // 수정 관련
   const [tempAttendee, setTempAttendee] = useState<AttendeeInfo | null>(null);
@@ -132,7 +132,7 @@ function AttendeeDetail() {
         )}
       </TitleBar>
       <ContentContainer>
-        {hasNamesakeError && (
+        {isNamesakeError && (
           <Alert type="warning" style={{ marginBottom: "1.2rem" }}>
             There are attendees with the same name and note. Please modify them
             without duplication.
