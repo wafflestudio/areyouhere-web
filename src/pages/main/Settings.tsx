@@ -21,7 +21,7 @@ function Settings() {
   const [description, setDescription] = useState("");
 
   // 이름 목록에 unknown name 허용 체크박스 (현재는 미사용)
-  const [onlyListNameAllowed, setOnlyListNameAllowed] = useState(false);
+  const [isOnlyListNameAllowed, setIsOnlyListNameAllowed] = useState(false);
 
   const queryClient = useQueryClient();
   const { mutate: updateClass } = useMutation({
@@ -44,7 +44,7 @@ function Settings() {
     if (classItem) {
       setClassName(classItem.name);
       setDescription(classItem.description);
-      setOnlyListNameAllowed(classItem.allowOnlyRegistered);
+      setIsOnlyListNameAllowed(classItem.allowOnlyRegistered);
     }
   }, [classItem]);
 
@@ -53,7 +53,7 @@ function Settings() {
       id: classId,
       name: className,
       description,
-      onlyListNameAllowed,
+      onlyListNameAllowed: isOnlyListNameAllowed,
     });
   };
 

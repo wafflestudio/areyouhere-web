@@ -8,23 +8,23 @@ import questionMark from "../assets/support/questionMark.svg";
 import terms from "../assets/support/terms.svg";
 
 const FloatingSupportButton = () => {
-  const [showBubble, setShowBubble] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
+  const [isBubbleShown, setIsBubbleShown] = useState(false);
+  const [isMenuShown, setIsMenuShown] = useState(false);
 
   return (
     <Container
-      clickable={showMenu}
+      clickable={isMenuShown}
       onClick={() => {
-        setShowMenu(false);
-        setShowBubble(false);
+        setIsMenuShown(false);
+        setIsBubbleShown(false);
       }}
     >
       <ContextContainer>
-        <ReportBubble style={{ opacity: showBubble ? 1 : 0 }}>
+        <ReportBubble style={{ opacity: isBubbleShown ? 1 : 0 }}>
           <ReportBubbleContent>Help</ReportBubbleContent>
           <BubbleTipImg src={bubbleTip} alt="Bubble Tip" />
         </ReportBubble>
-        <ReportMenuContainer style={{ opacity: showMenu ? 1 : 0 }}>
+        <ReportMenuContainer style={{ opacity: isMenuShown ? 1 : 0 }}>
           <ReportMenuLink to="https://tally.so/r/w7WY6P" target="_blank">
             <img src={feedback} alt="Contact Support" />
             Contact & Feedback
@@ -38,14 +38,14 @@ const FloatingSupportButton = () => {
       </ContextContainer>
       <ReportIconButton
         onMouseEnter={() => {
-          if (!showMenu) setShowBubble(true);
+          if (!isMenuShown) setIsBubbleShown(true);
         }}
         onMouseLeave={() => {
-          setShowBubble(false);
+          setIsBubbleShown(false);
         }}
         onClick={(e) => {
-          setShowMenu(!showMenu);
-          setShowBubble(false);
+          setIsMenuShown(!isMenuShown);
+          setIsBubbleShown(false);
           e.stopPropagation();
         }}
       >

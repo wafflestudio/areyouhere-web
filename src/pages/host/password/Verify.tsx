@@ -28,18 +28,18 @@ function Verify() {
   }, []);
 
   const [verificationCode, setVerificationCode] = useState("");
-  const [verificationCodeError, setVerificationCodeError] = useState(false);
+  const [isVerificationCodeError, setIsVerificationCodeError] = useState(false);
 
   const { mutate: verifyEmailMutate } = useMutation({
     mutationFn: verifyEmail,
     mutationKey: ["verifyEmail"],
     onSuccess: () => {
-      setVerificationCodeError(false);
+      setIsVerificationCodeError(false);
       setIsVerified(true);
       navigate("/host/forgot-password/new-password");
     },
     onError: () => {
-      setVerificationCodeError(true);
+      setIsVerificationCodeError(true);
     },
   });
 
@@ -64,9 +64,9 @@ function Verify() {
         label="Verification Code"
         onChange={(e) => setVerificationCode(e.target.value)}
         supportingText={
-          verificationCodeError ? "Invalid verification code." : undefined
+          isVerificationCodeError ? "Invalid verification code." : undefined
         }
-        hasError={verificationCodeError}
+        hasError={isVerificationCodeError}
         style={{ marginBottom: "3rem" }}
       />
       <PrimaryButton

@@ -43,12 +43,12 @@ function SignUp() {
 
   // Email
   const [email, setEmail] = useState("");
-  const [sentEmail, setSentEmail] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
   const isEmailError = !EMAIL_REGEX.test(email);
 
   const [verificationCode, setVerificationCode] = useState("");
-  const [verified, setVerified] = useState(false);
-  const [verificationCodeError, setVerificationCodeError] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [isVerificationCodeError, setIsVerificationCodeError] = useState(false);
 
   // Password
   const {
@@ -77,7 +77,7 @@ function SignUp() {
     mutationFn: sendSignInEmail,
     mutationKey: ["sendSignInEmail"],
     onSuccess: () => {
-      setSentEmail(true);
+      setIsEmailSent(true);
     },
   });
 
@@ -85,11 +85,11 @@ function SignUp() {
     mutationFn: verifyEmail,
     mutationKey: ["verifyEmail"],
     onSuccess: () => {
-      setVerificationCodeError(false);
-      setVerified(true);
+      setIsVerificationCodeError(false);
+      setIsVerified(true);
     },
     onError: () => {
-      setVerificationCodeError(true);
+      setIsVerificationCodeError(true);
     },
   });
 
@@ -153,16 +153,18 @@ function SignUp() {
               height: "4.2rem",
               marginBottom: isEmailConflict ? "1.8rem" : "0.0rem",
             }}
-            disabled={email === "" || isEmailError || isEmailConflict}
+            disabled={
+              email === "" || isEmailError || isEmailConflict || isVerified
+            }
             onClick={(e) => {
               e.preventDefault();
               sendSignInEmailMutate(email);
             }}
           >
-            {sentEmail ? "Resend" : "Send Code"}
+            {isEmailSent ? "Resend" : "Send Code"}
           </PrimaryButton>
         </EmailBar>
-        {sentEmail && (
+        {isEmailSent && (
           <EmailBar>
             <TextField
               style={{ flex: "1" }}
@@ -170,16 +172,18 @@ function SignUp() {
               label="Verification code"
               onChange={(e) => setVerificationCode(e.target.value)}
               supportingText={
-                verificationCodeError ? "Invalid verification code." : undefined
+                isVerificationCodeError
+                  ? "Invalid verification code."
+                  : undefined
               }
-              hasError={verificationCodeError}
+              hasError={isVerificationCodeError}
             />
             <PrimaryButton
               style={{
                 height: "4.2rem",
-                marginBottom: verificationCodeError ? "1.8rem" : "0.0rem",
+                marginBottom: isVerificationCodeError ? "1.8rem" : "0.0rem",
               }}
-              disabled={verificationCode == "" || verified}
+              disabled={verificationCode == "" || isVerified}
               onClick={(e) => {
                 e.preventDefault();
                 verifyEmailMutate({ email, code: verificationCode });
@@ -229,7 +233,7 @@ function SignUp() {
           style={{ marginTop: "3.0rem" }}
           disabled={
             !NAME_REGEX.test(name) ||
-            !verified ||
+            !isVerified ||
             isButtonDisabled ||
             isSubmitting
           }

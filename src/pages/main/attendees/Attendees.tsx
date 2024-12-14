@@ -56,18 +56,18 @@ function Attendees() {
       // cleanup
       setTempAttendees(null);
       setIsEditing(false);
-      setHasNamesakeError(false);
+      setIsNamesakeError(false);
       setCheckedState({});
       // show snackbar
       show();
     },
     onError: () => {
       // TODO: show error message
-      setHasNamesakeError(true);
+      setIsNamesakeError(true);
     },
   });
 
-  const [hasNamesakeError, setHasNamesakeError] = useState(false);
+  const [isNamesakeError, setIsNamesakeError] = useState(false);
 
   const {
     checkedState,
@@ -160,7 +160,7 @@ function Attendees() {
               <TertiaryButton
                 onClick={() => {
                   setIsEditing(false);
-                  setHasNamesakeError(false);
+                  setIsNamesakeError(false);
                   setCheckedState({});
                 }}
               >
@@ -194,7 +194,7 @@ function Attendees() {
           )}
         </HeaderContainer>
         <ContentContainer>
-          {hasNamesakeError && (
+          {isNamesakeError && (
             <Alert type="warning" style={{ marginBottom: "1.2rem" }}>
               There are attendees with the same name and note. Please modify
               them without duplication.

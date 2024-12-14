@@ -12,17 +12,17 @@ interface AttendanceStatusDrawerProps {
 }
 
 const AttendanceStatusDrawer = ({ authCode }: AttendanceStatusDrawerProps) => {
-  const [open, setOpen] = useState(false);
+  const [isOpened, setIsOpened] = useState(false);
   const { data: attendanceDetailedStatus } =
     useDetailedAttendanceStatus(authCode);
 
   return (
     <>
-      <DrawerOpenButton onClick={() => setOpen(!open)}>
+      <DrawerOpenButton onClick={() => setIsOpened(!isOpened)}>
         <img src={expandDrawer} alt="Expand Drawer" />
       </DrawerOpenButton>
-      <Drawer open={open}>
-        <DrawerButton onClick={() => setOpen(false)}>
+      <Drawer open={isOpened}>
+        <DrawerButton onClick={() => setIsOpened(false)}>
           <img src={shrinkDrawer} alt="Collapse Drawer" />
         </DrawerButton>
         <AttendedChip style={{ marginTop: "1.9rem" }}>

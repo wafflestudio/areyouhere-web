@@ -21,7 +21,7 @@ function SignIn() {
   const [password, setPassword] = useState("");
 
   const emailError = !EMAIL_REGEX.test(email);
-  const [showError, setShowError] = useState(false);
+  const [isErrorShown, setIsErrorShown] = useState(false);
 
   const [resultError, setResultError] = useState<string | undefined>();
 
@@ -61,7 +61,7 @@ function SignIn() {
           onSubmit={(e) => {
             e.preventDefault();
             if (emailError) {
-              setShowError(true);
+              setIsErrorShown(true);
               return;
             }
             mutate({ email, password });
@@ -74,9 +74,9 @@ function SignIn() {
             label="Email Address"
             onChange={(e) => setEmail(e.target.value)}
             supportingText={
-              showError && emailError ? "Invalid email address" : undefined
+              isErrorShown && emailError ? "Invalid email address" : undefined
             }
-            hasError={showError && emailError}
+            hasError={isErrorShown && emailError}
           />
           <TextField
             type="password"
