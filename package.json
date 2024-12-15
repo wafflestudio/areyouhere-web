@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/dateformat": "^5.0.2",
+    "@types/node": "^22.10.2",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
