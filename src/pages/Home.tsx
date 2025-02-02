@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 
 import { AttendanceErrorCode, postAttend } from "../api/attendance.ts";
@@ -23,6 +23,20 @@ const ErrorMessages: Record<AttendanceErrorCode, string> = {
 
 function Home() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  // URL에서 code를 받아와서 passcode로 설정
+  useEffect(() => {
+    const codeFromUrl = searchParams.get("code");
+
+    if (codeFromUrl) {
+      setPasscode(codeFromUrl.toUpperCase());
+    }
+
+    nameInputRef.current?.focus();
+  }, [searchParams]);
 
   const [time, setTime] = useState(new Date());
 
@@ -98,6 +112,7 @@ function Home() {
               placeholder="Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              ref={nameInputRef}
             />
             <TextField
               type="text"
