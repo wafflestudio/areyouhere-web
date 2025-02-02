@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import styled from "styled-components";
 
 interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -76,26 +76,31 @@ const MultiLineTextarea = styled.textarea`
   }
 `;
 
-function TextField({
-  label,
-  style,
-  textFieldStyle,
-  hasError,
-  supportingText,
-  ...props
-}: TextFieldProps) {
-  return (
-    <InputContainer style={style}>
-      {typeof label === "string"
-        ? label && <TextFieldLabel>{label}</TextFieldLabel>
-        : label}
-      <StyledInput {...props} style={textFieldStyle} hasError={hasError} />
-      {supportingText != null && (
-        <SupportingLabel hasError={hasError}>{supportingText}</SupportingLabel>
-      )}
-    </InputContainer>
-  );
-}
+const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
+  (
+    { label, style, textFieldStyle, hasError, supportingText, ...props },
+    ref
+  ) => {
+    return (
+      <InputContainer style={style}>
+        {typeof label === "string"
+          ? label && <TextFieldLabel>{label}</TextFieldLabel>
+          : label}
+        <StyledInput
+          {...props}
+          ref={ref}
+          style={textFieldStyle}
+          hasError={hasError}
+        />
+        {supportingText != null && (
+          <SupportingLabel hasError={hasError}>
+            {supportingText}
+          </SupportingLabel>
+        )}
+      </InputContainer>
+    );
+  }
+);
 
 // create class, setting, account setting에서만 쓰임
 // label이 왼쪽에 있음
