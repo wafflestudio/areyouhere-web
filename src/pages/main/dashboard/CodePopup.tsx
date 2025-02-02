@@ -9,6 +9,7 @@ import { useCurrentSessionInfo } from "../../../api/dashboard";
 import logo from "../../../assets/dashboard/logo.svg";
 import { SecondaryButton } from "../../../components/Button";
 import AttendanceStatusDrawer from "../../../components/dashboard/AttendanceStatusDrawer.tsx";
+import QRCode from "../../../components/dashboard/QRCode.tsx";
 import { useClassId } from "../../../hooks/urlParse";
 
 function CodePopup() {
@@ -74,20 +75,23 @@ function CodePopup() {
         <ContentContainer>
           <TitleLabel>Session Name</TitleLabel>
           <Title>{currentSessionInfo?.sessionName}</Title>
-          <PasscodeBubble>
-            <Passcode>{currentSessionInfo?.authCode}</Passcode>
-            <PresentBubble>
-              <PresentLabel
-                style={{ marginTop: "0.6rem", verticalAlign: "top" }}
-              >
-                Present
-              </PresentLabel>
-              <PresentCount>{attendanceStatus?.attendances}</PresentCount>
-              <PresentLabel
-                style={{ verticalAlign: "bottom" }}
-              >{` / Total ${attendanceStatus?.total}`}</PresentLabel>
-            </PresentBubble>
-          </PasscodeBubble>
+          <PasscodeContainer>
+            <PasscodeBubble>
+              <Passcode>{currentSessionInfo?.authCode}</Passcode>
+              <PresentBubble>
+                <PresentLabel
+                  style={{ marginTop: "0.6rem", verticalAlign: "top" }}
+                >
+                  Present
+                </PresentLabel>
+                <PresentCount>{attendanceStatus?.attendances}</PresentCount>
+                <PresentLabel
+                  style={{ verticalAlign: "bottom" }}
+                >{` / Total ${attendanceStatus?.total}`}</PresentLabel>
+              </PresentBubble>
+            </PasscodeBubble>
+            <QRCode passcode={currentSessionInfo?.authCode} />
+          </PasscodeContainer>
           <Time>{dateFormat(time, "HH : MM : ss")}</Time>
           <ButtonContainer>
             <SecondaryButton
@@ -155,6 +159,12 @@ const ContentContainer = styled.div`
   align-items: center;
 `;
 
+const PasscodeContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 15rem;
+`;
+
 const TitleLabel = styled.p`
   ${({ theme }) => theme.typography.b2};
   color: ${({ theme }) => theme.colors.primary["500"]};
@@ -174,7 +184,7 @@ const Title = styled.h3`
 
 const PasscodeBubble = styled.div`
   position: relative;
-  padding: 2rem 10rem;
+  padding: 2rem 4rem;
   margin-top: 3.6rem;
 
   background: ${({ theme }) => theme.colors.white};
