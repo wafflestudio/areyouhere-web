@@ -68,6 +68,9 @@ const Theme: DefaultTheme = {
     dropShadow:
       "0px 1px 2px 0px rgba(27, 35, 46, 0.08), 0px 2px 4px 0px rgba(22, 28, 38, 0.08);",
     blur: "0px 4px 20px 5px rgba(143, 143, 143, 0.1);",
+    innerShadow: {
+      "200": "inset 0px 1px 4px rgba(12, 12, 12, 0.05);",
+    },
   },
 };
 

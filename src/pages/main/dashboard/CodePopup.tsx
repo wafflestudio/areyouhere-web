@@ -78,19 +78,21 @@ function CodePopup() {
           <PasscodeContainer>
             <PasscodeBubble>
               <Passcode>{currentSessionInfo?.authCode}</Passcode>
-              <PresentBubble>
-                <PresentLabel
-                  style={{ marginTop: "0.6rem", verticalAlign: "top" }}
-                >
-                  Present
-                </PresentLabel>
-                <PresentCount>{attendanceStatus?.attendances}</PresentCount>
-                <PresentLabel
-                  style={{ verticalAlign: "bottom" }}
-                >{` / Total ${attendanceStatus?.total}`}</PresentLabel>
-              </PresentBubble>
             </PasscodeBubble>
-            <QRCode passcode={currentSessionInfo?.authCode} />
+            <QRCodeContainer>
+              <QRCode passcode={currentSessionInfo?.authCode} />
+            </QRCodeContainer>
+            <PresentBubble>
+              <PresentLabel
+                style={{ marginTop: "0.6rem", verticalAlign: "top" }}
+              >
+                Present
+              </PresentLabel>
+              <PresentCount>{attendanceStatus?.attendances}</PresentCount>
+              <PresentLabel
+                style={{ verticalAlign: "bottom" }}
+              >{` / Total ${attendanceStatus?.total}`}</PresentLabel>
+            </PresentBubble>
           </PasscodeContainer>
           <Time>{dateFormat(time, "HH : MM : ss")}</Time>
           <ButtonContainer>
@@ -105,7 +107,7 @@ function CodePopup() {
                   });
                 }
               }}
-              style={{ borderRadius: "2rem", flex: "1" }}
+              style={{ flex: "1" }}
               colorScheme="red"
             >
               Deactivate
@@ -160,9 +162,26 @@ const ContentContainer = styled.div`
 `;
 
 const PasscodeContainer = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 15rem;
+  flex-direction: row;
+  padding: 3.2rem;
+  gap: 3.2rem;
+  background-color: ${({ theme }) => theme.colors.primary["50"]};
+  border-radius: 8.2rem 8.2rem 0 8.2rem;
+  box-shadow: ${({ theme }) => theme.effects["innerShadow"]["200"]};
+`;
+
+const QRCodeContainer = styled.div`
+  width: 19.2rem;
+  height: 19.2rem;
+  overflow: hidden;
+  padding: 2.8rem;
+
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: 5rem;
+  box-shadow: ${({ theme }) => theme.effects.blur};
 `;
 
 const TitleLabel = styled.p`
@@ -179,22 +198,22 @@ const Title = styled.h3`
   text-overflow: ellipsis;
   max-width: 60rem;
 
-  margin: 2rem 0;
+  margin: 1.2rem 0 3.6rem 0;
 `;
 
 const PasscodeBubble = styled.div`
-  position: relative;
-  padding: 2rem 4rem;
-  margin-top: 3.6rem;
+  display: flex;
+  align-content: center;
+  padding: 2.9rem 3.2rem 3.5rem 3.2rem;
 
   background: ${({ theme }) => theme.colors.white};
-  border-radius: 5rem 5rem 0 5rem;
+  border-radius: 5rem;
   box-shadow: ${({ theme }) => theme.effects.blur};
 `;
 
 const Passcode = styled.p`
   font-size: 12.8rem;
-  line-height: 15.4rem;
+  line-height: 12.8rem;
   font-weight: bold;
   text-align: center;
   text-indent: 0.3em;
@@ -248,7 +267,7 @@ const ButtonContainer = styled.div`
   height: 5rem;
   display: flex;
   gap: 3rem;
-  margin-top: 3rem;
+  margin-top: 10rem;
 `;
 
 export default CodePopup;
